@@ -460,6 +460,30 @@
             color: var(--neon-red);
             letter-spacing: 1px;
         }
+        .git-panel {
+            background: rgba(0, 242, 255, 0.02);
+            border: 1px solid rgba(0, 242, 255, 0.1);
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .git-commit {
+            font-size: 10px;
+            margin-bottom: 8px;
+            border-left: 2px solid var(--neon-blue);
+            padding-left: 8px;
+            opacity: 0.7;
+        }
+        .git-dirty {
+            color: var(--neon-red);
+            font-weight: 900;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -535,6 +559,24 @@
                             <div style="display:flex; justify-content:space-between; margin-top:5px;">
                                 <span id="usd-month" style="color:var(--neon-blue); font-family:Orbitron; font-weight:700;">+0.00 USD</span>
                                 <span id="vnd-month" style="color:var(--neon-purple); font-family:Orbitron; font-weight:700;">+0 VND</span>
+                            </div>
+                        </div>
+                        <div id="project-intel" class="git-panel">
+                            <label style="font-size: 10px; opacity: 0.5; display: block; margin-bottom: 10px;">STRATEGIC INTEL // GIT STATUS</label>
+                            <div id="git-list">
+                                <!-- Commits will load here -->
+                            </div>
+                            <div id="git-warning" style="display:none; margin-top:10px; font-size:10px;" class="git-dirty">
+                                [!] UNCOMMITTED CHANGES DETECTED
+                            </div>
+                            <div style="margin-top:15px; border-top:1px solid rgba(255,255,255,0.05); padding-top:10px;">
+                                <div style="display:flex; justify-content:space-between; font-size:10px;">
+                                    <span>SHIPMENT READINESS (SRS)</span>
+                                    <span id="srs-val" style="color:var(--neon-gold)">20%</span>
+                                </div>
+                                <div style="height:4px; background:rgba(255,255,255,0.1); margin-top:5px; border-radius:2px;">
+                                    <div id="srs-bar" style="height:100%; width:20%; background:var(--neon-gold); border-radius:2px; transition:width 1s;"></div>
+                                </div>
                             </div>
                         </div>
                         <div style="margin-top: 20px; padding: 15px; background: rgba(0, 242, 255, 0.03); border: 1px dashed var(--neon-blue); border-radius: 4px;">
@@ -978,10 +1020,36 @@
             } catch (e) { alert("REINFORCE FAILED: Check DNA access."); }
         };
 
+        async function updateGitStatus() {
+            try {
+                const res = await fetch('http://127.0.0.1:5050/api/git_status');
+                const data = await res.json();
+                if (data.status === "SUCCESS") {
+                    const list = document.getElementById('git-list');
+                    list.innerHTML = data.commits.map(c => `
+                        <div class="git-commit">
+                            <span style="color:var(--neon-blue)">[${c.hash}]</span> ${c.msg}
+                            <div style="font-size:8px; opacity:0.5;">${c.rel}</div>
+                        </div>
+                    `).join('');
+                    
+                    document.getElementById('git-warning').style.display = data.is_dirty ? 'block' : 'none';
+                    
+                    // Update SRS Score
+                    const score = data.srs_score || 20;
+                    document.getElementById('srs-val').innerText = score + "%";
+                    document.getElementById('srs-bar').style.width = score + "%";
+                    if (score >= 40) document.getElementById('srs-bar').style.background = 'var(--neon-green)';
+                }
+            } catch (e) {}
+        }
+
         setInterval(updateHUD, 3000);
         setInterval(updateIntelligence, 10000);
+        setInterval(updateGitStatus, 15000);
         updateHUD();
         updateNeuralScan();
+        updateGitStatus();
     </script>
 </body>
 </html>

@@ -355,7 +355,7 @@ def tactical_stop():
     try:
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
-        cursor.execute("UPDATE config SET value = '1' WHERE key = 'GLOBAL_PAUSE'")
+        cursor.execute("UPDATE hq_config SET value = '1' WHERE key = 'GLOBAL_PAUSE'")
         conn.commit()
         conn.close()
         return jsonify({"status": "SUCCESS", "message": "GLOBAL KILL-SWITCH ACTIVATED"})
@@ -412,6 +412,47 @@ def get_deploy_mode():
         return res[0] if res else "DEMO"
     except:
         return "DEMO"
+
+@app.route('/api/git_status', methods=['GET'])
+def get_git_status():
+    try:
+        import subprocess
+        # Get last 3 commits
+        cmd = ["git", "log", "-n", "3", "--oneline", "--format=%h|%s|%ar"]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        commits = []
+        for line in result.stdout.strip().split('\n'):
+            if '|' in line:
+                h, s, r = line.split('|')
+                commits.append({"hash": h, "msg": s, "rel": r})
+        
+        # Check if dirty
+        dirty_cmd = ["git", "status", "--porcelain"]
+        dirty_res = subprocess.run(dirty_cmd, capture_output=True, text=True)
+        is_dirty = len(dirty_res.stdout.strip()) > 0
+        
+        return jsonify({
+            "status": "SUCCESS", 
+            "commits": commits, 
+            "is_dirty": is_dirty,
+            "srs_score": 35 # Auditor manually injected score
+        })
+    except Exception as e:
+        return jsonify({"status": "ERROR", "message": str(e)}), 500
+
+@app.route('/api/tactical/mode', methods=['POST'])
+def toggle_core_mode():
+    try:
+        data = request.json
+        new_mode = data.get('mode', '0') # '0'=Demo, '1'=Real
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("UPDATE hq_config SET value = ? WHERE key = 'CORE_MODE'", (str(new_mode),))
+        conn.commit()
+        conn.close()
+        return jsonify({"status": "SUCCESS", "message": f"CORE_MODE SET TO {new_mode}"})
+    except Exception as e:
+        return jsonify({"status": "ERROR", "message": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5050, debug=False)

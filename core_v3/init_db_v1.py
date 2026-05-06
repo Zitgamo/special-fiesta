@@ -25,7 +25,7 @@ def init_safety_table():
     
     conn.commit()
     conn.close()
-    print("[✓] hq_config table initialized and seeded.")
+    print("[OK] hq_config table initialized and seeded.")
 
 if __name__ == "__main__":
     init_safety_table()
