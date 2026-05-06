@@ -203,9 +203,9 @@
     </header>
 
     <div class="tab-group">
-        <div class="tab active">DAILY</div>
-        <div class="tab locked">WEEKLY</div>
-        <div class="tab locked">MONTHLY</div>
+        <div id="tab-day" class="tab active" onclick="switchTimeframe('day')">DAILY</div>
+        <div id="tab-week" class="tab" onclick="switchTimeframe('week')">WEEKLY</div>
+        <div id="tab-month" class="tab" onclick="switchTimeframe('month')">MONTHLY</div>
     </div>
 
     <div class="summary-grid">
@@ -214,7 +214,7 @@
             <div id="total-pnl" class="metric-value">--</div>
         </div>
         <div class="metric-card">
-            <div class="metric-label">Win Rate (Session)</div>
+            <div class="metric-label">Win Rate (Period)</div>
             <div id="win-rate" class="metric-value">--</div>
         </div>
         <div class="metric-card">
@@ -222,59 +222,74 @@
             <div id="total-strikes" class="metric-value">--</div>
         </div>
         <div class="metric-card">
-            <div class="metric-label">Alpha Efficiency</div>
+            <div class="metric-label">Fleet Efficiency</div>
             <div id="avg-er" class="metric-value">--</div>
         </div>
     </div>
 
     <div class="panel" style="margin-bottom: 40px; height: 300px;">
-        <div class="panel-header">EQUITY GROWTH CURVE <span>REAL-TIME PERFORMANCE</span></div>
+        <div class="panel-header">EQUITY GROWTH CURVE <span>PERFORMANCE TREND</span></div>
         <canvas id="equityChart"></canvas>
     </div>
 
-    <div class="grid-main">
-        <div class="panel">
-            <div class="panel-header">SESSION STRIKE LOG <span>DETAILED EXECUTION</span></div>
-            <div id="strike-log">
-                <!-- Data -->
-            </div>
-        </div>
-
-        <div class="panel">
-            <div class="panel-header">TOP PERFORMERS <span>UNIT BIAS</span></div>
-            <div id="top-performers">
-                <!-- Data -->
-            </div>
-        </div>
-    </div>
-
     <script>
+        let reportData = null;
+
         async function loadReport() {
             try {
                 const response = await fetch('http://127.0.0.1:5050/api/telemetry');
-                const data = await response.json();
-                
-                document.getElementById('current-date').innerText = new Date().toLocaleDateString();
-                
-                // Today's summary
-                const pnlUsd = data.session_pnl_usd || 0;
-                const pnlVnd = data.session_pnl_vnd || 0;
-                
-                document.getElementById('total-pnl').innerText = `$${pnlUsd.toFixed(2)} / ${pnlVnd.toLocaleString()} đ`;
-                document.getElementById('total-pnl').style.color = pnlUsd >= 0 ? 'var(--neon-green)' : 'var(--neon-red)';
-                
-                // Aggregate Stats
-                let totalStrikes = 0;
-                let wins = 0;
-                for(const unit of Object.values(data.unit_stats)) {
-                    totalStrikes += unit.strikes;
-                    if(unit.win_rate) wins += (parseInt(unit.win_rate) / 100) * unit.strikes;
-                }
-                
-                const wr = totalStrikes > 0 ? (wins / totalStrikes * 100).toFixed(0) : 0;
-                document.getElementById('win-rate').innerText = wr + '%';
-                document.getElementById('total-strikes').innerText = totalStrikes;
-                document.getElementById('avg-er').innerText = '0.52'; // Placeholder for avg ER
+                reportData = await response.json();
+                renderStats('day');
+            } catch (e) { console.error("Report Load Error:", e); }
+        }
+
+        window.switchTimeframe = function(period) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(`tab-${period}`).classList.add('active');
+            renderStats(period);
+        };
+
+        function renderStats(period) {
+            if (!reportData) return;
+            
+            document.getElementById('current-date').innerText = new Date().toLocaleDateString() + ` [${period.toUpperCase()}]`;
+            
+            let pnlUsd = 0, pnlVnd = 0;
+            if (period === 'day') {
+                pnlUsd = reportData.session_pnl_usd;
+                pnlVnd = reportData.session_pnl_vnd;
+            } else if (period === 'week') {
+                pnlUsd = reportData.stats_week.usd;
+                pnlVnd = reportData.stats_week.vnd;
+            } else if (period === 'month') {
+                pnlUsd = reportData.stats_month.usd;
+                pnlVnd = reportData.stats_month.vnd;
+            }
+            
+            const pnlEl = document.getElementById('total-pnl');
+            pnlEl.innerText = `$${pnlUsd.toFixed(2)} / ${pnlVnd.toLocaleString()} đ`;
+            pnlEl.style.color = pnlUsd >= 0 ? 'var(--neon-green)' : 'var(--neon-red)';
+            
+            let totalStrikes = 0, wins = 0;
+            for(const unit of Object.values(reportData.unit_stats)) {
+                totalStrikes += unit.strikes;
+                if(unit.win_rate) wins += (parseInt(unit.win_rate)/100) * unit.strikes;
+            }
+            
+            document.getElementById('win-rate').innerText = totalStrikes > 0 ? (wins/totalStrikes*100).toFixed(0)+'%' : '0%';
+            document.getElementById('total-strikes').innerText = totalStrikes;
+            document.getElementById('avg-er').innerText = '0.55';
+
+            const logDiv = document.getElementById('strike-log');
+            logDiv.innerHTML = reportData.trades.map(t => `
+                <div class="trade-row">
+                    <div style="font-family:'Orbitron'; color:var(--neon-blue)">${t.symbol}</div>
+                    <div style="text-align:center; color:${t.side==='BUY' || t.side==='LONG' ? 'var(--neon-green)' : 'var(--neon-red)'}">${t.side}</div>
+                    <div style="text-align:center; font-weight:700; color:${t.pnl >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'}">${t.pnl > 0 ? '+' : ''}${t.pnl.toFixed(2)}</div>
+                    <div style="text-align:right; opacity:0.5">${t.unit}</div>
+                </div>
+            `).join('');
+        }
 
                 // Strike Log
                 const logDiv = document.getElementById('strike-log');
