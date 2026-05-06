@@ -56,8 +56,14 @@ def calculate_sovereign_scale():
                         with open(os.path.join(root, f), 'r', encoding='utf-8', errors='ignore') as f_obj:
                             ui_lines += len(f_obj.readlines())
                             
-        # Complexity Weight: Back has 1.5x weight per line due to logic density
-        back_score = py_lines * 1.5
+        # Intelligence Weight: 1MB of DB = 5000 virtual lines of "Experience"
+        db_size = 0
+        db_path = os.path.join(ROOT_DIR, "core_v3", "iron_core.db")
+        if os.path.exists(db_path):
+            db_size = os.path.getsize(db_path) / (1024 * 1024) # MB
+        
+        # Complexity Weight: Back has 1.5x weight per line + Experience weight
+        back_score = (py_lines * 1.5) + (db_size * 5000)
         front_score = ui_lines * 1.0
         total = back_score + front_score
         

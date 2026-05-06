@@ -99,6 +99,19 @@ class IronEngine:
                 # 2. LOG SNAPSHOT
                 self.forensics.log_snapshot(balance, equity, drawdown)
 
+                # --- AUTO-JANITOR: Tactical maintenance every 100 cycles ---
+                if not hasattr(self, 'cycle_count'): self.cycle_count = 0
+                self.cycle_count += 1
+                if self.cycle_count % 100 == 0:
+                    self.logger.info(" >> [MAINTENANCE] Triggering Auto-Janitor cleanup...")
+                    try:
+                        from janitor import SovereignJanitor
+                        janitor = SovereignJanitor()
+                        janitor.cleanup_temp_files()
+                        janitor.cleanup_old_logs(days=3)
+                    except Exception as e:
+                        self.logger.warning(f" !! [MAINTENANCE] Janitor failed: {e}")
+
                 # 3. INITIALIZE VAULT (Dual-Front Aware)
                 vault = IronVault(self.bridges)
                 
