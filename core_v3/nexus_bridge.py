@@ -275,8 +275,6 @@ def get_telemetry():
         boot_dt = datetime.strptime(boot_time, "%Y-%m-%d %H:%M:%S")
         uptime_sec = (datetime.now() - boot_dt).total_seconds()
         
-        conn.close()
-        
         data = {
             "status": "ONLINE",
             "safety_status": "HARDENED",
@@ -303,7 +301,7 @@ def get_telemetry():
             "uptime_seconds": uptime_sec
         }
         
-        return jsonify(data)
+        conn.close()
         return jsonify(data)
     except Exception as e:
         import traceback
