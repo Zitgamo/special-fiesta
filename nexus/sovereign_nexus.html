@@ -460,6 +460,43 @@
             color: var(--neon-red);
             letter-spacing: 1px;
         }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+            font-family: 'Orbitron', sans-serif;
+        }
+        .header-title {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--neon-blue);
+            letter-spacing: 4px;
+        }
+        .header-status {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .header-status span {
+            font-size: 10px;
+            color: var(--text-color);
+            opacity: 0.7;
+            letter-spacing: 2px;
+            background: rgba(255,255,255,0.05);
+            padding: 5px 10px;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .uptime-tracker {
+            color: var(--neon-green) !important;
+            border-color: var(--neon-green) !important;
+            font-weight: bold;
+        }
+
         .git-panel {
             background: rgba(0, 242, 255, 0.02);
             border: 1px solid rgba(0, 242, 255, 0.1);
@@ -489,6 +526,13 @@
 <body>
     <div class="scanline"></div>
     <header>
+        <div class="header-top">
+            <div class="header-title">SOVEREIGN NEXUS v8.8</div>
+            <div class="header-status">
+                <span id="system-uptime" class="uptime-tracker">UPTIME: 00:00:00</span>
+                <span id="system-time">SYNCING CLOCK...</span>
+            </div>
+        </div>
         <div class="title">
             SOVEREIGN NEXUS <span class="tag-status">HARDENED</span>
             <span id="git-tag" style="font-size:10px; margin-left:15px; padding:2px 8px; border:1px solid rgba(255,255,255,0.1); border-radius:3px; opacity:0.6; font-family:Orbitron; letter-spacing:1px;">GIT: MASTER [---]</span>
@@ -809,6 +853,7 @@
                             modeLock.nextElementSibling.style.borderColor = isReal ? 'var(--neon-red)' : 'var(--neon-gold)';
                         }
                     }
+                    const elVndPnl = document.getElementById('vnd-pnl');
                     if (elVndPnl) {
                         elVndPnl.innerText = formatVND(data.session_pnl_vnd || 0);
                         elVndPnl.className = data.session_pnl_vnd >= 0 ? 'pnl-pos' : 'pnl-neg';
@@ -970,8 +1015,6 @@
         window.toggleSafety = function() {
             const isArmed = document.getElementById('safety-lock').checked;
             document.getElementById('btn-stop').disabled = !isArmed;
-            document.getElementById('btn-omega').disabled = !isArmed;
-            document.getElementById('btn-gamma').disabled = !isArmed;
             
             if (isArmed) {
                 console.log("⚠️ TACTICAL SYSTEMS ARMED. USE EXTREME CAUTION.");
@@ -1034,6 +1077,23 @@
                     `).join('');
                     
                     document.getElementById('git-warning').style.display = data.is_dirty ? 'block' : 'none';
+                    
+                    // Update top clock & uptime
+                    if (data.current_time_utc) {
+                        document.getElementById('system-time').innerText = "LOCAL TIME: " + data.current_time_utc;
+                    }
+                    if (data.uptime_seconds) {
+                        const totalSec = Math.floor(data.uptime_seconds);
+                        const h = String(Math.floor(totalSec / 3600)).padStart(2, '0');
+                        const m = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
+                        const s = String(totalSec % 60).padStart(2, '0');
+                        document.getElementById('system-uptime').innerText = `UPTIME: ${h}:${m}:${s}`;
+                        
+                        // Pulse effect if running > 12h
+                        if (totalSec > 43200) {
+                            document.getElementById('system-uptime').style.boxShadow = "0 0 10px var(--neon-green)";
+                        }
+                    }
                     
                     // Update SRS Score
                     const score = data.srs_score || 20;

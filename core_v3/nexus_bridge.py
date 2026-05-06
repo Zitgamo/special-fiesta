@@ -13,6 +13,9 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from bridges import IronBridges
 from analytics import IronAnalytics
 
+# Track when the server started for uptime monitoring
+START_TIME = datetime.now()
+
 app = Flask(__name__)
 CORS(app)
 
@@ -280,6 +283,9 @@ def get_telemetry():
             "squadron": squad,
             "unit_stats": unit_stats,
             "git_status": _get_git_metadata(),
+            "back_score": round(scale['back'], 1),
+            "front_score": round(scale['front'], 1),
+            "uptime_seconds": (datetime.now() - START_TIME).total_seconds(),
             "deploy_mode": get_deploy_mode(),
             "current_time_utc": current_time_local
         })
