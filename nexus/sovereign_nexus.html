@@ -140,6 +140,29 @@
             font-weight: 900; 
         }
 
+        .pnl-sub {
+            font-size: 9px;
+            opacity: 0.3;
+            margin-top: 4px;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .ratio-bar-container {
+            width: 150px;
+            height: 4px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 2px;
+            margin-top: 10px;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .ratio-fill { height: 100%; transition: width 0.5s; }
+        .ratio-front { background: var(--neon-blue); }
+        .ratio-back { background: var(--neon-purple); }
+
         main {
             display: grid;
             grid-template-columns: 420px 1fr 450px;
@@ -318,12 +341,31 @@
         <div class="title">SOVEREIGN NEXUS <span class="tag-status">HARDENED</span></div>
         <div class="pnl-container">
             <div class="pnl-box">
-                <label>GLOBAL P&L (USD)</label>
+                <label>GLOBAL ASSETS // FRONT</label>
                 <span id="usd-pnl" class="pnl-pos">$0.00</span>
+                <div class="pnl-sub">
+                    <span id="usd-week">W: +0.00</span>
+                    <span id="usd-month">M: +0.00</span>
+                </div>
             </div>
             <div class="pnl-box" style="border-left-color: var(--neon-purple)">
-                <label>AO LÀNG (VND)</label>
-                <span id="vnd-pnl" class="pnl-pos">0đ</span>
+                <label>SOUTHERN COMMAND // BACK</label>
+                <span id="vnd-pnl" class="pnl-pos">0 đ</span>
+                <div class="pnl-sub">
+                    <span id="vnd-week">W: +0</span>
+                    <span id="vnd-month">M: +0</span>
+                </div>
+            </div>
+            <div class="pnl-box" style="display: flex; flex-direction: column; justify-content: center; padding: 12px 20px;">
+                <label>BACK / FRONT RATIO</label>
+                <div class="ratio-bar-container">
+                    <div id="ratio-front" class="ratio-fill ratio-front" style="width: 50%"></div>
+                    <div id="ratio-back" class="ratio-fill ratio-back" style="width: 50%"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 8px; margin-top: 5px; opacity: 0.5; letter-spacing: 1px;">
+                    <span id="ratio-front-text">F: 50%</span>
+                    <span id="ratio-back-text">B: 50%</span>
+                </div>
             </div>
         </div>
         <div style="text-align: right">
@@ -490,8 +532,20 @@
                     document.getElementById('clock-local').innerText = data.current_time_utc;
                     document.getElementById('usd-pnl').innerText = `$${(data.session_pnl_usd || 0).toFixed(2)}`;
                     document.getElementById('usd-pnl').className = data.session_pnl_usd >= 0 ? 'pnl-pos' : 'pnl-neg';
+                    document.getElementById('usd-week').innerText = `W: ${(data.stats_week.usd >= 0 ? '+' : '')}${data.stats_week.usd.toFixed(2)}`;
+                    document.getElementById('usd-month').innerText = `M: ${(data.stats_month.usd >= 0 ? '+' : '')}${data.stats_month.usd.toFixed(2)}`;
+
                     document.getElementById('vnd-pnl').innerText = formatVND(data.session_pnl_vnd || 0);
                     document.getElementById('vnd-pnl').className = data.session_pnl_vnd >= 0 ? 'pnl-pos' : 'pnl-neg';
+                    document.getElementById('vnd-week').innerText = `W: ${(data.stats_week.vnd >= 0 ? '+' : '')}${Math.floor(data.stats_week.vnd/1000)}K`;
+                    document.getElementById('vnd-month').innerText = `M: ${(data.stats_month.vnd >= 0 ? '+' : '')}${Math.floor(data.stats_month.vnd/1000)}K`;
+
+                    const fRatio = data.performance_ratio.front;
+                    const bRatio = data.performance_ratio.back;
+                    document.getElementById('ratio-front').style.width = `${fRatio}%`;
+                    document.getElementById('ratio-back').style.width = `${bRatio}%`;
+                    document.getElementById('ratio-front-text').innerText = `F: ${fRatio.toFixed(0)}%`;
+                    document.getElementById('ratio-back-text').innerText = `B: ${bRatio.toFixed(0)}%`;
 
                     document.getElementById('equity-mt5').innerText = `$${(data.health_mt5.equity || 0).toFixed(2)}`;
                     document.getElementById('equity-bnc').innerText = `$${(data.health_bnc.equity || 0).toFixed(2)}`;
