@@ -502,7 +502,14 @@
                         </div>
                     </div>
                     <div id="page-audit" class="radar-box" style="display: none; padding: 20px;">
-                        <div style="margin-bottom: 20px;">
+                        <div style="margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 10px;">
+                            <label style="font-size:10px; opacity:0.5; letter-spacing:2px;">DAILY PERFORMANCE</label>
+                            <div style="display:flex; justify-content:space-between; margin-top:5px;">
+                                <span id="usd-day" style="color:var(--neon-blue); font-family:Orbitron; font-weight:700;">+0.00 USD</span>
+                                <span id="vnd-day" style="color:var(--neon-purple); font-family:Orbitron; font-weight:700;">+0 VND</span>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 10px;">
                             <label style="font-size:10px; opacity:0.5; letter-spacing:2px;">WEEKLY PERFORMANCE</label>
                             <div style="display:flex; justify-content:space-between; margin-top:5px;">
                                 <span id="usd-week" style="color:var(--neon-blue); font-family:Orbitron; font-weight:700;">+0.00 USD</span>
@@ -706,10 +713,15 @@
                         elUsdPnl.className = data.session_pnl_usd >= 0 ? 'pnl-pos' : 'pnl-neg';
                     }
 
+                    const elUsdDay = document.getElementById('usd-day');
+                    const elVndDay = document.getElementById('vnd-day');
+                    if (elUsdDay && data.stats_day) elUsdDay.innerText = `${(data.stats_day.usd >= 0 ? '+' : '')}${data.stats_day.usd.toFixed(2)} USD`;
+                    if (elVndDay && data.stats_day) elVndDay.innerText = `${(data.stats_day.vnd >= 0 ? '+' : '')}${Math.floor(data.stats_day.vnd/1000)}K VND`;
+
                     const elUsdWeek = document.getElementById('usd-week');
                     const elUsdMonth = document.getElementById('usd-month');
-                    if (elUsdWeek && data.stats_week) elUsdWeek.innerText = `WEEKLY: ${(data.stats_week.usd >= 0 ? '+' : '')}${data.stats_week.usd.toFixed(2)} USD`;
-                    if (elUsdMonth && data.stats_month) elUsdMonth.innerText = `MONTHLY: ${(data.stats_month.usd >= 0 ? '+' : '')}${data.stats_month.usd.toFixed(2)} USD`;
+                    if (elUsdWeek && data.stats_week) elUsdWeek.innerText = `${(data.stats_week.usd >= 0 ? '+' : '')}${data.stats_week.usd.toFixed(2)} USD`;
+                    if (elUsdMonth && data.stats_month) elUsdMonth.innerText = `${(data.stats_month.usd >= 0 ? '+' : '')}${data.stats_month.usd.toFixed(2)} USD`;
 
                     const elVndPnl = document.getElementById('vnd-pnl');
                     if (elVndPnl) {
@@ -863,10 +875,18 @@
             }
         };
 
-        window.syncFleet = function() {
-            updateHUD();
-            updateIntelligence();
-            // Pulse the button effect
+        window.syncFleet = async function() {
+            const btn = event.currentTarget;
+            const originalText = btn.innerText;
+            btn.innerText = "SYNCING...";
+            btn.disabled = true;
+            try {
+                await fetch('http://127.0.0.1:5050/api/sync', { method: 'POST' });
+                await updateHUD();
+                await updateIntelligence();
+            } catch (e) { console.error("Sync Error:", e); }
+            btn.innerText = originalText;
+            btn.disabled = false;
         };
 
         window.reinforce = function(unit) {

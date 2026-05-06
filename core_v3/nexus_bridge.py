@@ -243,6 +243,7 @@ def get_telemetry():
             "session_pnl_usd": session_pnl,
             "session_pnl_vnd": session_pnl_vnd,
             "system_balance": system_balance,
+            "stats_day": {"usd": round(day_pnl_front, 2), "vnd": int(day_pnl_back)},
             "stats_week": {"usd": round(week_pnl_front, 2), "vnd": int(week_pnl_back)},
             "stats_month": {"usd": round(month_pnl_front, 2), "vnd": int(month_pnl_back)},
             "health_mt5": mt5_health,
@@ -309,5 +310,16 @@ def get_intelligence():
     except Exception as e:
         return jsonify({"status": "ERROR", "message": str(e)}), 500
 
-if __name__ == "__main__":
-    app.run(port=5050, debug=False)
+@app.route('/api/sync', methods=['POST'])
+def force_sync():
+    try:
+        # Trigger actual MT5/Binance re-poll
+        mt5.initialize()
+        # This forces the singleton or internal states to refresh
+        IronBridges.refresh_all()
+        return jsonify({"status": "SUCCESS", "message": "FLEET SYNCHRONIZED"})
+    except Exception as e:
+        return jsonify({"status": "ERROR", "message": str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5050, debug=False)
