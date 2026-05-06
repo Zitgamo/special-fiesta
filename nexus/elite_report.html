@@ -232,6 +232,13 @@
         <canvas id="equityChart"></canvas>
     </div>
 
+    <div class="panel">
+        <div class="panel-header">RECENT TACTICAL STRIKES <span>UNIT LOGS</span></div>
+        <div id="strike-log">
+            <!-- Trades injected here -->
+        </div>
+    </div>
+
     <script>
         let reportData = null;
 
@@ -281,29 +288,15 @@
             document.getElementById('avg-er').innerText = '0.55';
 
             const logDiv = document.getElementById('strike-log');
-            logDiv.innerHTML = reportData.trades.map(t => `
-                <div class="trade-row">
-                    <div style="font-family:'Orbitron'; color:var(--neon-blue)">${t.symbol}</div>
-                    <div style="text-align:center; color:${t.side==='BUY' || t.side==='LONG' ? 'var(--neon-green)' : 'var(--neon-red)'}">${t.side}</div>
-                    <div style="text-align:center; font-weight:700; color:${t.pnl >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'}">${t.pnl > 0 ? '+' : ''}${t.pnl.toFixed(2)}</div>
-                    <div style="text-align:right; opacity:0.5">${t.unit}</div>
-                </div>
-            `).join('');
-        }
-
-                // Strike Log
-                const logDiv = document.getElementById('strike-log');
-                logDiv.innerHTML = data.trades.map(t => `
+            if (logDiv) {
+                logDiv.innerHTML = reportData.trades.slice(0, 20).map(t => `
                     <div class="trade-row">
-                        <div style="font-family:'Orbitron'; color:var(--neon-blue)">${t.symbol}</div>
-                        <div style="text-align:center; color:${t.side==='BUY' || t.side==='LONG' ? 'var(--neon-green)' : 'var(--neon-red)'}">${t.side}</div>
-                        <div style="text-align:center; font-weight:700; color:${t.pnl >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'}">${t.pnl > 0 ? '+' : ''}${t.pnl.toFixed(2)}</div>
-                        <div style="text-align:right; opacity:0.5">${t.unit}</div>
+                        <div style="font-family:'Orbitron'; color:var(--neon-blue); font-size:12px;">${t.symbol}</div>
+                        <div style="text-align:center; font-size:12px; color:${t.side==='BUY' || t.side==='LONG' ? 'var(--neon-green)' : 'var(--neon-red)'}">${t.side}</div>
+                        <div style="text-align:center; font-weight:700; color:${t.pnl >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'}">${t.pnl >= 0 ? '+' : ''}${t.pnl.toFixed(2)}</div>
+                        <div style="text-align:right; opacity:0.5; font-size:11px;">${t.unit}</div>
                     </div>
                 `).join('');
-
-            } catch (e) {
-                console.error("Report Load Error:", e);
             }
         }
 
