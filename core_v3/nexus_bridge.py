@@ -296,8 +296,8 @@ def get_telemetry():
             "squadron": squad,
             "unit_stats": unit_stats,
             "git_status": _get_git_metadata(),
-            "back_score": round(scale['back'], 1),
-            "front_score": round(scale['front'], 1),
+            "back_score": round(system_balance['back'], 1),
+            "front_score": round(system_balance['front'], 1),
             "deploy_mode": get_deploy_mode(),
             "current_time_utc": current_time_local,
             "uptime_seconds": uptime_sec
