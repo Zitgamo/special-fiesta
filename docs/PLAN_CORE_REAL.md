@@ -30,6 +30,7 @@
 
 ### 🔵 Component: Backend (API)
 #### [MODIFY] `core_v3/nexus_bridge.py`
+- **[NEW] Git Info Endpoint:** Thêm logic sử dụng lệnh `git log` và `git status` để lấy thông tin commit mới nhất và trạng thái hệ thống.
 - Bổ sung logic tính toán **Sovereign Balance Ratio**:
   - `back_score = (Số lượng lệnh thành công * 0.5) + (Kích thước DB * 0.1)`
   - `front_score = (Số lượng thành phần UI * 10) + (Mức độ CSS hiệu ứng)`
@@ -38,6 +39,9 @@
 ### 🔵 Component: UI (Frontend)
 #### [MODIFY] `nexus/sovereign_nexus.html`
 - Thiết kế và chèn một Component CSS/SVG: **"THE SOVEREIGN SCALE"**.
+- **[NEW] Git Status Monitor:** 
+    - Thêm một panel nhỏ hiển thị: `Last Commit Message`, `Time` và `Status` (Clean/Dirty).
+    - Nếu có file chưa commit, panel sẽ nhấp nháy đỏ cảnh báo: *"UNCOMMITTED CHANGES DETECTED"*.
 - Vị trí: Góc trên bên trái hoặc ngay dưới PnL Container.
 - Hiệu ứng: Cây kim đồng hồ hoặc đĩa cân dao động dựa trên tỉ lệ `back_score : front_score`.
 - Hiển thị thông báo động: *"Vỏ đẹp - Ruột tốt: Đạt trạng thái Tuyệt Đối"* hoặc *"Cảnh báo: Code đang chạy nhanh hơn Vỏ - Hãy làm đẹp giao diện!"*.
