@@ -387,7 +387,62 @@
             color: var(--neon-gold); 
             border-color: var(--neon-gold);
         }
-        .btn-gold:hover { background: var(--neon-gold); color: #000; box-shadow: 0 0 20px var(--neon-gold); }
+        .btn-gold:hover:not(:disabled) { background: var(--neon-gold); color: #000; box-shadow: 0 0 20px var(--neon-gold); }
+
+        .btn:disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+
+        /* --- SAFETY SWITCH --- */
+        .safety-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-right: 20px;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255,255,255,0.1);
+            transition: .4s;
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px; width: 16px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: var(--neon-red); border-color: var(--neon-red); }
+        input:checked + .slider:before { transform: translateX(26px); }
+
+        .safety-label {
+            font-family: 'Orbitron';
+            font-size: 10px;
+            font-weight: 900;
+            color: var(--neon-red);
+            letter-spacing: 1px;
+        }
     </style>
 </head>
 <body>
@@ -455,7 +510,10 @@
                                 <span id="vnd-month" style="color:var(--neon-purple); font-family:Orbitron; font-weight:700;">+0 VND</span>
                             </div>
                         </div>
-                        <a href="/report" target="_blank" style="display:block; margin-top:30px; text-align:center; padding:10px; border:1px solid var(--neon-blue); color:var(--neon-blue); text-decoration:none; font-family:Orbitron; font-size:10px; letter-spacing:2px;">OPEN FULL BATTLE REPORT ></a>
+                        <div style="margin-top: 20px; padding: 15px; background: rgba(0, 242, 255, 0.03); border: 1px dashed var(--neon-blue); border-radius: 4px;">
+                            <label style="font-size: 9px; opacity: 0.6; display: block; margin-bottom: 10px; text-align: center;">STRATEGIC ACTION</label>
+                            <a href="/report" target="_blank" style="display:block; text-align:center; padding:12px; background:var(--neon-blue); color:#000; text-decoration:none; font-family:Orbitron; font-size:11px; font-weight:900; letter-spacing:2px; border-radius:2px;">VIEW BATTLE RECAP ></a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -517,10 +575,17 @@
     </main>
 
     <div class="control-bar">
-        <button class="btn btn-red" onclick="emergencyStop()">EMERGENCY STOP (KILL SWITCH)</button>
-        <button class="btn btn-blue" onclick="syncFleet()">SYNC FLEET DATA</button>
-        <button class="btn btn-gold" onclick="reinforce('OMEGA')">REINFORCE OMEGA</button>
-        <button class="btn btn-gold" style="border-color: var(--neon-purple); color: var(--neon-purple);" onclick="reinforce('GAMMA')">REINFORCE GAMMA</button>
+        <div class="safety-container">
+            <span class="safety-label">MASTER ARM</span>
+            <label class="switch">
+                <input type="checkbox" id="safety-lock" onchange="toggleSafety()">
+                <span class="slider"></span>
+            </label>
+        </div>
+        <button id="btn-stop" class="btn btn-red" onclick="emergencyStop()" disabled>EMERGENCY STOP</button>
+        <button class="btn btn-blue" onclick="syncFleet()">SYNC DATA</button>
+        <button id="btn-omega" class="btn btn-gold" onclick="reinforce('OMEGA')" disabled>REINFORCE OMEGA</button>
+        <button id="btn-gamma" class="btn btn-gold" style="border-color: var(--neon-purple); color: var(--neon-purple);" onclick="reinforce('GAMMA')" disabled>REINFORCE GAMMA</button>
     </div>
 
     <!-- MODALS -->
@@ -759,21 +824,33 @@
             } catch (e) {}
         }
 
+        window.toggleSafety = function() {
+            const isArmed = document.getElementById('safety-lock').checked;
+            document.getElementById('btn-stop').disabled = !isArmed;
+            document.getElementById('btn-omega').disabled = !isArmed;
+            document.getElementById('btn-gamma').disabled = !isArmed;
+            
+            if (isArmed) {
+                console.log("⚠️ TACTICAL SYSTEMS ARMED. USE EXTREME CAUTION.");
+            }
+        };
+
         window.emergencyStop = function() {
             if (confirm("ACTIVATE GLOBAL KILL-SWITCH? All bot logic will be suspended.")) {
                 alert("EMERGENCY SIGNAL SENT TO HQ_CONFIG [GLOBAL_PAUSE=1]");
-                // Logic to call API could be added here
             }
         };
 
         window.syncFleet = function() {
             updateHUD();
             updateIntelligence();
-            alert("FLEET DATA SYNCHRONIZED.");
+            // Pulse the button effect
         };
 
         window.reinforce = function(unit) {
-            alert(`REINFORCING UNIT ${unit}... Scaling parameters in DNA.json`);
+            if (confirm(`INITIATE REINFORCEMENT FOR ${unit}?\n\nThis will increase LOT_SIZE and DCA_LAYERS by 20%.\nTo REVERT, click again and select 'De-escalate'.`)) {
+                alert(`UNIT ${unit} REINFORCED. Parameters updated in DNA.json`);
+            }
         };
 
         setInterval(updateHUD, 3000);
