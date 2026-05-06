@@ -598,6 +598,14 @@
                 <span class="slider"></span>
             </label>
         </div>
+        <div class="safety-container" style="margin-left: 20px; border-left: 1px solid rgba(255,255,255,0.05); padding-left: 20px;">
+            <span class="safety-label" style="color: var(--neon-gold);">DEPLOY MODE</span>
+            <label class="switch">
+                <input type="checkbox" id="mode-lock" onchange="toggleMode()">
+                <span class="slider" style="background-color: var(--neon-gold); border-color: var(--neon-gold);"></span>
+            </label>
+            <span id="mode-text" style="font-size: 10px; font-family: Orbitron; color: var(--neon-gold); margin-left: 10px;">DEMO</span>
+        </div>
         <button id="btn-stop" class="btn btn-red" onclick="emergencyStop()" disabled>EMERGENCY STOP</button>
         <button class="btn btn-blue" onclick="syncFleet()">SYNC DATA</button>
         <div style="margin-left:auto; display:flex; gap:20px; align-items:center;">
@@ -736,7 +744,18 @@
                     if (elUsdWeek && data.stats_week) elUsdWeek.innerText = `${(data.stats_week.usd >= 0 ? '+' : '')}${data.stats_week.usd.toFixed(2)} USD`;
                     if (elUsdMonth && data.stats_month) elUsdMonth.innerText = `${(data.stats_month.usd >= 0 ? '+' : '')}${data.stats_month.usd.toFixed(2)} USD`;
 
-                    const elVndPnl = document.getElementById('vnd-pnl');
+                    if (data.deploy_mode) {
+                        const modeLock = document.getElementById('mode-lock');
+                        const modeText = document.getElementById('mode-text');
+                        if (modeLock && modeText) {
+                            const isReal = data.deploy_mode === "REAL";
+                            modeLock.checked = isReal;
+                            modeText.innerText = data.deploy_mode;
+                            modeText.style.color = isReal ? 'var(--neon-red)' : 'var(--neon-gold)';
+                            modeLock.nextElementSibling.style.backgroundColor = isReal ? 'var(--neon-red)' : 'var(--neon-gold)';
+                            modeLock.nextElementSibling.style.borderColor = isReal ? 'var(--neon-red)' : 'var(--neon-gold)';
+                        }
+                    }
                     if (elVndPnl) {
                         elVndPnl.innerText = formatVND(data.session_pnl_vnd || 0);
                         elVndPnl.className = data.session_pnl_vnd >= 0 ? 'pnl-pos' : 'pnl-neg';
@@ -870,6 +889,23 @@
                 }
             } catch (e) {}
         }
+
+        window.toggleMode = async function() {
+            const isReal = document.getElementById('mode-lock').checked;
+            const mode = isReal ? "REAL" : "DEMO";
+            if (isReal && !confirm("⚠️ DANGER: ACTIVATE REAL MONEY MODE?\n\nThis will link the fleet to live market execution.")) {
+                document.getElementById('mode-lock').checked = false;
+                return;
+            }
+            try {
+                await fetch('http://127.0.0.1:5050/api/tactical/mode', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mode: mode })
+                });
+                updateHUD();
+            } catch (e) { alert("MODE SWITCH FAILED."); }
+        };
 
         window.toggleSafety = function() {
             const isArmed = document.getElementById('safety-lock').checked;

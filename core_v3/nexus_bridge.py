@@ -274,6 +274,7 @@ def get_telemetry():
             "squadron": squad,
             "unit_stats": unit_stats,
             "git_status": get_git_status(),
+            "deploy_mode": get_deploy_mode(),
             "current_time_utc": current_time_local
         })
     except Exception as e:
@@ -380,6 +381,31 @@ def tactical_reinforce():
         return jsonify({"status": "ERROR", "message": "UNIT_NOT_IN_DNA"}), 404
     except Exception as e:
         return jsonify({"status": "ERROR", "message": str(e)}), 500
+
+@app.route('/api/tactical/mode', methods=['POST'])
+def tactical_mode():
+    try:
+        data = request.json
+        mode = data.get('mode', 'DEMO').upper()
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("INSERT OR REPLACE INTO config (key, value) VALUES ('DEPLOY_MODE', ?)", (mode,))
+        conn.commit()
+        conn.close()
+        return jsonify({"status": "SUCCESS", "message": f"SYSTEM MODE SET TO {mode}"})
+    except Exception as e:
+        return jsonify({"status": "ERROR", "message": str(e)}), 500
+
+def get_deploy_mode():
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT value FROM config WHERE key = 'DEPLOY_MODE'")
+        res = cursor.fetchone()
+        conn.close()
+        return res[0] if res else "DEMO"
+    except:
+        return "DEMO"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5050, debug=False)
