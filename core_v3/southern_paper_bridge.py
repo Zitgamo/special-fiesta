@@ -312,6 +312,16 @@ class SouthernPaperBridge:
                     u['spread_ratio'] = spread_ratio
                     
                     self.logger.info(f" [{uid}] ENTRY {'LONG' if side==1 else 'SHORT'} @ {price} | SL: {u['sl']:.1f} ({sl_mult}x) TP: {u['tp']:.1f} ({tp_mult}x) | ER: {er}")
+                    
+                    # --- SIGNAL RELAY (ALPHA ONLY as per User Request) ---
+                    if uid == "SOUTH_ALPHA":
+                        try:
+                            from signal_commander import SignalCommander
+                            sc = SignalCommander()
+                            # 1 hđ = 1 contract for VN30. We use 1.0 as lot for visual consistency.
+                            sc.send_signal(SYMBOL, s_id, price, u['sl'], u['tp'], er, lot=1.0, reason="South Alpha (Index Strike)")
+                        except Exception as sig_err:
+                            self.logger.error(f" !! [SIGNAL_ERR] Failed to relay South Alpha strike: {sig_err}")
 
         self.export_state(price)
 

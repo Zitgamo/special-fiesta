@@ -1,7 +1,7 @@
 import sqlite3
 import os
 
-DB_PATH = "iron_core.db"
+DB_PATH = "core_v3/iron_core.db"
 if os.path.exists(DB_PATH):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()

@@ -175,3 +175,14 @@
 [2026-05-06 14:28:39,403] INFO:  >> [WALLET] Resumed Southern Balance: 106,750,000 VND
 [2026-05-06 14:28:39,410] INFO:  >> [RESTORE] Resumed Dragon Fleet from state file.
 [2026-05-06 14:28:39,410] INFO: Southern Front Expansion: Online.
+[2026-05-06 14:55:49,874] INFO: Southern Front Bridge Initializing...
+[2026-05-06 14:55:49,882] INFO:  >> [WALLET] Resumed Southern Balance: 107,260,000 VND
+[2026-05-06 14:55:49,882] INFO:  >> [RESTORE] Resumed Dragon Fleet from state file.
+[2026-05-06 14:55:49,882] INFO: Southern Front Expansion: Online.
+[2026-05-06 14:55:55,278] INFO:  [SQL_SYNC] SOUTH_OMEGA Strike recorded to iron_core.db
+[2026-05-06 14:55:55,278] INFO:  [WALLET_UPDATE] New Balance: 106,850,000 VND
+[2026-05-06 14:55:55,278] INFO:  [PAPER_STRIKE] SOUTH_OMEGA LONG PnL: -4.10 pts
+[2026-05-06 14:55:55,314] INFO:  [SOUTH_OMEGA] ENTRY LONG @ 2060.0 | SL: 2056.5 (1.5x) TP: 2067.0 (3.0x) | ER: 0.5
+[2026-05-06 14:55:55,367] INFO:  [SQL_SYNC] SOUTH_GAMMA Strike recorded to iron_core.db
+[2026-05-06 14:55:55,367] INFO:  [WALLET_UPDATE] New Balance: 106,890,000 VND
+[2026-05-06 14:55:55,367] INFO:  [PAPER_STRIKE] SOUTH_GAMMA LONG PnL: 0.40 pts
