@@ -236,10 +236,21 @@ class IronBridges:
                 tick = mt5.symbol_info_tick(symbol)
                 if not tick: continue
                 
+                info = mt5.symbol_info(symbol)
+                if info:
+                    # Strict MT5 Volume Step Formatting
+                    v_step = info.volume_step
+                    # e.g., 0.01 -> 2 decimal places
+                    v_str = str(float(v_step)).rstrip('0')
+                    decimals = len(v_str.split('.')[1]) if '.' in v_str else 0
+                    safe_volume = round(float(volume), decimals)
+                else:
+                    safe_volume = float(volume)
+                
                 request = {
                     "action": mt5.TRADE_ACTION_DEAL,
                     "symbol": symbol,
-                    "volume": float(volume),
+                    "volume": safe_volume,
                     "type": mt5.ORDER_TYPE_BUY if side.upper() == "BUY" else mt5.ORDER_TYPE_SELL,
                     "price": tick.ask if side.upper() == "BUY" else tick.bid,
                     "sl": float(sl) if sl else 0.0,

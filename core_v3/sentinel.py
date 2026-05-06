@@ -42,7 +42,16 @@ class IronSentinel:
         return False
 
     def resurrect(self, name):
-        print(f" !! [SENTINEL] {name} has fallen! Initiating Emergency Resurrection...")
+        import datetime
+        crash_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        msg = f" !! [SENTINEL] {name} has fallen! Initiating Emergency Resurrection at {crash_time}..."
+        print(msg)
+        
+        # Log the crash for the 12h Stress Test Audit
+        os.makedirs("logs", exist_ok=True)
+        with open("logs/sentinel_crash.log", "a") as f:
+            f.write(f"[{crash_time}] CRASH DETECTED: {name} resurrected.\n")
+            
         path_data = self.fleet[name]
         base = os.getcwd()
         

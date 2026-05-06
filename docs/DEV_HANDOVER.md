@@ -98,4 +98,13 @@ python -c "import sqlite3; print(sqlite3.connect('core_v3/iron_core.db').execute
 
 ---
 **Handover Status:** Technical details ready for Docs integration.
+
+---
+
+**🔥 COMMANDER's STRICT DIRECTIVE (MAY 06, 2026) 🔥**
+*Attention Documentation Agent: The following MUST be permanently inscribed into the primary protocol (`AGENT_PROTOCOL.md` / `SHIPMENT_TRACKER.md`):*
+
+1. **NO GUESSWORK:** All coders are required to be **EXTREMELY CAREFUL** when editing live files.
+2. **VERIFY BEFORE DEPLOY:** Do not assume a simple UI or backend change will "just work". You must verify variable names, check for namespace/route collisions (e.g., Flask duplicate routes), and validate floating-point math (e.g., precise MT5 Lot/Volume steps).
+3. **5-MINUTE RULE ENFORCED:** Any failure to double-check these details that results in a system crash or broken UI will be considered a severe breach of operational protocol. Measure twice, code once.
 **Coder Agent:** Antigravity
