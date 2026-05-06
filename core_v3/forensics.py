@@ -186,8 +186,8 @@ class IronForensics:
     def record_learning(self, unit_id, symbol, side, sl_mult, tp_mult, er, pnl, atr=0, spread=0, session='N/A'):
         try:
             self._execute_with_retry(
-                '''INSERT INTO empirical_learning (unit_id, symbol, side, sl_mult, tp_mult, er_at_entry, volatility_atr, spread_ratio, session, outcome_pnl)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                '''INSERT INTO empirical_learning (unit_id, symbol, side, sl_mult, tp_mult, er_at_entry, volatility_atr, spread_ratio, session, outcome_pnl, timestamp)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))''',
                 (unit_id, symbol, side, sl_mult, tp_mult, er, atr, spread, session, pnl),
                 is_commit=True
             )
@@ -221,20 +221,20 @@ class IronForensics:
             
             if ticket:
                 cursor.execute('''
-                    INSERT INTO trades (ticket, unit_id, symbol, side, volume, price, sl, tp, sl_mult, tp_mult, er_at_entry, pnl, type, comment)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    INSERT INTO trades (ticket, unit_id, symbol, side, volume, price, sl, tp, sl_mult, tp_mult, er_at_entry, pnl, type, comment, timestamp)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
                     ON CONFLICT(ticket) DO UPDATE SET
                         pnl = excluded.pnl,
                         type = excluded.type,
                         comment = excluded.comment,
                         exit_price = CASE WHEN excluded.type = 'CLOSED' THEN excluded.price ELSE exit_price END,
-                        exit_time = CASE WHEN excluded.type = 'CLOSED' THEN CURRENT_TIMESTAMP ELSE exit_time END
+                        exit_time = CASE WHEN excluded.type = 'CLOSED' THEN datetime('now', 'localtime') ELSE exit_time END
                 ''', (ticket, unit_id, symbol, side, volume, price, sl, tp, sl_mult, tp_mult, er, pnl, status, comment))
             else:
                 # No ticket yet (PENDING)
                 cursor.execute('''
-                    INSERT INTO trades (unit_id, symbol, side, volume, price, sl, tp, sl_mult, tp_mult, er_at_entry, pnl, type, comment)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    INSERT INTO trades (unit_id, symbol, side, volume, price, sl, tp, sl_mult, tp_mult, er_at_entry, pnl, type, comment, timestamp)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
                 ''', (unit_id, symbol, side, volume, price, sl, tp, sl_mult, tp_mult, er, pnl, status, comment))
                 
             conn.commit()
@@ -252,8 +252,8 @@ class IronForensics:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             cursor.execute('''
-                INSERT INTO equity_history (balance, equity, drawdown)
-                VALUES (?, ?, ?)
+                INSERT INTO equity_history (balance, equity, drawdown, timestamp)
+                VALUES (?, ?, ?, datetime('now', 'localtime'))
             ''', (balance, equity, drawdown))
             conn.commit()
             conn.close()

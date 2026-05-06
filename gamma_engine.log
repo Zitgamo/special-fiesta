@@ -2727,3 +2727,12 @@
 [2026-05-06 11:50:01,935] ERROR:  !! [HARVESTER_ERR] cannot access local variable 'symbol' where it is not associated with a value
 [2026-05-06 11:50:12,252] INFO:  >> [HARVESTER] GAMMA is dominating. Scaling in reinforcements...
 [2026-05-06 11:50:12,252] ERROR:  !! [HARVESTER_ERR] cannot access local variable 'symbol' where it is not associated with a value
+[2026-05-06 11:50:24,354] INFO: --- IRON CORE ENGINE v3.0 ACTIVE ---
+[2026-05-06 11:50:50,317] INFO:  >> [SAFE_HANDOVER] Syncing AUDUSD SL to 0.7239
+[2026-05-06 11:51:00,668] INFO:  >> [SAFE_HANDOVER] Syncing AUDUSD SL to 0.7239
+[2026-05-06 11:51:11,026] INFO:  >> [SAFE_HANDOVER] Syncing AUDUSD SL to 0.72392
+[2026-05-06 11:51:21,414] INFO:  >> [SAFE_HANDOVER] Syncing AUDUSD SL to 0.72391
+[2026-05-06 11:51:42,295] INFO:  >> [SAFE_HANDOVER] Syncing AUDUSD SL to 0.72395
+[2026-05-06 11:51:52,674] INFO:  >> [SAFE_HANDOVER] Syncing AUDUSD SL to 0.72397
+[2026-05-06 11:52:13,403] INFO:  >> [SAFE_HANDOVER] Syncing AUDUSD SL to 0.72394
+[2026-05-06 11:52:23,790] INFO:  >> [SAFE_HANDOVER] Syncing AUDUSD SL to 0.72395

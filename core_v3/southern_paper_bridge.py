@@ -142,8 +142,8 @@ class SouthernPaperBridge:
             cursor = conn.cursor()
             
             cursor.execute("""
-                INSERT INTO trades (unit_id, symbol, side, volume, price, sl, tp, sl_mult, tp_mult, er_at_entry, type, pnl)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO trades (unit_id, symbol, side, volume, price, sl, tp, sl_mult, tp_mult, er_at_entry, type, pnl, timestamp)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
             """, (
                 unit_id, SYMBOL, trade['side'], 1.0, 
                 trade['entry_p'], trade['sl'], trade['tp'], 
@@ -207,13 +207,12 @@ class SouthernPaperBridge:
             conn = sqlite3.connect(db_path)
             cursor = conn.cursor()
             
-            now_t = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             drawdown = (current_float_pts * VND_PER_PT / self.current_balance_vnd) * 100 if self.current_balance_vnd != 0 else 0
             
             cursor.execute("""
                 INSERT INTO equity_history (balance, equity, drawdown, timestamp)
-                VALUES (?, ?, ?, ?)
-            """, (self.current_balance_vnd, current_equity, drawdown, now_t))
+                VALUES (?, ?, ?, datetime('now', 'localtime'))
+            """, (self.current_balance_vnd, current_equity, drawdown))
             conn.commit()
             conn.close()
         except: pass
