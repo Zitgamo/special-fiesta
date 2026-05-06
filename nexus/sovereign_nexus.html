@@ -300,6 +300,12 @@
             100% { transform: translateY(100vh); }
         }
 
+        @keyframes pulse-gold {
+            0% { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 204, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0); }
+        }
+
         .pnl-pos { color: var(--neon-green); text-shadow: 0 0 10px var(--neon-green); }
         .pnl-neg { color: var(--neon-red); text-shadow: 0 0 10px var(--neon-red); }
 
@@ -584,8 +590,12 @@
         </div>
         <button id="btn-stop" class="btn btn-red" onclick="emergencyStop()" disabled>EMERGENCY STOP</button>
         <button class="btn btn-blue" onclick="syncFleet()">SYNC DATA</button>
-        <button id="btn-omega" class="btn btn-gold" onclick="reinforce('OMEGA')" disabled>REINFORCE OMEGA</button>
-        <button id="btn-gamma" class="btn btn-gold" style="border-color: var(--neon-purple); color: var(--neon-purple);" onclick="reinforce('GAMMA')" disabled>REINFORCE GAMMA</button>
+        <div style="margin-left:auto; display:flex; gap:20px; align-items:center;">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <div style="width:10px; height:10px; border-radius:50%; background:var(--neon-gold); box-shadow: 0 0 10px var(--neon-gold);"></div>
+                <span style="font-size:10px; opacity:0.6; letter-spacing:1px;">AUTONOMOUS ESCALATION ACTIVE</span>
+            </div>
+        </div>
     </div>
 
     <!-- MODALS -->
@@ -756,9 +766,18 @@
                             const meta = unitStyles[unit] || { name: "RECON", icon: "🛰️", color: "var(--neon-blue)" };
                             const stats = data.unit_stats?.[unit] || { win_rate: "0%", context: { er: 0, confidence: 0 } };
                             
+                            // Autonomous Escalation Indicator
+                            const isEscalated = stats.context?.er > 1.2 && (stats.context?.confidence > 70 || stats.win_rate.includes('8') || stats.win_rate.includes('9'));
+                            const escColor = isEscalated ? 'var(--neon-gold)' : 'rgba(255,255,255,0.1)';
+                            const escPulse = isEscalated ? 'animation: pulse-gold 2s infinite;' : '';
+
                             squadDiv.innerHTML += `
                                 <div class="unit-card" style="--unit-color: ${meta.color}">
-                                    <div class="unit-name">${meta.icon} ${unit} <span style="font-size:10px; opacity:0.4; letter-spacing:2px; margin-left:auto;">${meta.name}</span></div>
+                                    <div class="unit-name">
+                                        ${meta.icon} ${unit} 
+                                        <span style="font-size:10px; opacity:0.4; letter-spacing:2px; margin-left:auto;">${meta.name}</span>
+                                        <div title="Tactical Escalation Status" style="width:12px; height:12px; border-radius:50%; background:${escColor}; margin-left:10px; border:2px solid rgba(0,0,0,0.5); ${escPulse}"></div>
+                                    </div>
                                     <div class="metric-grid">
                                         <div class="metric-item"><label>ER</label><value>${(stats.context?.er || 0).toFixed(2)}</value></div>
                                         <div class="metric-item"><label>WIN%</label><value style="color:var(--neon-green)">${stats.win_rate}</value></div>
@@ -768,7 +787,7 @@
                                         ${symbols.map(s => `<span style="font-size:10px; padding:2px 6px; background:rgba(255,255,255,0.05); border-radius:2px;">${s}</span>`).join('')}
                                     </div>
                                     <div style="margin-top:15px; border-top:1px solid rgba(255,255,255,0.05); padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
-                                        <span style="font-size:11px; opacity:0.5">LOT: ${data.dna?.[unit]?.LOT_SIZE || 'AUTO'}</span>
+                                        <span style="font-size:11px; opacity:0.5">LOT: ${data.dna?.[unit]?.LOT_SIZE || 'AUTO'} ${isEscalated ? '(X1.5)' : ''}</span>
                                         <span style="font-size:10px; color:${meta.color}; cursor:pointer; font-weight:700;" onclick="toggleLogic('${unit}')">STRATEGY ></span>
                                     </div>
                                 </div>

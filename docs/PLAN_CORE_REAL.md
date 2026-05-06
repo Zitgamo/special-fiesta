@@ -39,9 +39,10 @@
 ### 🔵 Component: UI (Frontend)
 #### [MODIFY] `nexus/sovereign_nexus.html`
 - Thiết kế và chèn một Component CSS/SVG: **"THE SOVEREIGN SCALE"**.
-- **[NEW] Git Status Monitor:** 
-    - Thêm một panel nhỏ hiển thị: `Last Commit Message`, `Time` và `Status` (Clean/Dirty).
-    - Nếu có file chưa commit, panel sẽ nhấp nháy đỏ cảnh báo: *"UNCOMMITTED CHANGES DETECTED"*.
+- **[NEW] Project Progress Monitor:** 
+    - Hiển thị trực tiếp các thông số từ `SHIPMENT_TRACKER.md`.
+    - Bao gồm: `Version`, `Readiness Score (%)`, và `Current Phase`.
+    - Giúp Commander theo dõi tiến độ mà không cần mở file tài liệu hay hỏi AI.
 - Vị trí: Góc trên bên trái hoặc ngay dưới PnL Container.
 - Hiệu ứng: Cây kim đồng hồ hoặc đĩa cân dao động dựa trên tỉ lệ `back_score : front_score`.
 - Hiển thị thông báo động: *"Vỏ đẹp - Ruột tốt: Đạt trạng thái Tuyệt Đối"* hoặc *"Cảnh báo: Code đang chạy nhanh hơn Vỏ - Hãy làm đẹp giao diện!"*.
