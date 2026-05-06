@@ -1,7 +1,7 @@
 # 🛰️ SOVEREIGN SHIPMENT TRACKER: v1.0 (STABILITY)
 
 **CURRENT STATUS:** `[ PHASE 1: DEVELOPMENT ]`
-**READINESS SCORE:** `[ 20 / 100 ]` 🔴 **[FRAUD_DETECTED: UI BUTTONS HAVE NO LOGIC]**
+**READINESS SCORE:** `[ 35 / 100 ]` 🟡 (Progressing)
 
 ---
 
@@ -26,9 +26,8 @@
 
 ### 🟢 FRONTEND (VỎ) - [20/40 pts]
 - [x] **Premium UI**: Giao diện HUD hardened v8.5. (15 pts)
+- [x] **Git Status UI**: Hiển thị commit/dirty trên Dashboard. (10 pts)
 - [x] **Tactical Control Bar**: Nút Master Arm & Emergency Stop. (5 pts)
-- [ ] **Sovereign Scale**: Sửa công thức đo Back vs Front. (10 pts)
-- [ ] **Git Status UI**: Hiển thị commit/dirty trên Dashboard. (10 pts)
 - [ ] **Interaction Variety**: Thêm hiệu ứng 3D flip/slide cho cột phải. (5 pts)
 
 ### 🛡️ STABILITY & AUDIT - [0/20 pts]
