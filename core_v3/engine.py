@@ -16,8 +16,19 @@ class IronEngine:
         from safety import IronSafety
         self.safety = IronSafety()
         self.is_running = True
+        from paths import DNA_PATH
+        self.dna_path = DNA_PATH
+        self.dna = self._load_dna()
         self.tracker_path = f"core_v3/signal_tracker_{self.unit_id.lower()}.json"
         self.signal_tracker = self._load_tracker()
+        
+    def _load_dna(self):
+        if os.path.exists(self.dna_path):
+            try:
+                with open(self.dna_path, 'r') as f:
+                    return json.load(f)
+            except: pass
+        return {}
         
     def _load_tracker(self):
         if os.path.exists(self.tracker_path):
@@ -152,6 +163,7 @@ class IronEngine:
                         max_layers = self.dna.get(self.unit_id, {}).get("ACTIVE_RISK", {}).get("MAX_LAYERS", 1)
                         
                         # Calculate Unit Expectancy
+                        stats = {} # Default
                         wr_str = stats.get("win_rate", "50%").replace('%','')
                         wr = float(wr_str) / 100
                         expectancy = (wr * 2.0) - ((1-wr) * 1.0) # Simplified R:R proxy
