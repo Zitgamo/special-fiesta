@@ -16,8 +16,22 @@ class IronEngine:
         from safety import IronSafety
         self.safety = IronSafety()
         self.is_running = True
-        self.signal_tracker = {} # Track last sent signals: {symbol: {side, price, time}}
+        self.tracker_path = f"core_v3/signal_tracker_{self.unit_id.lower()}.json"
+        self.signal_tracker = self._load_tracker()
         
+    def _load_tracker(self):
+        if os.path.exists(self.tracker_path):
+            try:
+                with open(self.tracker_path, 'r') as f:
+                    return json.load(f)
+            except: pass
+        return {}
+
+    def _save_tracker(self):
+        try:
+            with open(self.tracker_path, 'w') as f:
+                json.dump(self.signal_tracker, f)
+        except: pass
     def _setup_logging(self):
         logging.basicConfig(
             level=logging.INFO,
@@ -135,10 +149,11 @@ class IronEngine:
                         if drawdown < -0.01:
                             try:
                                 target_pos = active_symbol_pos[0]
-                                self.logger.info(f" >> [HARVESTER] {symbol} is dominating. Scaling in reinforcements...")
+                                current_symbol = target_pos['symbol']
+                                self.logger.info(f" >> [HARVESTER] {current_symbol} is dominating. Scaling in reinforcements...")
                                 
                                 # Fetch symbol info for correct volume rounding
-                                info = mt5.symbol_info(target_pos['symbol'])
+                                info = mt5.symbol_info(current_symbol)
                                 if info:
                                     min_lot = info.volume_min
                                     v_step = info.volume_step
@@ -149,9 +164,9 @@ class IronEngine:
                                     scale_lot = max(scale_lot, min_lot)
                                     
                                     if scale_lot <= (base_lot * 0.5): # Safety cap
-                                        self.bridges.execute_order(target_pos['symbol'], target_pos['side'], scale_lot, unit_id=self.unit_id)
-                            except Exception as e:
-                                self.logger.error(f" !! [HARVESTER_ERR] {symbol} scale-in failed: {e}")
+                                        self.bridges.execute_order(current_symbol, target_pos['side'], scale_lot, unit_id=self.unit_id)
+                            except Exception as harvester_err:
+                                self.logger.error(f" !! [HARVESTER_ERR] {self.unit_id} scale-in failed: {harvester_err}")
                         
                         continue
 
@@ -279,6 +294,7 @@ class IronEngine:
                                 sc.send_signal(symbol, side, price, sl, tp, er, lot=0.01, reason="Elite Unit Strike")
                                 self.logger.info(f" >> [RELAY] Signal relayed to Telegram.")
                                 self.signal_tracker[symbol] = {'side': side, 'price': price, 'time': now}
+                                self._save_tracker()
                             else:
                                 self.logger.info(f" >> [DEDUPLICATION] {symbol} {side} signal suppressed (Duplicate).")
                                 

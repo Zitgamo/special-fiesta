@@ -43,31 +43,57 @@ class IronSafety:
             return False, f"SPREAD_TOO_HIGH ({spread} > {atr * self.MAX_SPREAD_ATR_RATIO})"
 
         # 3. TEMPORAL SANITY (The Global Loop Attack Guard)
-        # Use a file-based lock to track strikes across all units
         strike_log_path = "core_v3/strike_frequency.json"
+        symbol_log_path = "core_v3/symbol_cooldown.json"
         now = time.time()
-        strikes = []
-        if os.path.exists(strike_log_path):
+        
+        # --- SYMBOL COOLDOWN (Task 11: Anti-Spam) ---
+        symbol_tracker = {}
+        if os.path.exists(symbol_log_path):
             try:
-                with open(strike_log_path, 'r') as f:
-                    strikes = json.load(f)
-            except: strikes = []
+                with open(symbol_log_path, 'r') as f:
+                    symbol_tracker = json.load(f)
+            except: pass
+            
+        last_strike = symbol_tracker.get(symbol, 0)
+        if now - last_strike < 1800: # 30 Minute Cooldown per symbol
+            return False, f"SYMBOL_COOLDOWN_ACTIVE ({int(1800 - (now - last_strike))}s remaining)"
+
+        # --- GLOBAL FREQUENCY (Task 11: Race Condition Guard) ---
+        # Retry logic for reading/writing global strike log
+        passed_global = False
+        for attempt in range(5):
+            try:
+                strikes = []
+                if os.path.exists(strike_log_path):
+                    with open(strike_log_path, 'r') as f:
+                        strikes = json.load(f)
+                
+                strikes = [t for t in strikes if now - t < 3600]
+                if len(strikes) >= self.MAX_STRIKES_PER_HOUR:
+                    return False, f"GLOBAL_FREQUENCY_LIMIT ({len(strikes)}/hr)"
+                
+                # If we reach here, we pass global check. Log it!
+                strikes.append(now)
+                with open(strike_log_path, 'w') as f:
+                    json.dump(strikes, f)
+                passed_global = True
+                break # Success
+            except:
+                time.sleep(0.1) # Backoff
         
-        # Cleanup old strikes (> 1 hour)
-        strikes = [t for t in strikes if now - t < 3600]
-        
-        if len(strikes) >= self.MAX_STRIKES_PER_HOUR:
-            return False, f"GLOBAL_FREQUENCY_LIMIT ({len(strikes)}/hr)"
+        if not passed_global:
+            return False, "SAFETY_LOCK_BUSY"
 
         # 4. PRICE VALIDITY (Flash Crash Guard)
         if price <= 0:
             return False, "PRICE_DATA_CORRUPT"
 
-        # All checks passed. Log the strike for global tracking.
-        strikes.append(now)
+        # Update symbol tracker
+        symbol_tracker[symbol] = now
         try:
-            with open(strike_log_path, 'w') as f:
-                json.dump(strikes, f)
+            with open(symbol_log_path, 'w') as f:
+                json.dump(symbol_tracker, f)
         except: pass
         
         self.logger.info(f" !! [SAFETY_PASS] {unit_id} validated for {symbol} {side} {lot}")

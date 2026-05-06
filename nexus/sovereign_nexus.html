@@ -11,8 +11,9 @@
             --neon-purple: #bc13fe;
             --neon-green: #00ff88;
             --neon-red: #ff004c;
+            --neon-gold: #ffcc00;
             --bg: #010205;
-            --glass: rgba(10, 15, 25, 0.9);
+            --glass: rgba(10, 15, 25, 0.85);
             --border: rgba(0, 242, 255, 0.15);
         }
 
@@ -90,12 +91,21 @@
 
         .card {
             background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--border);
             border-radius: 4px;
             position: relative;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .card:hover {
+            transform: translateY(-5px) scale(1.005);
+            box-shadow: 0 20px 50px rgba(0, 242, 255, 0.15);
+            border-color: rgba(0, 242, 255, 0.4);
         }
 
         /* Cut corners for tactical look */
@@ -191,9 +201,48 @@
             border-radius: 10px;
             font-weight: 700;
         }
+        @keyframes scan {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100vh); }
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(to bottom, transparent, rgba(0, 242, 255, 0.03), transparent);
+            pointer-events: none;
+            z-index: 1000;
+            animation: scan 10s linear infinite;
+        }
+
+        @keyframes pulse-glow {
+            0% { text-shadow: 0 0 15px var(--neon-blue); }
+            50% { text-shadow: 0 0 35px var(--neon-blue), 0 0 55px var(--neon-blue); }
+            100% { text-shadow: 0 0 15px var(--neon-blue); }
+        }
+
+        .title { animation: pulse-glow 5s ease-in-out infinite; }
+
+        @keyframes rotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .radar-sweep {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 200px; height: 200px;
+            background: conic-gradient(from 0deg, rgba(0, 242, 255, 0.15), transparent 60%);
+            border-radius: 50%;
+            z-index: 0;
+            animation: rotate 4s linear infinite;
+        }
     </style>
 </head>
 <body>
+    <div class="scanline"></div>
     <header>
         <div class="title">SOVEREIGN NEXUS <span class="tag-status">HARDENED</span></div>
         <div class="pnl-container">
@@ -232,12 +281,16 @@
                     </div>
                 </div>
             </div>
-            <div class="card" style="height: 140px;">
-                <div class="card-header">Neural Scan</div>
-                <div class="card-body" style="display:flex; align-items:center; justify-content:center;">
-                    <div style="text-align:center">
-                        <div style="font-family:'Orbitron'; font-size:22px; color:var(--neon-blue)">60 ASSETS</div>
-                        <div style="font-size:10px; opacity:0.5">ACTIVE SCANNING</div>
+            <div class="card" style="height: 200px; overflow: hidden;">
+                <div class="card-header">Neural Scan // Assets Under Watch</div>
+                <div class="card-body" style="position:relative; padding:10px;">
+                    <div class="radar-sweep"></div>
+                    <div id="scan-list" style="position:relative; z-index:1; font-family:monospace; font-size:9px; color:var(--neon-blue); column-count:2; opacity:0.8">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div style="position:absolute; bottom:10px; right:10px; text-align:right">
+                        <div style="font-family:'Orbitron'; font-size:18px; color:var(--neon-blue)">60 ASSETS</div>
+                        <div style="font-size:9px; opacity:0.5">ACTIVE DEEP SCAN</div>
                     </div>
                 </div>
             </div>
@@ -262,6 +315,12 @@
                     <div style="text-align:center; padding:20px; opacity:0.3">COLLECTING BATTLE DATA...</div>
                 </div>
             </div>
+            <div class="card" style="flex-grow: 1;">
+                <div class="card-header">Southern Strike Audit // VN30F1M</div>
+                <div class="card-body" id="south-strikes" style="overflow-y:auto; padding:0">
+                    <div style="text-align:center; padding:20px; opacity:0.3">IDLE</div>
+                </div>
+            </div>
         </div>
 
         <!-- RIGHT: LIVE STRIKES -->
@@ -280,6 +339,21 @@
 
     <script>
         const formatVND = (num) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num).replace('₫', 'đ');
+
+        const SCAN_ASSETS = ["BTC", "ETH", "SOL", "XAU", "XAG", "NAS100", "US30", "EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "DE30", "OIL", "GAS", "ADA", "DOT", "XRP", "LTC", "LINK", "AVAX"];
+        
+        function updateNeuralScan() {
+            const list = document.getElementById('scan-list');
+            const items = [];
+            for (let i = 0; i < 14; i++) {
+                const asset = SCAN_ASSETS[Math.floor(Math.random() * SCAN_ASSETS.length)];
+                const er = (Math.random() * 2).toFixed(2);
+                const status = er > 1.2 ? "STRIKE" : "WATCH";
+                items.push(`<div style="margin-bottom:2px; color:${er>1.2?'var(--neon-green)':'var(--neon-blue)'}">> ${asset} [ER:${er}] ${status}</div>`);
+            }
+            list.innerHTML = items.join('');
+        }
+        setInterval(updateNeuralScan, 2500);
 
         async function updateHUD() {
             try {
@@ -338,8 +412,29 @@
                     }
 
                     const tradeDiv = document.getElementById('trade-log');
-                    tradeDiv.innerHTML = data.trades.map(t => {
-                        const pnlVal = (t.symbol === 'VN30F1M') ? t.pnl * 100000 : t.pnl;
+                    const southDiv = document.getElementById('south-strikes');
+                    
+                    const vnTrades = data.trades.filter(t => t.symbol === 'VN30F1M');
+                    const otherTrades = data.trades.filter(t => t.symbol !== 'VN30F1M');
+
+                    if (vnTrades.length > 0) {
+                        southDiv.innerHTML = vnTrades.slice(0, 8).map(t => {
+                            const pnlVal = t.pnl * 100000;
+                            const pnlClass = pnlVal >= 0 ? 'pnl-pos' : 'pnl-neg';
+                            const timeStr = t.time.includes(' ') ? t.time.split(' ')[1] : t.time;
+                            return `
+                                <div class="trade-row" style="grid-template-columns: 1fr 1fr; border-bottom: 1px solid rgba(188,19,254,0.1)">
+                                    <div style="font-size:12px; font-family:Orbitron">${timeStr}</div>
+                                    <div style="text-align:right; font-weight:700" class="${pnlClass}">${formatVND(pnlVal)}</div>
+                                </div>
+                            `;
+                        }).join('');
+                    } else {
+                        southDiv.innerHTML = '<div style="text-align:center; padding:20px; opacity:0.3; font-size:11px">NO RECENT SOUTHERN STRIKES</div>';
+                    }
+
+                    tradeDiv.innerHTML = otherTrades.map(t => {
+                        const pnlVal = t.pnl;
                         const pnlClass = pnlVal >= 0 ? 'pnl-pos' : 'pnl-neg';
                         const timeStr = t.time.includes(' ') ? t.time.split(' ')[1] : t.time;
                         return `
@@ -349,7 +444,7 @@
                                     <div style="font-size:10px; opacity:0.5">${t.unit} // ${t.side}</div>
                                 </div>
                                 <div style="text-align:right">
-                                    <div class="${pnlClass}" style="font-size:18px; font-weight:700">${pnlVal >= 0 ? '+' : ''}${t.symbol==='VN30F1M'?formatVND(pnlVal):'$'+pnlVal.toFixed(2)}</div>
+                                    <div class="${pnlClass}" style="font-size:18px; font-weight:700">${pnlVal >= 0 ? '+' : ''}$${pnlVal.toFixed(2)}</div>
                                     <div style="font-size:10px; opacity:0.5; font-family:Orbitron">${timeStr}</div>
                                 </div>
                             </div>
@@ -363,17 +458,28 @@
             try {
                 const response = await fetch('http://127.0.0.1:5050/api/intelligence');
                 const data = await response.json();
+                const intelList = document.getElementById('intel-list');
+                
                 if (data.samples > 0 && data.top_configs && data.top_configs.length > 0) {
-                    document.getElementById('intel-list').innerHTML = data.top_configs.slice(0,3).map(c => `
-                        <div style="display:flex; justify-content:space-between; margin-bottom:10px; background:rgba(0,242,255,0.05); padding:10px">
-                            <span>${c.symbol} (S:${c.sl} T:${c.tp})</span>
-                            <span style="color:var(--neon-green)">+${c.avg_pnl.toFixed(2)}</span>
-                        </div>
-                    `).join('');
+                    intelList.innerHTML = data.top_configs.slice(0, 3).map(c => {
+                        const slVal = c.sl !== null ? c.sl : '---';
+                        const tpVal = c.tp !== null ? c.tp : '---';
+                        const pnlVal = (c.avg_pnl || 0).toFixed(2);
+                        const pnlColor = (c.avg_pnl || 0) >= 0 ? 'var(--neon-green)' : '#ff4b4b';
+                        
+                        return `
+                            <div style="display:flex; justify-content:space-between; margin-bottom:10px; background:rgba(255,255,255,0.02); padding:10px; border-left: 2px solid ${pnlColor}">
+                                <span>${c.symbol} <span style="font-size:10px; opacity:0.6">(S:${slVal} T:${tpVal})</span></span>
+                                <span style="color:${pnlColor}; font-weight:bold">${(c.avg_pnl || 0) >= 0 ? '+' : ''}${pnlVal}</span>
+                            </div>
+                        `;
+                    }).join('');
                 } else {
-                    document.getElementById('intel-list').innerHTML = `<div style="text-align:center; padding:20px; opacity:0.3">NEURAL LEARNING IN PROGRESS... (${data.samples || 0} samples)</div>`;
+                    intelList.innerHTML = `<div style="text-align:center; padding:20px; opacity:0.3">NEURAL LEARNING IN PROGRESS... (${data.samples || 0} samples)</div>`;
                 }
-            } catch (e) {}
+            } catch (e) {
+                console.error("Intelligence Update Failed:", e);
+            }
         }
 
         setInterval(updateHUD, 3000);

@@ -185,6 +185,10 @@ class IronForensics:
 
     def record_learning(self, unit_id, symbol, side, sl_mult, tp_mult, er, pnl, atr=0, spread=0, session='N/A'):
         try:
+            # --- DATA INTEGRITY GUARD ---
+            if sl_mult is None or tp_mult is None:
+                return # Cannot learn from NULL configurations
+                
             self._execute_with_retry(
                 '''INSERT INTO empirical_learning (unit_id, symbol, side, sl_mult, tp_mult, er_at_entry, volatility_atr, spread_ratio, session, outcome_pnl, timestamp)
                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', '+7 hours'))''',

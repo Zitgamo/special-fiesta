@@ -287,18 +287,22 @@ class SovereignMaster:
 
         squadron = {"ALPHA": ["XAUUSD"], "OMEGA": [], "GAMMA": []}
         
-        # 5. Elite Assignment (EXNESS ONLY for Real-Money Guidance)
-        # We exclude crypto_results to ensure the user can execute on Exness MT5
-        squadron["ALPHA"] = list(set(["XAUUSD"] + pick_unique(results, 2)))[:2]
-        squadron["OMEGA"] = pick_unique(results, 2)
-        squadron["GAMMA"] = pick_unique(results, 2)
+        # 5. Elite Assignment (Balanced Distribution)
+        all_units = ["ALPHA", "OMEGA", "GAMMA"]
+        u_idx = 0
+        for item in results:
+            unit = all_units[u_idx]
+            if len(squadron[unit]) < 2:
+                squadron[unit].append(item['symbol'])
+            u_idx = (u_idx + 1) % len(all_units)
+            if all(len(squadron[u]) >= 2 for u in all_units): break
 
         # FALLBACK: If results are poor, inject Iron Classics (Exness)
-        if sum(len(v) for v in squadron.values()) < 3:
+        if sum(len(v) for v in squadron.values()) < 6:
             print(" !! [FAIL_SAFE] Scanner returned low signal. Injecting Iron Classics...")
-            squadron["ALPHA"] = list(set(squadron["ALPHA"] + ["XAUUSD", "US30"]))[:2]
-            squadron["OMEGA"] = list(set(squadron["OMEGA"] + ["GBPUSD"]))[:2]
-            squadron["GAMMA"] = list(set(squadron["GAMMA"] + ["NAS100", "XAGUSD"]))[:2]
+            if len(squadron["ALPHA"]) < 2: squadron["ALPHA"] = list(set(squadron["ALPHA"] + ["XAUUSD", "US30"]))[:2]
+            if len(squadron["OMEGA"]) < 2: squadron["OMEGA"] = list(set(squadron["OMEGA"] + ["GBPUSD", "EURUSD"]))[:2]
+            if len(squadron["GAMMA"]) < 2: squadron["GAMMA"] = list(set(squadron["GAMMA"] + ["NAS100", "XAGUSD"]))[:2]
 
         # 6. Save
         with open("core_v3/squadron.json", "w") as f:

@@ -188,7 +188,14 @@ class SouthernPaperBridge:
                 "pnl_pts": pnl_pts,
                 "pnl_vnd": pnl_pts * VND_PER_PT,
                 "equity_vnd": self.current_balance_vnd + (pnl_pts * VND_PER_PT),
-                "active": u['pos'] != 0
+                "active": u['pos'] != 0,
+                # --- CONTEXT PERSISTENCE ---
+                "sl_mult": u.get('sl_mult'),
+                "tp_mult": u.get('tp_mult'),
+                "er_at_entry": u.get('er_at_entry'),
+                "vol_atr": u.get('vol_atr'),
+                "session": u.get('session'),
+                "spread_ratio": u.get('spread_ratio')
             }
         with open(STATE_JSON, "w") as f:
             json.dump(state, f, indent=4)

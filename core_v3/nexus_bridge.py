@@ -250,6 +250,7 @@ def get_intelligence():
         cursor.execute("""
             SELECT symbol, sl_mult, tp_mult, COUNT(*) as count, AVG(outcome_pnl) as pnl
             FROM empirical_learning
+            WHERE sl_mult IS NOT NULL AND tp_mult IS NOT NULL
             GROUP BY symbol, sl_mult, tp_mult
             ORDER BY pnl DESC LIMIT 5
         """)
@@ -274,9 +275,9 @@ def get_intelligence():
         return jsonify({
             "samples": total_samples,
             "top_configs": [{
-                "symbol": c[0], "sl": c[1], "tp": c[2], "trades": c[3], "avg_pnl": round(c[4], 2)
+                "symbol": c[0], "sl": c[1], "tp": c[2], "trades": c[3], "avg_pnl": round(c[4] or 0, 2)
             } for c in top_configs],
-            "regime_perf": {r[0]: round(r[1], 2) for r in regime_perf}
+            "regime_perf": {r[0]: round(r[1] or 0, 2) for r in regime_perf}
         })
     except Exception as e:
         return jsonify({"status": "ERROR", "message": str(e)}), 500

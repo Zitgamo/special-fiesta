@@ -18,21 +18,23 @@
 - **Quy tắc 3**: Luôn đọc file này và chia nhỏ Sub-tasks trước khi bắt đầu code.
 
 ## 2. CURRENT STATUS (Tiến độ hiện tại)
-- **Hệ thống thời gian**: Đã đồng bộ ICT (+7h) bằng phương pháp Hard-coded cho toàn bộ DB và Bridge.
-- **Dữ liệu DNA**: Đã khôi phục các hệ số nhân SL/TP dương (Alpha: 1.0, Omega/Gamma: 1.5) để duy trì tính Dynamic ATR.
-- **Giao diện Nam Chiến Tuyến (Southern Command)**: Đã nâng cấp chữ to, có khung cuộn và khớp giờ ICT.
-- **Giao diện Nexus**: Đang bị lỗi hiển thị (Mất Binance card, Learning Engine báo NULL) và cần tinh chỉnh bố cục chống tràn.
-- **Logic Tối ưu**: Phát hiện `optimizer.py` sinh ra số âm cho SL/TP, gây lỗi DNA.
+- **Hệ thống thời gian**: ICT (+7h) ổn định trên toàn bộ DB và Bridge.
+- **Hardening (Bảo mật & Chống Spam)**: Đã triển khai Cooldown 30 phút theo symbol và Persistent Signal Tracking.
+- **Task 9 (Fix NULL Engine)**: Đã hoàn thành triệt để. Context trade được bảo toàn qua restart. Database đã sạch record lỗi.
+- **Task 11 (AUDUSD Spam)**: Đã fix lỗi race condition. AUDUSD và các symbol khác đã có cơ chế chặn spam an toàn.
+- **Giao diện Nexus (v8.0)**: Đã nâng cấp Glassmorphism, Neural Scan radar và Southern Audit panel (soi lệnh VN30).
+- **Đội hình (Squadron)**: Đã cân bằng lại logic gán lệnh. GAMMA đã được triển khai (NAS100/XAGUSD).
 
 ## 3. TACTICAL TASKS (Danh sách nhiệm vụ)
-- [x] **Task 1**: Audit và vá lỗi `optimizer.py`. Đảm bảo hệ số SL/TP luôn dương (Dùng `abs()` hoặc `max(0.1, val)`).
+- [x] **Task 1**: Audit và vá lỗi `optimizer.py`. Đảm bảo hệ số SL/TP luôn dương.
 - [x] **Task 2**: Khôi phục thẻ Binance (Eastern Front) trong `sovereign_nexus.html`.
-- [x] **Task 3**: Sửa logic hiển thị `intel-list` (Learning Engine) trong `sovereign_nexus.html` để không bị NULL.
-- [x] **Task 4**: Rà soát tổng thể bố cục Nexus để đảm bảo không bị tràn trên màn hình người dùng.
-- [x] **Task 5**: Kiểm tra cuối cùng (Final Audit) về tính đồng bộ thời gian trên toàn bộ Strike Log.
+- [x] **Task 3**: Sửa logic hiển thị `intel-list` (Learning Engine) trong `sovereign_nexus.html`.
+- [x] **Task 4**: Rà soát tổng thể bố cục Nexus để đảm bảo không bị tràn.
+- [x] **Task 5**: Kiểm tra cuối cùng (Final Audit) về tính đồng bộ thời gian.
 - [x] **Task 6**: Sửa lỗi hiển thị DD (Drawdown) cho Binance và Southern (Vn30).
-- [x] **Task 7**: Nâng cấp Neural Scan (Thêm hiệu ứng Hover/Click để xem chi tiết asset).
-- [x] **Task 8**: Khôi phục hiển thị ER Configuration (Efficiency Ratio) trong phần Deployment.
-- [/] **Task 9**: Fix triệt để lỗi NULL trong Learning Engine (Kiểm tra logic API và render).
+- [x] **Task 7**: Nâng cấp Neural Scan (Thêm hiệu ứng Hover/Radar).
+- [x] **Task 8**: Khôi phục hiển thị ER Configuration.
+- [x] **Task 9**: Fix triệt để lỗi NULL trong Learning Engine (Persistence Guard).
 - [x] **Task 10**: Sửa lỗi mất kết nối/đường dẫn của nút Battle Report.
-- [/] **Task 11**: Kiểm tra và ổn định AUDUSD (Chống spam lệnh).
+- [x] **Task 11**: Kiểm tra và ổn định AUDUSD (Chống spam lệnh bằng Symbol Cooldown).
+
