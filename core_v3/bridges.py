@@ -254,8 +254,8 @@ class IronBridges:
                 if result.retcode == mt5.TRADE_RETCODE_DONE:
                     return result
                 
-                # Abort retries for permanent/time-based errors
-                if result.retcode in [mt5.TRADE_RETCODE_MARKET_CLOSED, mt5.TRADE_RETCODE_AUTOTRADING_DISABLED_BY_SERVER]:
+                # Abort retries for permanent/time-based errors (10026=Client AT disabled, 10027=Server AT disabled)
+                if result.retcode in [mt5.TRADE_RETCODE_MARKET_CLOSED, 10026, 10027]:
                     error_msg = f" !!! [MT5_FATAL] Strike aborted: {result.comment} (Code: {result.retcode})"
                     print(error_msg)
                     self.logger.error(error_msg)
