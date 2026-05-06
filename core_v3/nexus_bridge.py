@@ -120,6 +120,11 @@ def get_telemetry():
             if BRIDGES.binance:
                 bal = BRIDGES.binance.fetch_balance()
                 bnc_health["equity"] = bal['total'].get('USDT', 0)
+                # Calculate floating PnL for Binance
+                positions = BRIDGES.binance.fetch_positions()
+                float_pnl = sum(float(p.get('unrealizedProfit', 0)) for p in positions if float(p.get('contracts', 0)) > 0)
+                if bnc_health["equity"] > 0:
+                    bnc_health["drawdown"] = float_pnl / bnc_health["equity"]
         except: pass
 
         # 5. Southern Health (Entrade/VN30)
@@ -140,9 +145,10 @@ def get_telemetry():
                         south_health["equity_vnd"] = first_unit.get("equity_vnd", last_vnd_equity)
                         south_health["active"] = any(u.get("active", False) for u in south_health["fleet"].values())
             
-            # Calculate floating PnL for Southern Front
+            # Calculate floating PnL for Southern Front (as percentage)
             float_pnl_vnd = sum(u.get("pnl_vnd", 0) for u in south_health["fleet"].values())
-            south_health["drawdown"] = float_pnl_vnd
+            if south_health["equity_vnd"] > 0:
+                south_health["drawdown"] = float_pnl_vnd / south_health["equity_vnd"]
             
             # Context v2.0 for Southern Front
             er_vn = IronAnalytics.get_efficiency_ratio("VN30F1M", BRIDGES)
@@ -206,6 +212,7 @@ def get_telemetry():
         
         conn.close()
         
+        # 8. Report Route Mock (or actual redirect)
         return jsonify({
             "status": "ONLINE",
             "safety_status": "HARDENED",
@@ -224,6 +231,10 @@ def get_telemetry():
         })
     except Exception as e:
         return jsonify({"status": "ERROR", "message": str(e)}), 500
+
+@app.route('/report', methods=['GET'])
+def view_report():
+    return "BATTLE REPORT SYSTEM ONLINE // DATA SYNC IN PROGRESS"
 
 @app.route('/api/intelligence', methods=['GET'])
 def get_intelligence():

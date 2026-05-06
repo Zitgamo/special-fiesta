@@ -23,6 +23,9 @@ class SovereignOptimizer:
         hint = forensics.get_optimal_hint(symbol, er)
         if hint:
             best_sl, best_tp = hint
+            # SAFETY OVERRIDE: Ensure historical hints never return negative or zero multipliers
+            best_sl = max(0.1, abs(best_sl))
+            best_tp = max(0.1, abs(best_tp))
             print(f" >> [LEARNING_OVERLAY] Found historical best for {symbol} @ ER {er}: SL {best_sl}x | TP {best_tp}x")
             return best_sl, best_tp
 
