@@ -1,0 +1,47 @@
+{
+    "ALPHA": {
+        "SL": 1.18,
+        "TP": 10.08,
+        "LOT_SIZE": 0.0005,
+        "ACTIVE_RISK": {
+            "SHAVE_VAL": 1.0,
+            "DCA_LEVEL": -10.0,
+            "MAX_LAYERS": 3,
+            "MILK_STEP": 1.0,
+            "MILK_LOT": 0.01,
+            "SHAVE_RATIO": 0.1
+        },
+        "SHADOW": null
+    },
+    "OMEGA": {
+        "SL": 0.98,
+        "TP": 3.78,
+        "LOT_SIZE": 0.0005,
+        "ACTIVE_RISK": {
+            "SHAVE_VAL": 1.0,
+            "DCA_LEVEL": -15.0,
+            "MAX_LAYERS": 2,
+            "MILK_STEP": 1.0,
+            "MILK_LOT": 0.01,
+            "SHAVE_RATIO": 0.1
+        },
+        "SHADOW": null
+    },
+    "GAMMA": {
+        "SL": 0.27,
+        "TP": 6.92,
+        "LOT_SIZE": 0.0005,
+        "ACTIVE_RISK": {
+            "SHAVE_VAL": 1.0,
+            "DCA_LEVEL": -8.0,
+            "MAX_LAYERS": 3,
+            "MILK_STEP": 1.0,
+            "MILK_LOT": 0.01,
+            "SHAVE_RATIO": 0.1
+        },
+        "SHADOW": null
+    },
+    "GLOBAL": {
+        "SENTIMENT": "NEUTRAL"
+    }
+}

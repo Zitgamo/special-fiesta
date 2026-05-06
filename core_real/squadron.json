@@ -1,0 +1,14 @@
+{
+    "ALPHA": [
+        "XAUUSD",
+        "USDKGS"
+    ],
+    "OMEGA": [
+        "EURUSD",
+        "BTC/USDT"
+    ],
+    "GAMMA": [
+        "GBPUSD",
+        "NAS100"
+    ]
+}

@@ -1,0 +1,842 @@
+{
+    "1893963114": {
+        "hwm": 3.91,
+        "hwm_state": "HWM_SET",
+        "lwm": 3.69,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1895493585": {
+        "hwm": 11.23,
+        "hwm_state": "HWM_SET",
+        "lwm": 10.89,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1895698087": {
+        "hwm": 14.4,
+        "hwm_state": "HWM_SET",
+        "lwm": 14.08,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897832538": {
+        "hwm": 13.29,
+        "hwm_state": "HWM_SET",
+        "lwm": 10.37,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897951990": {
+        "hwm": 2.95,
+        "hwm_state": "INITIAL",
+        "lwm": 2.1,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897956629": {
+        "hwm": 0.98,
+        "hwm_state": "INITIAL",
+        "lwm": 0.6,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897956910": {
+        "hwm": 1.01,
+        "hwm_state": "HWM_SET",
+        "lwm": 0.62,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897957674": {
+        "hwm": 0.98,
+        "hwm_state": "INITIAL",
+        "lwm": 0.59,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897957986": {
+        "hwm": 0.96,
+        "hwm_state": "INITIAL",
+        "lwm": 0.57,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897958287": {
+        "hwm": 0.99,
+        "hwm_state": "INITIAL",
+        "lwm": 0.6,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897958672": {
+        "hwm": 0.99,
+        "hwm_state": "INITIAL",
+        "lwm": 0.6,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897958926": {
+        "hwm": 0.97,
+        "hwm_state": "INITIAL",
+        "lwm": 0.58,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897959637": {
+        "hwm": 0.88,
+        "hwm_state": "INITIAL",
+        "lwm": 0.49,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897962310": {
+        "hwm": 0.86,
+        "hwm_state": "INITIAL",
+        "lwm": 0.48,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897962938": {
+        "hwm": 0.82,
+        "hwm_state": "INITIAL",
+        "lwm": 0.44,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897963765": {
+        "hwm": 0.8,
+        "hwm_state": "INITIAL",
+        "lwm": 0.42,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897964083": {
+        "hwm": 0.82,
+        "hwm_state": "INITIAL",
+        "lwm": 0.43,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897964591": {
+        "hwm": 0.79,
+        "hwm_state": "INITIAL",
+        "lwm": 0.41,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897965910": {
+        "hwm": 0.79,
+        "hwm_state": "INITIAL",
+        "lwm": 0.4,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897966714": {
+        "hwm": 0.73,
+        "hwm_state": "INITIAL",
+        "lwm": 0.35,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897967213": {
+        "hwm": 0.69,
+        "hwm_state": "INITIAL",
+        "lwm": 0.31,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897967951": {
+        "hwm": 0.69,
+        "hwm_state": "INITIAL",
+        "lwm": 0.31,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897968512": {
+        "hwm": 0.73,
+        "hwm_state": "INITIAL",
+        "lwm": 0.35,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897969988": {
+        "hwm": 0.75,
+        "hwm_state": "INITIAL",
+        "lwm": 0.36,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897974256": {
+        "hwm": 0.64,
+        "hwm_state": "INITIAL",
+        "lwm": 0.26,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897977375": {
+        "hwm": 0.61,
+        "hwm_state": "INITIAL",
+        "lwm": 0.22,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897978602": {
+        "hwm": 0.61,
+        "hwm_state": "INITIAL",
+        "lwm": 0.23,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897979373": {
+        "hwm": 0.59,
+        "hwm_state": "INITIAL",
+        "lwm": 0.21,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897980108": {
+        "hwm": 0.58,
+        "hwm_state": "INITIAL",
+        "lwm": 0.19,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897980543": {
+        "hwm": 0.64,
+        "hwm_state": "INITIAL",
+        "lwm": 0.26,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897981054": {
+        "hwm": 0.67,
+        "hwm_state": "INITIAL",
+        "lwm": 0.29,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897981657": {
+        "hwm": 0.66,
+        "hwm_state": "INITIAL",
+        "lwm": 0.27,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897982248": {
+        "hwm": 0.66,
+        "hwm_state": "INITIAL",
+        "lwm": 0.27,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897983880": {
+        "hwm": 0.72,
+        "hwm_state": "INITIAL",
+        "lwm": 0.34,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897984869": {
+        "hwm": 0.67,
+        "hwm_state": "INITIAL",
+        "lwm": 0.29,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897985396": {
+        "hwm": 0.65,
+        "hwm_state": "INITIAL",
+        "lwm": 0.27,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897986099": {
+        "hwm": 0.68,
+        "hwm_state": "INITIAL",
+        "lwm": 0.3,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897986796": {
+        "hwm": 0.71,
+        "hwm_state": "INITIAL",
+        "lwm": 0.32,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897987978": {
+        "hwm": 0.69,
+        "hwm_state": "INITIAL",
+        "lwm": 0.3,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897989495": {
+        "hwm": 0.73,
+        "hwm_state": "INITIAL",
+        "lwm": 0.35,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897990111": {
+        "hwm": 0.69,
+        "hwm_state": "INITIAL",
+        "lwm": 0.31,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897990523": {
+        "hwm": 0.67,
+        "hwm_state": "INITIAL",
+        "lwm": 0.29,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897991391": {
+        "hwm": 0.69,
+        "hwm_state": "INITIAL",
+        "lwm": 0.31,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897992295": {
+        "hwm": 0.63,
+        "hwm_state": "INITIAL",
+        "lwm": 0.25,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897993640": {
+        "hwm": 0.62,
+        "hwm_state": "INITIAL",
+        "lwm": 0.23,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897994249": {
+        "hwm": 0.6,
+        "hwm_state": "INITIAL",
+        "lwm": 0.21,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897994961": {
+        "hwm": 0.6,
+        "hwm_state": "INITIAL",
+        "lwm": 0.21,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897995928": {
+        "hwm": 0.6,
+        "hwm_state": "INITIAL",
+        "lwm": 0.21,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897996447": {
+        "hwm": 0.64,
+        "hwm_state": "INITIAL",
+        "lwm": 0.25,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897996889": {
+        "hwm": 0.65,
+        "hwm_state": "INITIAL",
+        "lwm": 0.27,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897997455": {
+        "hwm": 0.63,
+        "hwm_state": "INITIAL",
+        "lwm": 0.24,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897997889": {
+        "hwm": 0.63,
+        "hwm_state": "INITIAL",
+        "lwm": 0.25,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897998325": {
+        "hwm": 0.61,
+        "hwm_state": "INITIAL",
+        "lwm": 0.23,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897998972": {
+        "hwm": 0.62,
+        "hwm_state": "INITIAL",
+        "lwm": 0.24,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1897999775": {
+        "hwm": 0.62,
+        "hwm_state": "INITIAL",
+        "lwm": 0.24,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898000252": {
+        "hwm": 0.63,
+        "hwm_state": "INITIAL",
+        "lwm": 0.25,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898000848": {
+        "hwm": 0.65,
+        "hwm_state": "INITIAL",
+        "lwm": 0.27,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898001618": {
+        "hwm": 0.64,
+        "hwm_state": "INITIAL",
+        "lwm": 0.25,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898001953": {
+        "hwm": 0.56,
+        "hwm_state": "INITIAL",
+        "lwm": 0.18,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898002721": {
+        "hwm": 0.51,
+        "hwm_state": "INITIAL",
+        "lwm": 0.13,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898003644": {
+        "hwm": 0.53,
+        "hwm_state": "INITIAL",
+        "lwm": 0.15,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898003994": {
+        "hwm": 0.51,
+        "hwm_state": "INITIAL",
+        "lwm": 0.13,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898004326": {
+        "hwm": 0.5,
+        "hwm_state": "INITIAL",
+        "lwm": 0.11,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898005259": {
+        "hwm": 0.47,
+        "hwm_state": "INITIAL",
+        "lwm": 0.09,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898005845": {
+        "hwm": 0.59,
+        "hwm_state": "INITIAL",
+        "lwm": 0.2,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898007029": {
+        "hwm": 0.62,
+        "hwm_state": "INITIAL",
+        "lwm": 0.23,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898007401": {
+        "hwm": 0.58,
+        "hwm_state": "INITIAL",
+        "lwm": 0.2,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898007679": {
+        "hwm": 0.58,
+        "hwm_state": "INITIAL",
+        "lwm": 0.19,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898007999": {
+        "hwm": 0.58,
+        "hwm_state": "INITIAL",
+        "lwm": 0.19,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898008345": {
+        "hwm": 0.59,
+        "hwm_state": "INITIAL",
+        "lwm": 0.21,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898008780": {
+        "hwm": 0.61,
+        "hwm_state": "INITIAL",
+        "lwm": 0.23,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898009251": {
+        "hwm": 0.64,
+        "hwm_state": "INITIAL",
+        "lwm": 0.25,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898010281": {
+        "hwm": 0.64,
+        "hwm_state": "INITIAL",
+        "lwm": 0.25,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898012954": {
+        "hwm": 0.64,
+        "hwm_state": "INITIAL",
+        "lwm": 0.25,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898013522": {
+        "hwm": 0.63,
+        "hwm_state": "INITIAL",
+        "lwm": 0.25,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898013948": {
+        "hwm": 0.65,
+        "hwm_state": "INITIAL",
+        "lwm": 0.27,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898014702": {
+        "hwm": 0.61,
+        "hwm_state": "INITIAL",
+        "lwm": 0.22,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898015209": {
+        "hwm": 0.6,
+        "hwm_state": "INITIAL",
+        "lwm": 0.21,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898017999": {
+        "hwm": 0.6,
+        "hwm_state": "INITIAL",
+        "lwm": 0.21,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898019465": {
+        "hwm": 0.62,
+        "hwm_state": "INITIAL",
+        "lwm": 0.24,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898019951": {
+        "hwm": 0.61,
+        "hwm_state": "INITIAL",
+        "lwm": 0.23,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898020456": {
+        "hwm": 0.62,
+        "hwm_state": "INITIAL",
+        "lwm": 0.24,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898022262": {
+        "hwm": 0.62,
+        "hwm_state": "INITIAL",
+        "lwm": 0.24,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898023238": {
+        "hwm": 0.62,
+        "hwm_state": "INITIAL",
+        "lwm": 0.24,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898024160": {
+        "hwm": 0.65,
+        "hwm_state": "INITIAL",
+        "lwm": 0.27,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898024660": {
+        "hwm": 0.63,
+        "hwm_state": "INITIAL",
+        "lwm": 0.25,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898025038": {
+        "hwm": 0.63,
+        "hwm_state": "INITIAL",
+        "lwm": 0.25,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898025567": {
+        "hwm": 0.59,
+        "hwm_state": "INITIAL",
+        "lwm": 0.21,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898029505": {
+        "hwm": 0.59,
+        "hwm_state": "INITIAL",
+        "lwm": 0.21,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898033094": {
+        "hwm": 0.61,
+        "hwm_state": "INITIAL",
+        "lwm": 0.23,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898034088": {
+        "hwm": 0.6,
+        "hwm_state": "INITIAL",
+        "lwm": 0.21,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898034938": {
+        "hwm": 0.59,
+        "hwm_state": "INITIAL",
+        "lwm": 0.2,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898035703": {
+        "hwm": 0.61,
+        "hwm_state": "INITIAL",
+        "lwm": 0.23,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898036142": {
+        "hwm": 0.63,
+        "hwm_state": "INITIAL",
+        "lwm": 0.24,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898037003": {
+        "hwm": 0.66,
+        "hwm_state": "INITIAL",
+        "lwm": 0.27,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898037423": {
+        "hwm": 0.64,
+        "hwm_state": "INITIAL",
+        "lwm": 0.25,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898038110": {
+        "hwm": 0.64,
+        "hwm_state": "INITIAL",
+        "lwm": 0.25,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898038468": {
+        "hwm": 0.64,
+        "hwm_state": "INITIAL",
+        "lwm": 0.25,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898039130": {
+        "hwm": 0.6,
+        "hwm_state": "INITIAL",
+        "lwm": 0.21,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898039897": {
+        "hwm": 0.62,
+        "hwm_state": "INITIAL",
+        "lwm": 0.24,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898040381": {
+        "hwm": 0.61,
+        "hwm_state": "INITIAL",
+        "lwm": 0.23,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898040782": {
+        "hwm": 0.64,
+        "hwm_state": "INITIAL",
+        "lwm": 0.25,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898041331": {
+        "hwm": 0.61,
+        "hwm_state": "INITIAL",
+        "lwm": 0.23,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898041639": {
+        "hwm": 0.68,
+        "hwm_state": "INITIAL",
+        "lwm": 0.3,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898042348": {
+        "hwm": 0.77,
+        "hwm_state": "INITIAL",
+        "lwm": 0.38,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898043405": {
+        "hwm": 0.72,
+        "hwm_state": "INITIAL",
+        "lwm": 0.34,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898044395": {
+        "hwm": 0.63,
+        "hwm_state": "INITIAL",
+        "lwm": 0.25,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898045565": {
+        "hwm": 0.64,
+        "hwm_state": "INITIAL",
+        "lwm": 0.26,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898046102": {
+        "hwm": 0.64,
+        "hwm_state": "INITIAL",
+        "lwm": 0.25,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898046484": {
+        "hwm": 0.61,
+        "hwm_state": "INITIAL",
+        "lwm": 0.23,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898046870": {
+        "hwm": 0.66,
+        "hwm_state": "INITIAL",
+        "lwm": 0.27,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898047379": {
+        "hwm": 0.68,
+        "hwm_state": "INITIAL",
+        "lwm": 0.3,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898047759": {
+        "hwm": 0.65,
+        "hwm_state": "INITIAL",
+        "lwm": 0.27,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898048133": {
+        "hwm": 0.63,
+        "hwm_state": "INITIAL",
+        "lwm": 0.24,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898048406": {
+        "hwm": 0.62,
+        "hwm_state": "INITIAL",
+        "lwm": 0.23,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898048920": {
+        "hwm": 0.61,
+        "hwm_state": "INITIAL",
+        "lwm": 0.22,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898049517": {
+        "hwm": 0.62,
+        "hwm_state": "INITIAL",
+        "lwm": 0.23,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898050009": {
+        "hwm": 0.61,
+        "hwm_state": "INITIAL",
+        "lwm": 0.23,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898050536": {
+        "hwm": 0.64,
+        "hwm_state": "INITIAL",
+        "lwm": 0.25,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "BTC/USDT": {
+        "hwm": -2.477,
+        "hwm_state": "INITIAL",
+        "lwm": -2.5952,
+        "lwm_state": "LWM_SET",
+        "banked": 0.0
+    }
+}

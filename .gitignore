@@ -1,0 +1,25 @@
+# --- SOVEREIGN SECURITY IGNORE ---
+
+# Private Credentials (CRITICAL)
+core_v3/secrets.json
+secrets.json
+
+# Databases & Dynamic State
+*.db
+*.db-wal
+*.db-shm
+core_v3/iron_core.db
+core_v3/dna.json
+core_v3/squadron.json
+03_DATA/
+
+# Python Environment
+__pycache__/
+*.pyc
+venv/
+.env
+
+# Antigravity/System Data
+.gemini/
+.DS_Store
+Thumbs.db

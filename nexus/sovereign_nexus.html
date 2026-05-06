@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOVEREIGN NEXUS v4.0 // VICTORY DASHBOARD</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-blue: #00f2ff;
+            --neon-red: #ff004c;
+            --neon-gold: #ffcc00;
+            --neon-green: #00ff88;
+            --neon-purple: #bc13fe;
+            --glass: rgba(8, 12, 20, 0.9);
+            --glass-bright: rgba(255, 255, 255, 0.05);
+            --bg: #020408;
+        }
+
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.3;
+        }
+
+        body {
+            background: var(--bg);
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            padding: 12px 30px;
+            background: rgba(0, 242, 255, 0.02);
+            border-bottom: 1px solid rgba(0, 242, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            letter-spacing: 8px;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+        }
+
+        .pnl-panel {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            padding: 5px 20px;
+            border-radius: 20px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .news-alert {
+            display: none;
+            background: rgba(255, 0, 76, 0.3);
+            border-bottom: 1px solid var(--neon-red);
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 5px;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        main {
+            display: grid;
+            grid-template-columns: 1.2fr 2fr 1.2fr;
+            gap: 15px;
+            padding: 15px;
+            flex-grow: 1;
+        }
+
+        .panel {
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+        }
+
+        .panel-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 5px;
+            letter-spacing: 3px;
+        }
+
+        .front-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        .front-card:hover { transform: scale(1.02); background: rgba(255,255,255,0.04); }
+        .front-card.exness { border-left: 4px solid var(--neon-blue); }
+        .front-card.binance { border-left: 4px solid var(--neon-gold); }
+        .front-card.south { border-left: 4px solid var(--neon-purple); }
+
+        .metric-value {
+            font-size: 38px;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 2px;
+        }
+
+        .squadron-item {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .tag {
+            font-size: 8px;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .tag-exness { background: rgba(0, 242, 255, 0.1); color: var(--neon-blue); border: 1px solid var(--neon-blue); }
+        .tag-binance { background: rgba(255, 204, 0, 0.1); color: var(--neon-gold); border: 1px solid var(--neon-gold); }
+        .tag-south { background: rgba(188, 19, 254, 0.1); color: var(--neon-purple); border: 1px solid var(--neon-purple); }
+
+        .squadron-item {
+            padding: 15px 20px;
+            font-size: 16px;
+        }
+
+        .dna-row {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .trade-item {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255,255,255,0.03);
+            transition: all 0.5s ease;
+        }
+
+        .pnl-positive { color: var(--neon-green); text-shadow: 0 0 10px rgba(0, 255, 136, 0.3); }
+        .pnl-negative { color: var(--neon-red); text-shadow: 0 0 10px rgba(255, 0, 76, 0.3); }
+
+        .victory-glow {
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+            border-color: rgba(0, 255, 136, 0.2) !important;
+        }
+
+        .defeat-glow {
+            box-shadow: 0 0 20px rgba(255, 0, 76, 0.1);
+            border-color: rgba(255, 0, 76, 0.2) !important;
+        }
+
+        .interact-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        .interact-card:hover {
+            transform: scale(1.03) translateY(-3px);
+            background: rgba(255, 255, 255, 0.05) !important;
+            box-shadow: 0 10px 30px rgba(0, 242, 255, 0.15);
+            z-index: 50;
+            border-color: rgba(0, 242, 255, 0.5) !important;
+        }
+        .intel-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+        }
+        .intel-card:hover {
+            transform: scale(1.08) translateY(-5px);
+            background: rgba(255, 255, 255, 0.05) !important;
+            box-shadow: 0 10px 30px rgba(0, 242, 255, 0.2);
+            z-index: 100;
+            border-color: var(--neon-blue) !important;
+        }
+        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body>
+    <div id="chronos-banner" class="news-alert">CHRONOS STAND-DOWN // HIGH IMPACT NEWS IN PROGRESS</div>
+    
+    <header>
+        <div class="title">SOVEREIGN NEXUS v5.0</div>
+        <div style="display:flex; gap:15px; align-items:center">
+            <div id="usd-pnl-container" class="pnl-panel">DAILY USD: <span id="usd-pnl">$0.00</span></div>
+            <div id="vnd-pnl-container" class="pnl-panel">DAILY VND: <span id="vnd-pnl">0 đ</span></div>
+        </div>
+        <div style="text-align:right">
+            <div id="safety-status" style="font-family:'Orbitron'; font-size:10px; color:#00ff88; margin-bottom:5px; border:1px solid #00ff88; padding:2px 8px; border-radius:10px">SAFETY: HARDENED</div>
+            <div id="clock-local" style="font-family:'Orbitron'; font-size:18px; color:var(--neon-blue)">00:00:00</div>
+            <div id="clock-utc" style="font-size:10px; opacity:0.5; letter-spacing:2px">UTC: 00:00:00</div>
+        </div>
+    </header>
+
+    <main>
+        <!-- DUAL FRONTS -->
+        <div class="panel">
+            <div class="panel-title">WESTERN FRONT (EXNESS)</div>
+            <div class="front-card exness interact-card">
+                <div style="font-size:10px; opacity:0.4">EQUITY POOL</div>
+                <div id="equity-mt5" class="metric-value" style="color:var(--neon-blue)">$0.00</div>
+                <div style="display:flex; justify-content:space-between; margin-top:10px">
+                    <span style="font-size:11px; opacity:0.5">DRAWDOWN</span>
+                    <span id="drawdown-mt5" style="color:var(--neon-green); font-weight:700">0.00%</span>
+                </div>
+            </div>
+
+            <div class="panel-title" style="margin-top:10px">EASTERN FRONT (BINANCE)</div>
+            <div class="front-card binance">
+                <div style="font-size:10px; opacity:0.4">EQUITY POOL (USDT)</div>
+                <div id="equity-bnc" class="metric-value" style="color:var(--neon-gold)">$0.00</div>
+                <div style="display:flex; justify-content:space-between; margin-top:10px">
+                    <span style="font-size:11px; opacity:0.5">DRAWDOWN</span>
+                    <span id="drawdown-bnc" style="color:var(--neon-green); font-weight:700">0.00%</span>
+                </div>
+            </div>
+
+            <div class="panel-title" style="margin-top:10px">SOUTHERN FRONT (ENTRADE)</div>
+            <div class="front-card south">
+                <div style="font-size:10px; opacity:0.4">EQUITY POOL (VND)</div>
+                <div id="equity-south" class="metric-value" style="color:var(--neon-purple)">0 đ</div>
+                <div style="display:flex; justify-content:space-between; margin:10px 0">
+                    <span id="pos-status-south" style="font-size:11px; opacity:0.5">STANDBY</span>
+                    <span id="drawdown-south" style="color:var(--neon-green); font-weight:700">0.00%</span>
+                </div>
+                <a href="southern_command.html" target="_blank" style="display:block; text-align:center; padding:10px; border:1px solid var(--neon-purple); color:var(--neon-purple); text-decoration:none; font-family:'Orbitron'; font-size:10px; letter-spacing:2px; background:rgba(188,19,254,0.05); transition:all 0.3s">OPEN TACTICAL OVERLAY ></a>
+            </div>
+
+            <div class="panel-title" style="margin-top:auto">GLOBAL DISCOVERY</div>
+            <div id="scan-count" style="font-size:14px; color:var(--neon-blue); text-align:center; padding:10px; background:rgba(0,242,255,0.05); border-radius:4px">SCANNED: 60 ASSETS</div>
+        </div>
+
+        <!-- SQUADRONS -->
+        <div class="panel">
+            <div class="panel-title">SOVEREIGN SQUADRONS</div>
+            <div id="squadron-list" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 25px;">
+                <!-- Squadrons -->
+            </div>
+
+            <div id="dna-list" style="display: grid; gap: 8px; margin-bottom: 25px;">
+                <!-- DNA -->
+            </div>
+
+            <div class="panel-title">SOVEREIGN INTELLIGENCE (NEURAL WISDOM)</div>
+            <div id="intel-list" style="display: grid; gap: 10px;">
+                <div style="text-align:center; padding:20px; opacity:0.3">INITIALIZING NEURAL NET...</div>
+            </div>
+        </div>
+
+        <!-- STRIKES -->
+        <div class="panel">
+            <div class="panel-title">TACTICAL STRIKE LOG (LIVE PnL)</div>
+            <div id="trade-log" style="overflow-y:auto; flex-grow:1; max-height: 700px;">
+                <!-- Trades -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        async function updateHUD() {
+            try {
+                const response = await fetch('http://127.0.0.1:5050/api/telemetry');
+                if (!response.ok) throw new Error();
+                const data = await response.json();
+
+                if (data.status === "ONLINE") {
+                    document.getElementById('chronos-banner').style.display = data.news_pause ? 'block' : 'none';
+                    document.getElementById('safety-status').innerText = `SAFETY: ${data.safety_status || 'ACTIVE'}`;
+                    document.getElementById('safety-status').style.color = data.safety_status === 'HARDENED' ? '#00ff88' : '#ff004c';
+                    document.getElementById('safety-status').style.borderColor = data.safety_status === 'HARDENED' ? '#00ff88' : '#ff004c';
+                    // Session PnL (USD)
+                    const usdPnl = document.getElementById('usd-pnl');
+                    usdPnl.innerText = `$${data.session_pnl_usd.toFixed(2)}`;
+                    usdPnl.className = data.session_pnl_usd >= 0 ? 'pnl-positive' : 'pnl-negative';
+                    document.getElementById('usd-pnl-container').style.borderColor = data.session_pnl_usd >= 0 ? 'var(--neon-green)' : 'var(--neon-red)';
+
+                    // Session PnL (VND)
+                    const formatVND = (num) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num).replace('₫', 'đ');
+                    const vndPnl = document.getElementById('vnd-pnl');
+                    vndPnl.innerText = formatVND(data.session_pnl_vnd);
+                    vndPnl.className = data.session_pnl_vnd >= 0 ? 'pnl-positive' : 'pnl-negative';
+                    document.getElementById('vnd-pnl-container').style.borderColor = data.session_pnl_vnd >= 0 ? 'var(--neon-green)' : 'var(--neon-red)';
+
+                    // MT5
+                    const mt5 = data.health_mt5;
+                    document.getElementById('equity-mt5').innerText = `$${(mt5.equity || 0).toFixed(2)}`;
+                    document.getElementById('drawdown-mt5').innerText = `${((mt5.drawdown || 0) * 100).toFixed(2)}%`;
+                    document.getElementById('drawdown-mt5').style.color = mt5.drawdown > 0.001 ? 'var(--neon-red)' : 'rgba(255,255,255,0.4)';
+
+                    // BNC
+                    const bnc = data.health_bnc || {};
+                    document.getElementById('equity-bnc').innerText = `$${(bnc.equity || 0).toFixed(2)}`;
+                    document.getElementById('drawdown-bnc').innerText = `${((bnc.drawdown || 0) * 100).toFixed(2)}%`;
+                    document.getElementById('drawdown-bnc').style.color = bnc.drawdown > 0.001 ? 'var(--neon-red)' : 'rgba(255,255,255,0.4)';
+                    
+                    // SOUTH
+                    const south = data.health_south || {};
+                    const firstActive = Object.values(south.fleet || {}).find(u => u.active) || {};
+                    
+                    document.getElementById('equity-south').innerText = formatVND(south.equity_vnd || 0);
+                    document.getElementById('drawdown-south').innerText = `${((south.drawdown || 0) * 100).toFixed(2)}%`;
+                    document.getElementById('pos-status-south').innerText = south.active ? `${firstActive.side || ''} ${firstActive.symbol || ''} [SL: ${(firstActive.sl||0).toFixed(1)} TP: ${(firstActive.tp||0).toFixed(1)}]` : "STANDBY";
+                    document.getElementById('pos-status-south').style.color = south.active ? 'var(--neon-purple)' : 'rgba(255,255,255,0.3)';
+
+                    document.getElementById('clock-local').innerText = new Date().toLocaleTimeString();
+                    document.getElementById('clock-utc').innerText = `UTC: ${data.current_time_utc || '00:00:00'}`;
+
+                    const squadDiv = document.getElementById('squadron-list');
+                    squadDiv.innerHTML = '';
+                    const unitStats = data.unit_stats || {};
+
+                    for (const [unit, symbols] of Object.entries(data.squadron)) {
+                        const div = document.createElement('div');
+                        const unitColor = unit==='ALPHA'?'var(--neon-blue)':unit==='OMEGA'?'var(--neon-gold)':'var(--neon-purple)';
+                        const stats = unitStats[unit] || {win_rate: '0%', strikes: 0, context: {er: 0.5, atr: 0, confidence: 50}};
+                        const ctx = stats.context;
+                        const erColor = ctx.er > 0.6 ? 'var(--neon-green)' : ctx.er < 0.3 ? 'var(--neon-red)' : 'var(--neon-gold)';
+                        const confColor = ctx.confidence > 60 ? 'var(--neon-green)' : ctx.confidence < 40 ? 'var(--neon-red)' : 'var(--neon-blue)';
+                        
+                        div.innerHTML = `<div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:5px; opacity:0.6; font-family:'Orbitron'">
+                            <span>${unit} UNIT</span>
+                            <span style="color:${unitColor}">WR: ${stats.win_rate} [${stats.strikes}]</span>
+                        </div>
+                        <div class="intel-card" style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:4px; padding:10px; margin-bottom:15px; font-size:10px">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:5px">
+                                <span>ER (TREND):</span>
+                                <span style="color:${erColor}">${(ctx.er * 100).toFixed(0)}%</span>
+                            </div>
+                            <div style="height:2px; background:rgba(255,255,255,0.1); width:100%; position:relative; overflow:hidden; margin-bottom:8px">
+                                <div style="height:100%; background:${erColor}; width:${ctx.er * 100}%"></div>
+                            </div>
+                            
+                            <div style="display:flex; justify-content:space-between; margin-bottom:5px">
+                                <span>CONFIDENCE:</span>
+                                <span style="color:${confColor}">${ctx.confidence}%</span>
+                            </div>
+                            <div style="height:2px; background:rgba(255,255,255,0.1); width:100%; position:relative; overflow:hidden">
+                                <div style="height:100%; background:${confColor}; width:${ctx.confidence}%"></div>
+                            </div>
+
+                            <div style="display:flex; justify-content:space-between; margin-top:10px; opacity:0.5">
+                                <span>ATR (VOL):</span>
+                                <span>${ctx.atr ? ctx.atr.toFixed(2) : 'N/A'}</span>
+                            </div>
+                        </div>` + 
+                            symbols.map(s => {
+                                const isCrypto = s.includes('USDT') || s.includes('/');
+                                const tagClass = isCrypto ? 'tag-binance' : 'tag-exness';
+                                const tagLabel = isCrypto ? 'BINANCE' : 'EXNESS';
+                                return `<div class="squadron-item interact-card" style="border-left: 4px solid ${unitColor}; margin-bottom:10px; background:rgba(255,255,255,0.03); border-radius:4px; display:flex; justify-content:space-between; align-items:center">
+                                    <span style="font-weight:700">${s.replace('USDT','').replace('/','')}</span>
+                                    <span class="tag ${tagClass}">${tagLabel}</span>
+                                </div>`;
+                            }).join('');
+                        squadDiv.appendChild(div);
+                    }
+
+                    const dnaDiv = document.getElementById('dna-list');
+                    dnaDiv.innerHTML = '';
+                    for (const [unit, d] of Object.entries(data.dna)) {
+                        if (unit === 'GLOBAL') continue;
+                        const unitColor = unit==='ALPHA'?'var(--neon-blue)':unit==='OMEGA'?'var(--neon-gold)':'var(--neon-purple)';
+                        dnaDiv.innerHTML += `
+                            <div class="dna-row interact-card" style="border-left: 4px solid ${unitColor}">
+                                <div style="display:flex; justify-content:space-between; align-items:center">
+                                    <span style="font-family:'Orbitron'; color:${unitColor}">${unit} CONFIG</span>
+                                    <span style="font-size:24px; font-weight:700; color:#fff">LOT: ${d.LOT_SIZE}</span>
+                                </div>
+                                <div style="display:flex; gap:20px; margin-top:10px; opacity:0.6; font-size:14px">
+                                    <span>SL: ${d.SL}</span>
+                                    <span>TP: ${d.TP}</span>
+                                    <span>SHAVE: ${d.ACTIVE_RISK.SHAVE_VAL}%</span>
+                                    <span>MAX_LAYERS: ${d.ACTIVE_RISK.MAX_LAYERS}</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    const tradeDiv = document.getElementById('trade-log');
+                    tradeDiv.innerHTML = data.trades.map(t => {
+                        const isCrypto = t.symbol.includes('USDT');
+                        const isSouth = t.unit && t.unit.includes('SOUTH');
+                        const pnlClass = t.pnl >= 0 ? 'pnl-positive' : 'pnl-negative';
+                        const glowClass = t.pnl >= 0 ? 'victory-glow' : 'defeat-glow';
+                        const unitColor = t.unit && t.unit.includes('ALPHA') ? 'var(--neon-blue)' : t.unit && t.unit.includes('OMEGA') ? 'var(--neon-gold)' : 'var(--neon-purple)';
+                        const frontLabel = isCrypto ? 'BINANCE' : isSouth ? 'ENTRADE' : 'EXNESS';
+                        
+                        // Localize Timestamp
+                        let localTime = "--:--";
+                        if (t.time) {
+                            const utcDate = new Date(t.time + " UTC");
+                            localTime = utcDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+                        }
+                        
+                        return `
+                        <div class="trade-item interact-card ${glowClass}" style="border-left: 4px solid ${unitColor}">
+                            <div style="display:flex; justify-content:space-between; font-size:10px; opacity:0.4">
+                                <span>${t.unit} STRIKE</span>
+                                <span>${localTime}</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; margin-top:6px; align-items:center">
+                                <span style="font-weight:700; font-size:14px; color:${t.side==='BUY' || t.side==='LONG'?'var(--neon-green)':'var(--neon-red)'}">${t.side} ${t.symbol.replace('USDT','')}</span>
+                                <span class="${pnlClass}" style="font-weight:700; font-size:18px">${t.pnl >= 0 ? '+' : ''}${isSouth ? formatVND(t.pnl * 100000) : '$'+(t.pnl || 0).toFixed(2)}</span>
+                            </div>
+                            <div style="margin-top:5px; font-size:9px; opacity:0.3; text-align:right">ENTRY: ${t.price.toFixed(1)} | SL: ${(t.sl||0).toFixed(1)} | TP: ${(t.tp||0).toFixed(1)} | FRONT: ${frontLabel}</div>
+                        </div>`;
+                    }).join('');
+                }
+            } catch (e) {}
+        }
+        async function updateIntelligence() {
+            try {
+                const response = await fetch('http://127.0.0.1:5050/api/intelligence');
+                const data = await response.json();
+                const intelDiv = document.getElementById('intel-list');
+                
+                if (data.samples === 0) {
+                    intelDiv.innerHTML = `<div style="text-align:center; padding:15px; border:1px dashed rgba(255,255,255,0.1); border-radius:8px; opacity:0.5; font-size:12px">
+                        BRAIN IN INFANCY<br><span style="font-size:9px">Waiting for closed trades to build wisdom...</span>
+                    </div>`;
+                    return;
+                }
+
+                let html = `<div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:10px; color:var(--neon-blue); font-family:'Orbitron'">
+                    <span>EXPERIENCE SAMPLES:</span>
+                    <span>${data.samples}</span>
+                </div>`;
+
+                html += `<div style="font-size:10px; color:rgba(255,255,255,0.4); margin-bottom:10px; letter-spacing:1px">TOP PERFORMING CONFIGS (BY REAL PNL):</div>`;
+                
+                html += data.top_configs.map(c => `
+                    <div style="background:rgba(255,255,255,0.03); padding:10px; border-radius:6px; margin-bottom:6px; border:1px solid rgba(0,242,255,0.1); display:flex; justify-content:space-between; align-items:center">
+                        <div>
+                            <span style="font-weight:700; color:var(--neon-blue)">${c.symbol}</span>
+                            <span style="font-size:10px; opacity:0.5; margin-left:10px">SL:${c.sl} TP:${c.tp}</span>
+                        </div>
+                        <div style="text-align:right">
+                            <div style="font-size:14px; color:var(--neon-green)">+${c.avg_pnl.toFixed(2)}</div>
+                            <div style="font-size:8px; opacity:0.4">${c.trades} TRADES</div>
+                        </div>
+                    </div>
+                `).join('');
+
+                intelDiv.innerHTML = html;
+            } catch (e) {}
+        }
+
+        setInterval(updateHUD, 3000);
+        setInterval(updateIntelligence, 10000);
+        updateHUD();
+        updateIntelligence();
+    </script>
+</body>
+</html>

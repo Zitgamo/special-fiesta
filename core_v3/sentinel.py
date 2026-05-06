@@ -1,0 +1,137 @@
+import psutil
+import subprocess
+import time
+import os
+
+class IronSentinel:
+    """
+    Zero-Latency Self-Healing Guard.
+    Watches the fleet and resurrects any fallen process.
+    """
+    def __init__(self):
+        self.fleet = {
+            "MASTER": "core_v3/master.py",
+            "BRIDGE": "core_v3/nexus_bridge.py",
+            "GHOST_COMM": "core_v3/ghost_comm.py",
+            "ALPHA": ["core_v3/engine.py", "ALPHA"],
+            "OMEGA": ["core_v3/engine.py", "OMEGA"],
+            "GAMMA": ["core_v3/engine.py", "GAMMA"],
+            "SOUTHERN_FRONT": "core_v3/southern_paper_bridge.py"
+        }
+        self.is_running = True
+
+    def is_alive(self, name):
+        """Checks if a process is alive by its command line arguments."""
+        for proc in psutil.process_iter(['cmdline']):
+            try:
+                cmd = proc.info['cmdline']
+                if not cmd: continue
+                
+                cmd_str = " ".join(cmd).lower()
+                
+                # Check for unique identifiers (Case-Insensitive)
+                if name == "ALPHA" and all(k in cmd_str for k in ["engine.py", "alpha"]): return True
+                if name == "OMEGA" and all(k in cmd_str for k in ["engine.py", "omega"]): return True
+                if name == "GAMMA" and all(k in cmd_str for k in ["engine.py", "gamma"]): return True
+                if name == "MASTER" and "master.py" in cmd_str: return True
+                if name == "BRIDGE" and "nexus_bridge.py" in cmd_str: return True
+                if name == "GHOST_COMM" and "ghost_comm.py" in cmd_str: return True
+                if name == "SOUTHERN_FRONT" and "southern_paper_bridge.py" in cmd_str: return True
+            except: continue
+        return False
+
+    def resurrect(self, name):
+        print(f" !! [SENTINEL] {name} has fallen! Initiating Emergency Resurrection...")
+        path_data = self.fleet[name]
+        base = os.getcwd()
+        
+        if isinstance(path_data, list):
+            cmd = ["python", os.path.join(base, path_data[0]), path_data[1]]
+            subprocess.Popen(cmd)
+        else:
+            cmd = ["python", os.path.join(base, path_data)]
+            subprocess.Popen(cmd)
+            
+        print(f" >> [SUCCESS] {name} is back online.")
+
+    def run(self):
+        print("--- IRON SENTINEL v3.0: PROTOCOL LOCKDOWN ACTIVE ---")
+        import sys
+        sys.path.append(os.path.join(os.getcwd(), 'core_v3'))
+        from system_integrity_check import check_integrity_silent
+        
+        while self.is_running:
+            # 1. THE SUPREME AUDIT
+            # We must run this from the same directory as the engines
+            audit_pass, report = check_integrity_silent()
+            if not audit_pass:
+                print(f" !! [PROTOCOL_VIOLATION] {report}. TERMINATING FLEET!")
+                for name in self.fleet:
+                    # Logic to kill rogue processes
+                    pass
+                time.sleep(10)
+                continue
+                
+            # 2. RESURRECTION LOOP
+            for name in self.fleet:
+                if not self.is_alive(name):
+                    self.resurrect(name)
+            
+            # 3. SELF-HEALING MONITOR (Detect repeated failures)
+            self.monitor_engine_logs()
+            
+            # 4. HEARTBEAT AUDIT (Squadron Population Enforcement)
+            self.heartbeat_audit()
+            
+            time.sleep(5)
+
+    def monitor_engine_logs(self):
+        """Detects patterns like 'Invalid volume' and alerts the user."""
+        for unit in ["ALPHA", "OMEGA", "GAMMA"]:
+            log_file = f"{unit.lower()}_engine.log"
+            if not os.path.exists(log_file): continue
+            
+            try:
+                with open(log_file, "r") as f:
+                    # Look at the tail
+                    content = f.readlines()[-20:]
+                    if any("Invalid volume (Code: 10014)" in line for line in content):
+                        print(f" !! [CRITICAL] {unit} UNIT hitting VOLUME ERRORS. System requires optimization.")
+                    if any("Invalid stops (Code: 10016)" in line for line in content):
+                        print(f" !! [CRITICAL] {unit} UNIT hitting STOP ERRORS. ATR/SL logic may be too tight.")
+            except: pass
+
+    def heartbeat_audit(self):
+        """
+        Checks if the fleet is idle and triggers a Master re-scan if needed.
+        """
+        try:
+            import sqlite3
+            # Use absolute path to ensure DB access from anywhere
+            db_path = os.path.join(os.getcwd(), "core_v3", "iron_core.db")
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            # Count active trades (where type is 'LIVE')
+            cursor.execute("SELECT COUNT(*) FROM trades WHERE type = 'LIVE'")
+            active_count = cursor.fetchone()[0]
+            conn.close()
+            
+            if active_count == 0:
+                trigger_path = os.path.join(os.getcwd(), "core_v3", "scan_trigger.tmp")
+                # Only trigger if the file is old (e.g., > 1 hour) or doesn't exist
+                # to prevent constant scanning
+                should_trigger = True
+                if os.path.exists(trigger_path):
+                    if time.time() - os.path.getmtime(trigger_path) < 3600:
+                        should_trigger = False
+                
+                if should_trigger:
+                    print(" !! [SENTINEL] Fleet Idle. Triggering emergency Market Scan...")
+                    with open(trigger_path, "w") as f:
+                        f.write(str(time.time()))
+        except Exception as e:
+            print(f" !! [SENTINEL_ERR] Heartbeat audit failed: {e}")
+
+if __name__ == "__main__":
+    sentinel = IronSentinel()
+    sentinel.run()

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOVEREIGN // SOUTHERN COMMAND</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-purple: #bc13fe;
+            --neon-blue: #00f2ff;
+            --neon-green: #00ff88;
+            --neon-red: #ff004c;
+            --bg: #020408;
+            --glass: rgba(18, 10, 30, 0.95);
+        }
+
+        body {
+            background: var(--bg);
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            margin: 0;
+            padding: 40px;
+            overflow-x: hidden;
+        }
+
+        header {
+            border-bottom: 2px solid var(--neon-purple);
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            letter-spacing: 10px;
+            color: var(--neon-purple);
+            text-shadow: 0 0 20px rgba(188, 19, 254, 0.5);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .panel {
+            background: var(--glass);
+            border: 1px solid rgba(188, 19, 254, 0.2);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+        }
+
+        .panel-title {
+            font-family: 'Orbitron';
+            font-size: 12px;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .unit-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 1fr;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .unit-name { font-family: 'Orbitron'; color: var(--neon-purple); font-size: 18px; }
+        .unit-stat { text-align: center; }
+        .unit-label { font-size: 10px; opacity: 0.4; margin-bottom: 5px; }
+        .unit-val { font-family: 'Orbitron'; font-size: 16px; }
+
+        .stat-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .mini-card {
+            background: rgba(188, 19, 254, 0.05);
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            border: 1px solid rgba(188, 19, 254, 0.1);
+        }
+
+        .trade-log {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .trade-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1.5fr;
+            padding: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 14px;
+        }
+
+        .pnl-pos { color: var(--neon-green); }
+        .pnl-neg { color: var(--neon-red); }
+
+        .back-btn {
+            background: transparent;
+            border: 1px solid var(--neon-purple);
+            color: var(--neon-purple);
+            padding: 10px 20px;
+            font-family: 'Orbitron';
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            background: var(--neon-purple);
+            color: #fff;
+            box-shadow: 0 0 20px var(--neon-purple);
+        }
+
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100vh); }
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: rgba(188, 19, 254, 0.1);
+            z-index: 1000;
+            pointer-events: none;
+            animation: scanline 8s linear infinite;
+        }
+        .interact-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        .interact-card:hover {
+            transform: scale(1.02) translateY(-2px);
+            background: rgba(188, 19, 254, 0.1) !important;
+            box-shadow: 0 5px 20px rgba(188, 19, 254, 0.2);
+            z-index: 10;
+        }
+        .intel-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+        }
+        .intel-card:hover {
+            transform: scale(1.05) translateY(-5px);
+            background: rgba(188, 19, 254, 0.1) !important;
+            box-shadow: 0 10px 30px rgba(188, 19, 254, 0.3);
+            z-index: 100;
+            border: 1px solid var(--neon-purple);
+        }
+    </style>
+</head>
+<body>
+    <div class="scanline"></div>
+    
+    <header>
+        <div class="title">SOUTHERN COMMAND // TACTICAL OVERLAY</div>
+        <a href="http://127.0.0.1:5050/" class="back-btn">< BACK TO NEXUS</a>
+    </header>
+
+    <div class="grid">
+        <!-- FLEET STATUS -->
+        <div class="panel">
+            <div class="panel-title">ACTIVE DRAGON FLEET</div>
+            <div id="south-intelligence" style="margin-bottom: 25px; border-bottom: 1px solid rgba(188,19,254,0.1); padding-bottom: 15px;">
+                <!-- Intelligence Widgets -->
+            </div>
+            <div id="fleet-list">
+                <!-- Populated by JS -->
+            </div>
+
+            <div class="stat-box">
+                <div class="mini-card interact-card">
+                    <div class="unit-label">TOTAL EQUITY (VND)</div>
+                    <div id="total-equity" class="unit-val" style="color:var(--neon-purple)">100.000.000 đ</div>
+                </div>
+                <div class="mini-card interact-card">
+                    <div class="unit-label">TOTAL PnL (VND)</div>
+                    <div id="total-pnl" class="unit-val" style="color:var(--neon-green)">0 đ</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STRIKE LOG -->
+        <div class="panel">
+            <div class="panel-title">SOUTHERN STRIKE LOG</div>
+            <div class="trade-log">
+                <div class="trade-row" style="font-weight:700; font-size:10px; opacity:0.3; letter-spacing:2px">
+                    <div>UNIT</div>
+                    <div style="text-align:center">SIDE</div>
+                    <div style="text-align:center">PNL</div>
+                    <div style="text-align:right">TIMESTAMP</div>
+                </div>
+                <div id="southern-trades">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatVND(num) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num).replace('₫', 'đ');
+        }
+
+        async function updateCommand() {
+            try {
+                const response = await fetch('http://127.0.0.1:5050/api/telemetry');
+                const data = await response.json();
+                
+                if (data.status === "ONLINE") {
+                    const south = data.health_south || {};
+                    const fleet = south.fleet || {};
+                    const fleetDiv = document.getElementById('fleet-list');
+                    fleetDiv.innerHTML = '';
+                    
+                    let totalPnlVnd = 0;
+                    let totalEquityVnd = 0;
+
+                    for (const [uid, u] of Object.entries(fleet)) {
+                        const unitPnlVnd = (u.pnl_vnd || 0);
+                        totalPnlVnd += unitPnlVnd;
+                        totalEquityVnd = (u.equity_vnd || 100000000); 
+                        
+                        const side = u.pos === 1 ? 'LONG' : u.pos === -1 ? 'SHORT' : 'STANDBY';
+                        const color = u.pos === 1 ? 'var(--neon-green)' : u.pos === -1 ? 'var(--neon-red)' : 'rgba(255,255,255,0.2)';
+                        
+                        fleetDiv.innerHTML += `
+                        <div class="unit-card interact-card">
+                            <div class="unit-name">${uid}</div>
+                            <div class="unit-stat">
+                                <div class="unit-label">POSITION / ENTRY</div>
+                                <div class="unit-val" style="color:${color}">${side} @ ${(u.entry || 0).toFixed(1)}</div>
+                            </div>
+                            <div class="unit-stat">
+                                <div class="unit-label">SL / TP</div>
+                                <div class="unit-val" style="font-size:14px; opacity:0.8">${(u.sl || 0).toFixed(1)} / ${(u.tp || 0).toFixed(1)}</div>
+                            </div>
+                            <div class="unit-stat">
+                                <div class="unit-label">PNL (VND)</div>
+                                <div class="unit-val" style="font-size:20px; color:${unitPnlVnd >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'}">${formatVND(unitPnlVnd)}</div>
+                            </div>
+                        </div>`;
+                    }
+
+                    // --- SOUTHERN INTELLIGENCE ---
+                    const intelDiv = document.getElementById('south-intelligence');
+                    const ctx = south.context || {er: 0.5, atr: 0, confidence: 50};
+                    const erColor = ctx.er > 0.6 ? 'var(--neon-green)' : ctx.er < 0.3 ? 'var(--neon-red)' : 'var(--neon-gold)';
+                    const confColor = ctx.confidence > 60 ? 'var(--neon-green)' : ctx.confidence < 40 ? 'var(--neon-red)' : 'var(--neon-blue)';
+                    
+                    intelDiv.innerHTML = `
+                        <div style="font-size:10px; opacity:0.4; letter-spacing:3px; margin-bottom:15px">VN30F1M // NEURAL INTELLIGENCE</div>
+                        <div class="intel-card" style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:20px; background:rgba(255,255,255,0.02); padding:15px; border-radius:8px; border:1px solid rgba(255,255,255,0.05)">
+                            <div>
+                                <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px">
+                                    <span>TREND EFFICIENCY (ER)</span>
+                                    <span style="color:${erColor}">${(ctx.er*100).toFixed(0)}%</span>
+                                </div>
+                                <div style="height:3px; background:rgba(255,255,255,0.05); width:100%">
+                                    <div style="height:100%; background:${erColor}; width:${ctx.er*100}%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px">
+                                    <span>NEURAL CONFIDENCE</span>
+                                    <span style="color:${confColor}">${ctx.confidence}%</span>
+                                </div>
+                                <div style="height:3px; background:rgba(255,255,255,0.05); width:100%">
+                                    <div style="height:100%; background:${confColor}; width:${ctx.confidence}%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px">
+                                    <span>VOLATILITY (ATR)</span>
+                                    <span style="color:var(--neon-blue)">${(ctx.atr || 0).toFixed(2)} pts</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    document.getElementById('total-equity').innerText = formatVND(totalEquityVnd);
+                    document.getElementById('total-pnl').innerText = formatVND(totalPnlVnd);
+                    document.getElementById('total-pnl').style.color = totalPnlVnd >= 0 ? 'var(--neon-green)' : 'var(--neon-red)';
+
+                    // Trades (VN TIME CALIBRATION)
+                    const tradeDiv = document.getElementById('southern-trades');
+                    const sTrades = data.trades.filter(t => t.unit && t.unit.includes('SOUTH') || t.symbol === 'VN30F1M');
+                    tradeDiv.innerHTML = sTrades.map(t => {
+                        const pnlVnd = t.pnl * 100000;
+                        const vnTime = new Date(t.time.replace(' ', 'T')).toLocaleString('en-GB', { timeZone: 'Asia/Ho_Chi_Minh', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                        return `
+                        <div class="trade-row interact-card">
+                            <div style="color:var(--neon-purple)">${t.unit}</div>
+                            <div style="text-align:center; color:${t.side==='BUY'?'var(--neon-green)':'var(--neon-red)'}">${t.side}</div>
+                            <div style="text-align:center">
+                                <span class="${pnlVnd >= 0 ? 'pnl-pos' : 'pnl-neg'}" style="font-size:16px">${formatVND(pnlVnd)}</span>
+                                <div style="font-size:10px; opacity:0.3">ENTRY: ${t.price.toFixed(1)}</div>
+                            </div>
+                            <div style="text-align:right; opacity:0.4; font-size:12px">${vnTime}</div>
+                        </div>
+                    `;}).join('');
+                }
+            } catch (e) {}
+        }
+
+        setInterval(updateCommand, 3000);
+        updateCommand();
+    </script>
+</body>
+</html>

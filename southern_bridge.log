@@ -1,0 +1,28 @@
+[2026-05-06 09:09:41,626] INFO: Southern Front Bridge Initializing...
+[2026-05-06 09:09:41,627] INFO:  >> [RESTORE] Resumed Dragon Fleet from state file.
+[2026-05-06 09:09:41,628] INFO: Southern Front Expansion: Online.
+[2026-05-06 09:35:48,901] INFO: Southern Front Bridge Initializing...
+[2026-05-06 09:35:48,901] INFO:  >> [RESTORE] Resumed Dragon Fleet from state file.
+[2026-05-06 09:35:48,902] INFO: Southern Front Expansion: Online.
+[2026-05-06 09:40:50,820] INFO: Southern Front Bridge Initializing...
+[2026-05-06 09:40:50,821] INFO:  >> [RESTORE] Resumed Dragon Fleet from state file.
+[2026-05-06 09:40:50,821] INFO: Southern Front Expansion: Online.
+[2026-05-06 09:41:42,922] INFO: Southern Front Bridge Initializing...
+[2026-05-06 09:41:42,923] INFO:  >> [RESTORE] Resumed Dragon Fleet from state file.
+[2026-05-06 09:41:42,923] INFO: Southern Front Expansion: Online.
+[2026-05-06 09:41:46,611] INFO:  [SOUTH_GAMMA] ENTRY SHORT @ 2043.1 | SL: 2045.3 TP: 2034.1
+[2026-05-06 09:42:41,599] INFO: Southern Front Bridge Initializing...
+[2026-05-06 09:42:41,599] INFO:  >> [RESTORE] Resumed Dragon Fleet from state file.
+[2026-05-06 09:42:41,599] INFO: Southern Front Expansion: Online.
+[2026-05-06 09:43:45,206] INFO:  [SQL_SYNC] SOUTH_OMEGA Strike recorded to iron_core.db
+[2026-05-06 09:43:45,206] INFO:  [PAPER_STRIKE] SOUTH_OMEGA LONG PnL: -4.30 pts
+[2026-05-06 09:54:49,604] INFO:  [SOUTH_OMEGA] ENTRY LONG @ 2043.5 | SL: 2041.6 TP: 2049.8
+[2026-05-06 09:55:49,988] INFO:  [SOUTH_ALPHA] ENTRY LONG @ 2043.9 | SL: 2040.8 TP: 2056.1
+[2026-05-06 09:56:50,366] INFO:  [SQL_SYNC] SOUTH_ALPHA Strike recorded to iron_core.db
+[2026-05-06 09:56:50,366] INFO:  [PAPER_STRIKE] SOUTH_ALPHA LONG PnL: -0.90 pts
+[2026-05-06 10:00:51,865] INFO:  [SOUTH_ALPHA] ENTRY SHORT @ 2042.3 | SL: 2045.3 TP: 2030.5
+[2026-05-06 10:01:52,301] INFO:  [SQL_SYNC] SOUTH_OMEGA Strike recorded to iron_core.db
+[2026-05-06 10:01:52,301] INFO:  [PAPER_STRIKE] SOUTH_OMEGA LONG PnL: -2.10 pts
+[2026-05-06 10:22:00,716] INFO:  [SQL_SYNC] SOUTH_GAMMA Strike recorded to iron_core.db
+[2026-05-06 10:22:00,716] INFO:  [PAPER_STRIKE] SOUTH_GAMMA SHORT PnL: 2.20 pts
+[2026-05-06 10:24:01,466] INFO:  [SOUTH_GAMMA] ENTRY SHORT @ 2039.6 | SL: 2041.4 TP: 2032.4
