@@ -19,19 +19,35 @@ class GhostComm:
         @self.bot.message_handler(commands=['start', 'status'])
         def send_status(message):
             try:
-                # Fetch live data from DNA or Bridge
-                with open("core_v3/dna.json", "r") as f:
-                    dna = json.load(f)
+                import requests
+                # Fetch live data from the local Bridge API
+                response = requests.get('http://127.0.0.1:5050/api/telemetry')
+                data = response.json()
                 
+                # HTML Formatting for a premium Telegram UI
                 status_msg = (
-                    "--- SOVEREIGN COMMAND STATUS ---\n"
-                    f"REGIME: {dna['GLOBAL'].get('REGIME', 'NEUTRAL')}\n"
-                    f"ALPHA: {dna['ALPHA'].get('LOT_MULT', 1.0)}x | OMEGA: {dna['OMEGA'].get('LOT_MULT', 1.0)}x\n"
-                    "--------------------------------"
+                    "<b>🦅 SOVEREIGN TACTICAL COMMAND 🦅</b>\n"
+                    "━━━━━━━━━━━━━━━━━━\n"
+                    f"🟢 <b>STATUS</b>: {data.get('status', 'ONLINE')}\n"
+                    f"🕒 <b>LOCAL TIME</b>: <code>{data.get('current_time_utc', '--')}</code>\n\n"
+                    
+                    "<b>📊 PERFORMANCE (DAY)</b>\n"
+                    f" 🔹 <b>Global (USD)</b>: <code>${data.get('session_pnl_usd', 0):+.2f}</code>\n"
+                    f" 🔹 <b>Southern (VND)</b>: <code>{data.get('session_pnl_vnd', 0):+,} đ</code>\n\n"
+                    
+                    "<b>📅 AGGREGATE RECAP</b>\n"
+                    f" 🔸 <b>WEEK</b>: <code>${data.get('stats_week', {}).get('usd', 0):+.2f}</code> | <code>{data.get('stats_week', {}).get('vnd', 0):+,} đ</code>\n"
+                    f" 🔸 <b>MONTH</b>: <code>${data.get('stats_month', {}).get('usd', 0):+.2f}</code> | <code>{data.get('stats_month', {}).get('vnd', 0):+,} đ</code>\n\n"
+                    
+                    "<b>⚡ FRONT VS BACK RATIO</b>\n"
+                    f" [<code>{'█' * int(data.get('performance_ratio', {}).get('front', 50) / 10)}{'░' * (10 - int(data.get('performance_ratio', {}).get('front', 50) / 10))}</code>]\n"
+                    f" <i>Front: {data.get('performance_ratio', {}).get('front', 0):.0f}% | Back: {data.get('performance_ratio', {}).get('back', 0):.0f}%</i>\n"
+                    "━━━━━━━━━━━━━━━━━━\n"
+                    "🔗 <a href='http://127.0.0.1:5050/'>OPEN NEXUS DASHBOARD</a>"
                 )
-                self.bot.reply_to(message, status_msg)
+                self.bot.reply_to(message, status_msg, parse_mode='HTML')
             except Exception as e:
-                self.bot.reply_to(message, f"ERR: {e}")
+                self.bot.reply_to(message, f"❌ <b>COMMAND FAILED</b>: <code>{e}</code>", parse_mode='HTML')
 
         @self.bot.message_handler(commands=['rebirth'])
         def force_rebirth(message):
