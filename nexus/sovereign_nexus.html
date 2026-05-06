@@ -350,29 +350,10 @@
             <div class="pnl-box">
                 <label>GLOBAL ASSETS // FRONT</label>
                 <span id="usd-pnl" class="pnl-pos">$0.00</span>
-                <div class="pnl-sub">
-                    <span id="usd-week">W: +0.00</span>
-                    <span id="usd-month">M: +0.00</span>
-                </div>
             </div>
             <div class="pnl-box" style="border-left-color: var(--neon-purple)">
                 <label>SOUTHERN COMMAND // BACK</label>
                 <span id="vnd-pnl" class="pnl-pos">0 đ</span>
-                <div class="pnl-sub">
-                    <span id="vnd-week">W: +0</span>
-                    <span id="vnd-month">M: +0</span>
-                </div>
-            </div>
-            <div class="pnl-box" style="display: flex; flex-direction: column; justify-content: center; padding: 12px 20px; min-width: 220px;">
-                <label>SYSTEM BALANCE (RUỘT vs VỎ)</label>
-                <div class="ratio-bar-container" style="width: 100%;">
-                    <div id="ratio-back" class="ratio-fill ratio-back" style="width: 70%"></div>
-                    <div id="ratio-front" class="ratio-fill ratio-front" style="width: 30%"></div>
-                </div>
-                <div style="display: flex; justify-content: space-between; font-size: 10px; margin-top: 8px; font-weight: 700; letter-spacing: 1px;">
-                    <span id="ratio-back-text" style="color: var(--neon-purple)">BACK: 70%</span>
-                    <span id="ratio-front-text" style="color: var(--neon-blue)">FRONT: 30%</span>
-                </div>
             </div>
         </div>
         <div style="text-align: right">
@@ -390,6 +371,7 @@
                     <div class="tab-group">
                         <div class="tab-item active" onclick="flipPage('radar')">SCANNER</div>
                         <div class="tab-item" onclick="flipPage('pools')">POOLS</div>
+                        <div class="tab-item" onclick="flipPage('audit')">AUDIT</div>
                     </div>
                     <div id="page-radar" class="radar-box active" style="display: flex;">
                         <div id="scan-list-mini" class="scroll-area" style="padding: 15px;">
@@ -409,6 +391,23 @@
                             <label>VN30 EQUITY</label>
                             <value id="equity-south" style="color: var(--neon-purple); font-size: 28px;">0 đ</value>
                         </div>
+                    </div>
+                    <div id="page-audit" class="radar-box" style="display: none; padding: 20px;">
+                        <div style="margin-bottom: 20px;">
+                            <label style="font-size:10px; opacity:0.5; letter-spacing:2px;">WEEKLY PERFORMANCE</label>
+                            <div style="display:flex; justify-content:space-between; margin-top:5px;">
+                                <span id="usd-week" style="color:var(--neon-blue); font-family:Orbitron; font-weight:700;">+0.00 USD</span>
+                                <span id="vnd-week" style="color:var(--neon-purple); font-family:Orbitron; font-weight:700;">+0 VND</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label style="font-size:10px; opacity:0.5; letter-spacing:2px;">MONTHLY PERFORMANCE</label>
+                            <div style="display:flex; justify-content:space-between; margin-top:5px;">
+                                <span id="usd-month" style="color:var(--neon-blue); font-family:Orbitron; font-weight:700;">+0.00 USD</span>
+                                <span id="vnd-month" style="color:var(--neon-purple); font-family:Orbitron; font-weight:700;">+0 VND</span>
+                            </div>
+                        </div>
+                        <a href="/report" target="_blank" style="display:block; margin-top:30px; text-align:center; padding:10px; border:1px solid var(--neon-blue); color:var(--neon-blue); text-decoration:none; font-family:Orbitron; font-size:10px; letter-spacing:2px;">OPEN FULL BATTLE REPORT ></a>
                     </div>
                 </div>
             </div>
@@ -433,7 +432,34 @@
                     <!-- Engagement data -->
                 </div>
             </div>
-            <div class="panel" style="height: 250px;">
+            <div class="panel" style="height: 300px;">
+                <div class="panel-header">SOVEREIGN SYSTEM BALANCE</div>
+                <div class="panel-body">
+                    <div style="display: flex; flex-direction: column; justify-content: center; padding: 10px;">
+                        <label style="font-size: 10px; opacity: 0.5; letter-spacing: 2px; margin-bottom: 10px;">RUỘT (BACK) vs VỎ (FRONT)</label>
+                        <div class="ratio-bar-container" style="width: 100%; height: 10px; background: rgba(255,255,255,0.05); border-radius: 5px; overflow: hidden; display: flex;">
+                            <div id="ratio-back" class="ratio-fill ratio-back" style="width: 70%; background: var(--neon-purple); transition: width 0.5s;"></div>
+                            <div id="ratio-front" class="ratio-fill ratio-front" style="width: 30%; background: var(--neon-blue); transition: width 0.5s;"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-top: 15px; font-weight: 700; letter-spacing: 1px;">
+                            <span id="ratio-back-text" style="color: var(--neon-purple)">BACK: 70%</span>
+                            <span id="ratio-front-text" style="color: var(--neon-blue)">FRONT: 30%</span>
+                        </div>
+                        <div style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                            <div style="display: flex; justify-content: space-between; font-size: 10px; opacity: 0.6;">
+                                <span>Logic Lines (Python)</span>
+                                <span id="back-lines">0</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 10px; opacity: 0.6; margin-top: 5px;">
+                                <span>Aesthetic Lines (UI)</span>
+                                <span id="front-lines">0</span>
+                            </div>
+                        </div>
+                        <div id="balance-status" style="margin-top: 15px; text-align: center; font-size: 10px; color: var(--neon-green); letter-spacing: 1px;">STATUS: OPTIMAL BALANCE</div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel" style="height: 200px;">
                 <div class="panel-header">TACTICAL EVENT FEED</div>
                 <div id="intel-list" class="panel-body" style="font-size: 11px; color: var(--neon-blue); opacity: 0.8;">
                     <!-- Learning events -->
@@ -457,18 +483,23 @@
         window.flipPage = function(target) {
             const p1 = document.getElementById('page-pools');
             const p2 = document.getElementById('page-radar');
+            const p3 = document.getElementById('page-audit');
             const tabs = document.querySelectorAll('.tab-item');
             
+            p1.style.display = 'none';
+            p2.style.display = 'none';
+            p3.style.display = 'none';
+            tabs.forEach(t => t.classList.remove('active'));
+
             if (target === 'radar') {
-                p1.style.display = 'none';
                 p2.style.display = 'flex';
                 tabs[0].classList.add('active');
-                tabs[1].classList.remove('active');
-            } else {
-                p2.style.display = 'none';
+            } else if (target === 'pools') {
                 p1.style.display = 'block';
                 tabs[1].classList.add('active');
-                tabs[0].classList.remove('active');
+            } else if (target === 'audit') {
+                p3.style.display = 'block';
+                tabs[2].classList.add('active');
             }
         };
 
@@ -553,6 +584,17 @@
                     document.getElementById('ratio-front').style.width = `${fRatio}%`;
                     document.getElementById('ratio-back-text').innerText = `BACK: ${bRatio.toFixed(1)}%`;
                     document.getElementById('ratio-front-text').innerText = `FRONT: ${fRatio.toFixed(1)}%`;
+                    document.getElementById('back-lines').innerText = data.system_balance.back_lines;
+                    document.getElementById('front-lines').innerText = data.system_balance.front_lines;
+                    
+                    const statusEl = document.getElementById('balance-status');
+                    if (fRatio > bRatio + 30) {
+                        statusEl.innerText = "STATUS: LÃNG PHÍ HÌNH THỨC";
+                        statusEl.style.color = "var(--neon-red)";
+                    } else {
+                        statusEl.innerText = "STATUS: OPTIMAL BALANCE";
+                        statusEl.style.color = "var(--neon-green)";
+                    }
 
                     document.getElementById('equity-mt5').innerText = `$${(data.health_mt5.equity || 0).toFixed(2)}`;
                     document.getElementById('equity-bnc').innerText = `$${(data.health_bnc.equity || 0).toFixed(2)}`;
