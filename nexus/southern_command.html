@@ -297,8 +297,8 @@
                     `;
 
                     document.getElementById('total-equity').innerText = formatVND(totalEquityVnd);
-                    document.getElementById('total-pnl').innerText = formatVND(totalPnlVnd);
-                    document.getElementById('total-pnl').style.color = totalPnlVnd >= 0 ? 'var(--neon-green)' : 'var(--neon-red)';
+                    document.getElementById('total-pnl').innerText = formatVND(data.session_pnl_vnd || 0);
+                    document.getElementById('total-pnl').style.color = (data.session_pnl_vnd || 0) >= 0 ? 'var(--neon-green)' : 'var(--neon-red)';
 
                     // Trades (VN TIME CALIBRATION)
                     const tradeDiv = document.getElementById('southern-trades');

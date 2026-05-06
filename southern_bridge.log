@@ -26,3 +26,56 @@
 [2026-05-06 10:22:00,716] INFO:  [SQL_SYNC] SOUTH_GAMMA Strike recorded to iron_core.db
 [2026-05-06 10:22:00,716] INFO:  [PAPER_STRIKE] SOUTH_GAMMA SHORT PnL: 2.20 pts
 [2026-05-06 10:24:01,466] INFO:  [SOUTH_GAMMA] ENTRY SHORT @ 2039.6 | SL: 2041.4 TP: 2032.4
+[2026-05-06 11:22:13,651] INFO: Southern Front Bridge Initializing...
+[2026-05-06 11:22:13,651] INFO: Southern Front Bridge Initializing...
+[2026-05-06 11:22:13,652] INFO:  >> [RESTORE] Resumed Dragon Fleet from state file.
+[2026-05-06 11:22:13,652] INFO: Southern Front Expansion: Online.
+[2026-05-06 11:22:13,652] INFO:  >> [RESTORE] Resumed Dragon Fleet from state file.
+[2026-05-06 11:22:13,652] INFO: Southern Front Expansion: Online.
+[2026-05-06 11:22:22,904] ERROR: Bridge Cycle Error: cannot access local variable 'datetime' where it is not associated with a value
+[2026-05-06 11:23:05,755] INFO: Southern Front Bridge Initializing...
+[2026-05-06 11:23:05,756] INFO:  >> [RESTORE] Resumed Dragon Fleet from state file.
+[2026-05-06 11:23:05,756] INFO: Southern Front Expansion: Online.
+[2026-05-06 11:23:09,034] INFO:  [SQL_SYNC] SOUTH_ALPHA Strike recorded to iron_core.db
+[2026-05-06 11:23:09,034] INFO:  [PAPER_STRIKE] SOUTH_ALPHA SHORT PnL: 2.40 pts
+[2026-05-06 11:23:09,058] INFO:  [SOUTH_ALPHA] ENTRY LONG @ 2039.9 | SL: 2038.4 (1.5x) TP: 2042.9 (3.0x) | ER: 0.5
+[2026-05-06 11:23:09,069] INFO:  [SOUTH_OMEGA] ENTRY LONG @ 2039.9 | SL: 2038.4 (1.5x) TP: 2042.9 (3.0x) | ER: 0.5
+[2026-05-06 11:23:09,088] INFO:  [SQL_SYNC] SOUTH_GAMMA Strike recorded to iron_core.db
+[2026-05-06 11:23:09,090] INFO:  [PAPER_STRIKE] SOUTH_GAMMA SHORT PnL: -0.30 pts
+[2026-05-06 11:23:09,097] INFO:  [SOUTH_GAMMA] ENTRY LONG @ 2039.9 | SL: 2038.4 (1.5x) TP: 2042.9 (3.0x) | ER: 0.5
+[2026-05-06 11:25:17,783] INFO: Southern Front Bridge Initializing...
+[2026-05-06 11:25:17,792] INFO:  >> [WALLET] Resumed Southern Balance: 99,760,000 VND
+[2026-05-06 11:25:17,801] INFO:  >> [RESTORE] Resumed Dragon Fleet from state file.
+[2026-05-06 11:25:17,803] INFO: Southern Front Expansion: Online.
+[2026-05-06 11:33:15,431] INFO: Southern Front Bridge Initializing...
+[2026-05-06 11:33:15,446] INFO:  >> [WALLET] Resumed Southern Balance: 99,760,000 VND
+[2026-05-06 11:33:15,446] INFO:  >> [RESTORE] Resumed Dragon Fleet from state file.
+[2026-05-06 11:33:15,446] INFO: Southern Front Expansion: Online.
+[2026-05-06 11:34:09,581] INFO: Southern Front Bridge Initializing...
+[2026-05-06 11:34:09,621] INFO:  >> [WALLET] Resumed Southern Balance: 99,760,000 VND
+[2026-05-06 11:34:09,623] INFO:  >> [RESTORE] Resumed Dragon Fleet from state file.
+[2026-05-06 11:34:09,623] INFO: Southern Front Expansion: Online.
+[2026-05-06 11:36:19,312] INFO: Southern Front Bridge Initializing...
+[2026-05-06 11:36:19,319] INFO:  >> [WALLET] Resumed Southern Balance: 99,760,000 VND
+[2026-05-06 11:36:19,320] INFO:  >> [RESTORE] Resumed Dragon Fleet from state file.
+[2026-05-06 11:36:19,320] INFO: Southern Front Expansion: Online.
+[2026-05-06 11:37:03,751] INFO: Southern Front Bridge Initializing...
+[2026-05-06 11:37:03,758] INFO:  >> [WALLET] Resumed Southern Balance: 99,760,000 VND
+[2026-05-06 11:37:03,758] INFO:  >> [RESTORE] Resumed Dragon Fleet from state file.
+[2026-05-06 11:37:03,758] INFO: Southern Front Expansion: Online.
+[2026-05-06 11:41:28,835] INFO: Southern Front Bridge Initializing...
+[2026-05-06 11:41:28,840] INFO:  >> [WALLET] Resumed Southern Balance: 99,760,000 VND
+[2026-05-06 11:41:28,840] INFO:  >> [RESTORE] Resumed Dragon Fleet from state file.
+[2026-05-06 11:41:28,840] INFO: Southern Front Expansion: Online.
+[2026-05-06 11:42:09,159] INFO: Southern Front Bridge Initializing...
+[2026-05-06 11:42:09,240] INFO:  >> [WALLET] Resumed Southern Balance: 99,760,000 VND
+[2026-05-06 11:42:09,240] INFO:  >> [RESTORE] Resumed Dragon Fleet from state file.
+[2026-05-06 11:42:09,240] INFO: Southern Front Expansion: Online.
+[2026-05-06 11:44:04,746] INFO: Southern Front Bridge Initializing...
+[2026-05-06 11:44:04,748] INFO:  >> [WALLET] Resumed Southern Balance: 99,760,000 VND
+[2026-05-06 11:44:04,750] INFO:  >> [RESTORE] Resumed Dragon Fleet from state file.
+[2026-05-06 11:44:04,750] INFO: Southern Front Expansion: Online.
+[2026-05-06 11:49:26,095] INFO: Southern Front Bridge Initializing...
+[2026-05-06 11:49:26,096] INFO:  >> [WALLET] Resumed Southern Balance: 99,760,000 VND
+[2026-05-06 11:49:26,096] INFO:  >> [RESTORE] Resumed Dragon Fleet from state file.
+[2026-05-06 11:49:26,096] INFO: Southern Front Expansion: Online.

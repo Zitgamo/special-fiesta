@@ -13,6 +13,8 @@ class IronEngine:
         self.logger = self._setup_logging()
         self.bridges = IronBridges(secrets_path)
         self.forensics = IronForensics()
+        from safety import IronSafety
+        self.safety = IronSafety()
         self.is_running = True
         self.signal_tracker = {} # Track last sent signals: {symbol: {side, price, time}}
         
@@ -184,7 +186,14 @@ class IronEngine:
 
                         # B. Global Exposure Check
                         active_pos = self.bridges.get_active_positions()
-                        safe_to_strike, global_reason = safety.global_exposure_audit(active_pos)
+                        
+                        # C. SYMBOL LOCK (Anti-Spam)
+                        symbol_positions = [p for p in active_pos if p.get('symbol') == symbol]
+                        if len(symbol_positions) > 0:
+                            self.logger.warning(f" !! [POSITION_LOCK] {symbol} already has an active strike. Aborting.")
+                            continue
+
+                        safe_to_strike, global_reason = self.safety.global_exposure_audit(active_pos)
                         if not safe_to_strike:
                             self.logger.warning(f" !! [SAFETY_BLOCK] Global Limit: {global_reason}")
                             continue
@@ -194,7 +203,7 @@ class IronEngine:
                         tick = mt5.symbol_info_tick(symbol)
                         spread = (tick.ask - tick.bid) if tick else 0
                         
-                        safe_to_fire, safety_reason = safety.pre_flight_audit(self.unit_id, symbol, side, lot, price, atr, spread)
+                        safe_to_fire, safety_reason = self.safety.pre_flight_audit(self.unit_id, symbol, side, lot, price, atr, spread)
                         
                         if not safe_to_fire:
                             self.logger.error(f" !! [SAFETY_ABORT] {symbol}: {safety_reason}")
@@ -219,6 +228,10 @@ class IronEngine:
                         # 9. EXECUTION STRIKE (WITH REAL-MONEY FIRELOCK)
                         is_demo = account.trade_mode == mt5.ACCOUNT_TRADE_MODE_DEMO
                         
+                        # --- STAGGERED ATTACK (Anti-Collision) ---
+                        import random
+                        time.sleep(random.random() * 2) 
+
                         if not is_demo:
                             self.logger.info(f" >> [FIRELOCK] Real Account Detected. Switching to SIGNAL-ONLY mode.")
                             result = True # Simulate success to trigger signal relay

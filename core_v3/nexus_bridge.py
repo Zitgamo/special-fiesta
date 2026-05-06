@@ -48,34 +48,71 @@ def southern():
         with open(SOUTH_HTML, 'r', encoding='utf-8') as f: return f.read()
     except Exception as e: return f"SOUTH_NOT_FOUND: {e}", 404
 
+@app.route('/report', methods=['GET'])
+def report():
+    try:
+        report_path = os.path.join(ROOT_DIR, "nexus", "elite_report.html")
+        with open(report_path, 'r', encoding='utf-8') as f: return f.read()
+    except Exception as e: return f"REPORT_NOT_FOUND: {e}", 404
+
+@app.route('/api/reports/equity_curve', methods=['GET'])
+def get_equity_curve():
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        # Fetch last 100 points for a smooth curve
+        cursor.execute("SELECT timestamp, equity FROM equity_history ORDER BY id DESC LIMIT 100")
+        data = cursor.fetchall()
+        conn.close()
+        return jsonify([{"t": d[0], "e": d[1]} for d in reversed(data)])
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/api/telemetry', methods=['GET'])
 def get_telemetry():
     try:
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         
-        # 1. MT5 Health (Exness)
-        cursor.execute("SELECT balance, equity, drawdown, timestamp FROM equity_history ORDER BY id DESC LIMIT 1")
-        health = cursor.fetchone()
+        # 1. (Legacy MT5 fetch removed - now using live mt5_health below)
         
         # 2. Strike Logs (Filter out FAILED/PENDING)
         cursor.execute("SELECT symbol, side, volume, price, pnl, timestamp, unit_id, sl, tp FROM trades WHERE type IN ('LIVE', 'CLOSED', 'PAPER') ORDER BY id DESC LIMIT 10")
         trades_raw = cursor.fetchall()
         
         # 3. Session PnL (Realized Growth Today - Multi-Front)
-        # Using 00:00 UTC as the anchor for professional session tracking
-        cursor.execute("SELECT unit_id, symbol, pnl FROM trades WHERE date(timestamp) = date('now')")
+        # Using localtime to match user's actual day
+        cursor.execute("SELECT unit_id, symbol, pnl FROM trades WHERE date(timestamp, 'localtime') = date('now', 'localtime')")
         today_trades = cursor.fetchall()
         
         ex_realized = sum(t[2] for t in today_trades if "USDT" not in str(t[1]) and "SOUTH" not in str(t[0]) and t[1] != "VN30F1M")
         bnc_realized = sum(t[2] for t in today_trades if "USDT" in str(t[1]))
-        south_realized_vnd = sum(t[2] for t in today_trades if "SOUTH" in str(t[0]) or t[1] == "VN30F1M")
+        
+        # South PnL is recorded in pts, must multiply by 100,000 for VND
+        south_realized_pts = sum(t[2] for t in today_trades if "SOUTH" in str(t[0]) or t[1] == "VN30F1M")
+        south_realized_vnd = int(south_realized_pts * 100000)
         
         session_pnl = round(ex_realized + bnc_realized, 2)
-        session_pnl_vnd = int(south_realized_vnd) if south_realized_vnd != 0 else int(session_pnl * 25000)
+        session_pnl_vnd = south_realized_vnd # Absolute truth from DB
         
         from datetime import datetime
         current_time_utc = datetime.utcnow().strftime('%H:%M:%S')
+        
+        # 2. MT5 Health (Exness)
+        mt5_health = {"equity": 0, "drawdown": 0}
+        try:
+            terminal_path = "C:\\Program Files\\MetaTrader 5 EXNESS\\terminal64.exe"
+            if mt5.initialize(path=terminal_path):
+                acc = mt5.account_info()
+                if acc:
+                    mt5_health["equity"] = acc.equity
+                    mt5_health["drawdown"] = (acc.equity / acc.balance - 1) if acc.balance != 0 else 0
+                else:
+                    print(f"!! [MT5_ERR] Account info failed: {mt5.last_error()}")
+            else:
+                print(f"!! [MT5_ERR] Init failed: {mt5.last_error()}")
+        except Exception as e:
+            print(f"!! [MT5_EXC] {e}")
         
         # 4. Binance Health
         bnc_health = {"equity": 0, "drawdown": 0}
@@ -86,15 +123,26 @@ def get_telemetry():
         except: pass
 
         # 5. Southern Health (Entrade/VN30)
-        south_health = {"equity_vnd": 100000000, "drawdown": 0, "active": False, "fleet": {}, "context": {"er": 0.5, "atr": 0, "confidence": 50}}
+        last_vnd_equity = 100000000
+        try:
+            cursor.execute("SELECT equity FROM equity_history WHERE equity > 1000000 ORDER BY id DESC LIMIT 1")
+            res = cursor.fetchone()
+            if res: last_vnd_equity = res[0]
+        except: pass
+
+        south_health = {"equity_vnd": last_vnd_equity, "drawdown": 0, "active": False, "fleet": {}, "context": {"er": 0.5, "atr": 0, "confidence": 50}}
         try:
             if os.path.exists(SOUTH_STATE_PATH):
                 with open(SOUTH_STATE_PATH, 'r') as f:
                     south_health["fleet"] = json.load(f)
                     if south_health["fleet"]:
                         first_unit = list(south_health["fleet"].values())[0]
-                        south_health["equity_vnd"] = first_unit.get("equity_vnd", 100000000)
+                        south_health["equity_vnd"] = first_unit.get("equity_vnd", last_vnd_equity)
                         south_health["active"] = any(u.get("active", False) for u in south_health["fleet"].values())
+            
+            # Calculate floating PnL for Southern Front
+            float_pnl_vnd = sum(u.get("pnl_vnd", 0) for u in south_health["fleet"].values())
+            south_health["drawdown"] = float_pnl_vnd
             
             # Context v2.0 for Southern Front
             er_vn = IronAnalytics.get_efficiency_ratio("VN30F1M", BRIDGES)
@@ -119,6 +167,9 @@ def get_telemetry():
             with open(DNA_PATH, 'r') as f: dna = json.load(f)
         if os.path.exists(SQUADRON_PATH):
             with open(SQUADRON_PATH, 'r') as f: squad = json.load(f)
+            
+        # Update session_pnl_vnd with live floating data
+        session_pnl_vnd += int(south_health["drawdown"])
             
         # 7. Unit Stats Audit
         unit_stats = {}
@@ -160,12 +211,7 @@ def get_telemetry():
             "safety_status": "HARDENED",
             "session_pnl_usd": session_pnl,
             "session_pnl_vnd": session_pnl_vnd,
-            "health_mt5": {
-                "balance": health[0] if health else 0,
-                "equity": health[1] if health else 0,
-                "drawdown": health[2] if health else 0,
-                "last_update": health[3] if health else "N/A"
-            },
+            "health_mt5": mt5_health,
             "health_bnc": bnc_health,
             "health_south": south_health,
             "trades": [{

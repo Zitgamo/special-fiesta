@@ -42,18 +42,34 @@ class IronSafety:
         if spread > (atr * self.MAX_SPREAD_ATR_RATIO):
             return False, f"SPREAD_TOO_HIGH ({spread} > {atr * self.MAX_SPREAD_ATR_RATIO})"
 
-        # 3. TEMPORAL SANITY (The Loop Attack Guard)
+        # 3. TEMPORAL SANITY (The Global Loop Attack Guard)
+        # Use a file-based lock to track strikes across all units
+        strike_log_path = "core_v3/strike_frequency.json"
         now = time.time()
-        self.last_strikes = [t for t in self.last_strikes if now - t < 3600] # Keep last hour
-        if len(self.last_strikes) >= self.MAX_STRIKES_PER_HOUR:
-            return False, f"FREQUENCY_CIRCUIT_BREAKER ({len(self.last_strikes)}/hr)"
+        strikes = []
+        if os.path.exists(strike_log_path):
+            try:
+                with open(strike_log_path, 'r') as f:
+                    strikes = json.load(f)
+            except: strikes = []
+        
+        # Cleanup old strikes (> 1 hour)
+        strikes = [t for t in strikes if now - t < 3600]
+        
+        if len(strikes) >= self.MAX_STRIKES_PER_HOUR:
+            return False, f"GLOBAL_FREQUENCY_LIMIT ({len(strikes)}/hr)"
 
         # 4. PRICE VALIDITY (Flash Crash Guard)
         if price <= 0:
             return False, "PRICE_DATA_CORRUPT"
 
-        # All checks passed. Log the strike attempt for temporal tracking.
-        self.last_strikes.append(now)
+        # All checks passed. Log the strike for global tracking.
+        strikes.append(now)
+        try:
+            with open(strike_log_path, 'w') as f:
+                json.dump(strikes, f)
+        except: pass
+        
         self.logger.info(f" !! [SAFETY_PASS] {unit_id} validated for {symbol} {side} {lot}")
         return True, "SAFE"
 

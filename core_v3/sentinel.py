@@ -19,6 +19,7 @@ class IronSentinel:
             "SOUTHERN_FRONT": "core_v3/southern_paper_bridge.py"
         }
         self.is_running = True
+        self.last_scribe = 0
 
     def is_alive(self, name):
         """Checks if a process is alive by its command line arguments."""
@@ -83,6 +84,11 @@ class IronSentinel:
             # 4. HEARTBEAT AUDIT (Squadron Population Enforcement)
             self.heartbeat_audit()
             
+            # 5. AUTO-SCRIBE (Cloud Synchronization)
+            if time.time() - self.last_scribe > 7200: # Every 2 hours
+                self.auto_scribe()
+                self.last_scribe = time.time()
+            
             time.sleep(5)
 
     def monitor_engine_logs(self):
@@ -131,6 +137,35 @@ class IronSentinel:
                         f.write(str(time.time()))
         except Exception as e:
             print(f" !! [SENTINEL_ERR] Heartbeat audit failed: {e}")
+
+    def auto_scribe(self):
+        """
+        Auto-Scribe: The invisible historian.
+        Automatically commits and pushes significant changes to GitHub.
+        """
+        try:
+            # Check if git is initialized
+            if not os.path.exists(os.path.join(os.getcwd(), ".git")): return
+
+            # Check for changes
+            status = subprocess.check_output(["git", "status", "--porcelain"]).decode()
+            if not status: return 
+
+            print(" >> [SENTINEL] Auto-Scribe: Detecting system evolution. Recording to history...")
+            
+            timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+            message = f"AUTO-SCRIBE: System Evolution detected at {timestamp}. Synchronizing fleet state."
+            
+            # Git sync protocol
+            subprocess.run(["git", "add", "."], capture_output=True)
+            subprocess.run(["git", "commit", "-m", message], capture_output=True)
+            
+            # Push (non-blocking to prevent sentinel hang)
+            print(" >> [SENTINEL] Auto-Scribe: Pushing to Sovereign Cloud (GitHub)...")
+            subprocess.Popen(["git", "push", "origin", "main"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            
+        except Exception as e:
+            print(f" !! [SENTINEL_ERR] Auto-Scribe failed: {e}")
 
 if __name__ == "__main__":
     sentinel = IronSentinel()

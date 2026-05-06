@@ -9,27 +9,27 @@
     "1895493585": {
         "hwm": 11.23,
         "hwm_state": "HWM_SET",
-        "lwm": 10.89,
+        "lwm": 10.8,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1895698087": {
-        "hwm": 14.4,
+        "hwm": 16.8,
         "hwm_state": "HWM_SET",
         "lwm": 14.08,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1897832538": {
-        "hwm": 13.29,
+        "hwm": 18.7,
         "hwm_state": "HWM_SET",
         "lwm": 10.37,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1897951990": {
-        "hwm": 2.95,
-        "hwm_state": "INITIAL",
+        "hwm": 8.4,
+        "hwm_state": "HWM_SET",
         "lwm": 2.1,
         "lwm_state": "INITIAL",
         "banked": 0.0
@@ -37,13 +37,13 @@
     "1897956629": {
         "hwm": 0.98,
         "hwm_state": "INITIAL",
-        "lwm": 0.6,
+        "lwm": -0.13,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1897956910": {
         "hwm": 1.01,
-        "hwm_state": "HWM_SET",
+        "hwm_state": "RETRACED",
         "lwm": 0.62,
         "lwm_state": "INITIAL",
         "banked": 0.0

@@ -100,6 +100,20 @@ class SouthernPaperBridge:
             }
         }
         
+        # --- PERSISTENT BALANCE ---
+        self.current_balance_vnd = 100000000
+        try:
+            import sqlite3
+            db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "iron_core.db")
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            cursor.execute("SELECT equity FROM equity_history WHERE equity > 1000000 ORDER BY id DESC LIMIT 1")
+            res = cursor.fetchone()
+            if res: self.current_balance_vnd = res[0]
+            conn.close()
+            self.logger.info(f" >> [WALLET] Resumed Southern Balance: {self.current_balance_vnd:,.0f} VND")
+        except: pass
+        
         # Load existing state if available
         if os.path.exists(STATE_JSON):
             try:
@@ -149,6 +163,12 @@ class SouthernPaperBridge:
                                  session=trade.get('session', 'ASIA'))
             
             self.logger.info(f" [SQL_SYNC] {unit_id} Strike recorded to iron_core.db")
+            
+            # --- COMPOUND EQUITY ---
+            VND_PER_PT = 100000
+            self.current_balance_vnd += (trade['pnl_pts'] * VND_PER_PT)
+            self.logger.info(f" [WALLET_UPDATE] New Balance: {self.current_balance_vnd:,.0f} VND")
+            
         except Exception as e:
             self.logger.error(f" !! [SQL_ERR] Could not sync paper trade: {e}")
 
@@ -156,7 +176,6 @@ class SouthernPaperBridge:
 
     def export_state(self, price):
         VND_PER_PT = 100000
-        INITIAL_VND = 100000000 # 100 Million VND (Approx 10 contracts)
         state = {}
         for uid, u in self.units.items():
             pnl_pts = round((price - u['entry']) * u['pos'], 2) if u['pos'] != 0 else 0
@@ -168,11 +187,36 @@ class SouthernPaperBridge:
                 "entry_t": u['entry_t'],
                 "pnl_pts": pnl_pts,
                 "pnl_vnd": pnl_pts * VND_PER_PT,
-                "equity_vnd": INITIAL_VND + (pnl_pts * VND_PER_PT),
+                "equity_vnd": self.current_balance_vnd + (pnl_pts * VND_PER_PT),
                 "active": u['pos'] != 0
             }
         with open(STATE_JSON, "w") as f:
             json.dump(state, f, indent=4)
+        
+        self.record_equity_snapshot(price)
+
+    def record_equity_snapshot(self, price):
+        """Records a point in the equity history for the Southern Front."""
+        try:
+            VND_PER_PT = 100000
+            current_float_pts = sum((price - u['entry']) * u['pos'] for u in self.units.values() if u['pos'] != 0)
+            current_equity = self.current_balance_vnd + (current_float_pts * VND_PER_PT)
+            
+            import sqlite3
+            db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "iron_core.db")
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            
+            now_t = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            drawdown = (current_float_pts * VND_PER_PT / self.current_balance_vnd) * 100 if self.current_balance_vnd != 0 else 0
+            
+            cursor.execute("""
+                INSERT INTO equity_history (balance, equity, drawdown, timestamp)
+                VALUES (?, ?, ?, ?)
+            """, (self.current_balance_vnd, current_equity, drawdown, now_t))
+            conn.commit()
+            conn.close()
+        except: pass
 
     def run_cycle(self):
         df_raw = fetch_vn30_lightning()
@@ -243,7 +287,6 @@ class SouthernPaperBridge:
                     sl_mult, tp_mult = optimizer.optimize_targets(SYMBOL, price, atr, s_id, er=er)
                     
                     # Capture Context (F1M is always ASIA)
-                    from datetime import datetime
                     utc_hour = datetime.utcnow().hour
                     session = "ASIA" # F1M is localized
                     spread_ratio = 0.05 # Conservative estimate for F1M
