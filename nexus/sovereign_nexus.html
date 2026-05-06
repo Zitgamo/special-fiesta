@@ -136,17 +136,20 @@
 
         .pnl-box span { 
             font-family: 'Orbitron';
-            font-size: 24px; 
+            font-size: 26px; 
             font-weight: 900; 
+            white-space: nowrap;
         }
 
         .pnl-sub {
-            font-size: 9px;
-            opacity: 0.3;
-            margin-top: 4px;
+            font-size: 11px;
+            opacity: 0.5;
+            margin-top: 8px;
             letter-spacing: 1px;
             display: flex;
             justify-content: space-between;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 5px;
         }
 
         .ratio-bar-container {
@@ -356,15 +359,15 @@
                     <span id="vnd-month">M: +0</span>
                 </div>
             </div>
-            <div class="pnl-box" style="display: flex; flex-direction: column; justify-content: center; padding: 12px 20px;">
-                <label>BACK / FRONT RATIO</label>
-                <div class="ratio-bar-container">
-                    <div id="ratio-front" class="ratio-fill ratio-front" style="width: 50%"></div>
-                    <div id="ratio-back" class="ratio-fill ratio-back" style="width: 50%"></div>
+            <div class="pnl-box" style="display: flex; flex-direction: column; justify-content: center; padding: 12px 20px; min-width: 220px;">
+                <label>SYSTEM BALANCE (RUỘT vs VỎ)</label>
+                <div class="ratio-bar-container" style="width: 100%;">
+                    <div id="ratio-back" class="ratio-fill ratio-back" style="width: 70%"></div>
+                    <div id="ratio-front" class="ratio-fill ratio-front" style="width: 30%"></div>
                 </div>
-                <div style="display: flex; justify-content: space-between; font-size: 8px; margin-top: 5px; opacity: 0.5; letter-spacing: 1px;">
-                    <span id="ratio-front-text">F: 50%</span>
-                    <span id="ratio-back-text">B: 50%</span>
+                <div style="display: flex; justify-content: space-between; font-size: 10px; margin-top: 8px; font-weight: 700; letter-spacing: 1px;">
+                    <span id="ratio-back-text" style="color: var(--neon-purple)">BACK: 70%</span>
+                    <span id="ratio-front-text" style="color: var(--neon-blue)">FRONT: 30%</span>
                 </div>
             </div>
         </div>
@@ -540,12 +543,12 @@
                     document.getElementById('vnd-week').innerText = `W: ${(data.stats_week.vnd >= 0 ? '+' : '')}${Math.floor(data.stats_week.vnd/1000)}K`;
                     document.getElementById('vnd-month').innerText = `M: ${(data.stats_month.vnd >= 0 ? '+' : '')}${Math.floor(data.stats_month.vnd/1000)}K`;
 
-                    const fRatio = data.performance_ratio.front;
-                    const bRatio = data.performance_ratio.back;
-                    document.getElementById('ratio-front').style.width = `${fRatio}%`;
+                    const bRatio = data.system_balance.back;
+                    const fRatio = data.system_balance.front;
                     document.getElementById('ratio-back').style.width = `${bRatio}%`;
-                    document.getElementById('ratio-front-text').innerText = `F: ${fRatio.toFixed(0)}%`;
-                    document.getElementById('ratio-back-text').innerText = `B: ${bRatio.toFixed(0)}%`;
+                    document.getElementById('ratio-front').style.width = `${fRatio}%`;
+                    document.getElementById('ratio-back-text').innerText = `BACK: ${bRatio.toFixed(1)}%`;
+                    document.getElementById('ratio-front-text').innerText = `FRONT: ${fRatio.toFixed(1)}%`;
 
                     document.getElementById('equity-mt5').innerText = `$${(data.health_mt5.equity || 0).toFixed(2)}`;
                     document.getElementById('equity-bnc').innerText = `$${(data.health_bnc.equity || 0).toFixed(2)}`;

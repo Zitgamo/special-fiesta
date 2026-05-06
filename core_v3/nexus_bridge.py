@@ -30,6 +30,38 @@ ELITE_HTML = os.path.join(ROOT_DIR, "nexus", "elite_focus.html")
 
 BRIDGES = IronBridges(SECRETS_PATH)
 
+def calculate_sovereign_scale():
+    """Calculates Logic (Back) vs Aesthetic (Front) balance."""
+    try:
+        py_lines = 0
+        for root, _, files in os.walk(BASE_DIR):
+            for f in files:
+                if f.endswith('.py'):
+                    with open(os.path.join(root, f), 'r', encoding='utf-8', errors='ignore') as f_obj:
+                        py_lines += len(f_obj.readlines())
+        
+        ui_lines = 0
+        nexus_dir = os.path.join(ROOT_DIR, "nexus")
+        if os.path.exists(nexus_dir):
+            for root, _, files in os.walk(nexus_dir):
+                for f in files:
+                    if f.endswith(('.html', '.css')):
+                        with open(os.path.join(root, f), 'r', encoding='utf-8', errors='ignore') as f_obj:
+                            ui_lines += len(f_obj.readlines())
+                            
+        # Logic Score: Python complexity
+        back_score = py_lines / 10.0
+        # Aesthetic Score: UI density
+        front_score = ui_lines / 4.0
+        
+        total = back_score + front_score
+        return {
+            "back": round(back_score / total * 100, 1) if total > 0 else 50,
+            "front": round(front_score / total * 100, 1) if total > 0 else 50
+        }
+    except:
+        return {"back": 70, "front": 30}
+
 @app.route('/', methods=['GET'])
 def index():
     try:
@@ -102,10 +134,8 @@ def get_telemetry():
         session_pnl = round(day_pnl_front, 2)
         session_pnl_vnd = int(day_pnl_back)
         
-        # Calculate Back/Front Efficiency %
-        total_pnl_abs = abs(day_pnl_front * 23500) + abs(day_pnl_back)
-        front_ratio = (abs(day_pnl_front * 23500) / total_pnl_abs * 100) if total_pnl_abs > 0 else 50
-        back_ratio = 100 - front_ratio
+        # Calculate Sovereign System Balance (Ruột vs Vỏ)
+        system_balance = calculate_sovereign_scale()
 
         from datetime import datetime, timedelta
         current_time_local = (datetime.utcnow() + timedelta(hours=7)).strftime('%H:%M:%S')
@@ -214,7 +244,7 @@ def get_telemetry():
             "safety_status": "HARDENED",
             "session_pnl_usd": session_pnl,
             "session_pnl_vnd": session_pnl_vnd,
-            "performance_ratio": {"front": front_ratio, "back": back_ratio},
+            "system_balance": system_balance,
             "stats_week": {"usd": round(week_pnl_front, 2), "vnd": int(week_pnl_back)},
             "stats_month": {"usd": round(month_pnl_front, 2), "vnd": int(month_pnl_back)},
             "health_mt5": mt5_health,
