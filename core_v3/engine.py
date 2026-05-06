@@ -104,6 +104,8 @@ class IronEngine:
                 if os.path.exists(log_file) and os.path.getsize(log_file) > 5 * 1024 * 1024:
                     self.logger.info(f" >> [MAINTENANCE] Log size exceeded 5MB. Triggering Auto-Janitor...")
                     try:
+                        import sys
+                        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
                         from janitor import SovereignJanitor
                         janitor = SovereignJanitor()
                         janitor.cleanup_temp_files()

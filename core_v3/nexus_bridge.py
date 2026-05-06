@@ -304,7 +304,10 @@ def get_telemetry():
         }
         
         return jsonify(data)
+        return jsonify(data)
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify({"status": "ERROR", "message": str(e)}), 500
 
 @app.route('/report', methods=['GET'])
