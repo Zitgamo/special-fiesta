@@ -435,7 +435,7 @@ def get_git_status():
             "status": "SUCCESS", 
             "commits": commits, 
             "is_dirty": is_dirty,
-            "srs_score": 35 # Auditor manually injected score
+            "srs_score": 40 # Auditor manually injected score
         })
     except Exception as e:
         return jsonify({"status": "ERROR", "message": str(e)}), 500
