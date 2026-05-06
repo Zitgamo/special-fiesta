@@ -79,3 +79,7 @@
 [2026-05-06 11:49:26,096] INFO:  >> [WALLET] Resumed Southern Balance: 99,760,000 VND
 [2026-05-06 11:49:26,096] INFO:  >> [RESTORE] Resumed Dragon Fleet from state file.
 [2026-05-06 11:49:26,096] INFO: Southern Front Expansion: Online.
+[2026-05-06 11:49:37,994] INFO: Southern Front Bridge Initializing...
+[2026-05-06 11:49:37,995] INFO:  >> [WALLET] Resumed Southern Balance: 99,760,000 VND
+[2026-05-06 11:49:37,995] INFO:  >> [RESTORE] Resumed Dragon Fleet from state file.
+[2026-05-06 11:49:37,995] INFO: Southern Front Expansion: Online.

@@ -9,26 +9,26 @@
     "1895493585": {
         "hwm": 11.23,
         "hwm_state": "HWM_SET",
-        "lwm": 10.8,
+        "lwm": 10.75,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1895698087": {
-        "hwm": 16.8,
+        "hwm": 17.25,
         "hwm_state": "HWM_SET",
         "lwm": 14.08,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1897832538": {
-        "hwm": 18.7,
+        "hwm": 18.89,
         "hwm_state": "HWM_SET",
         "lwm": 10.37,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1897951990": {
-        "hwm": 8.4,
+        "hwm": 8.6,
         "hwm_state": "HWM_SET",
         "lwm": 2.1,
         "lwm_state": "INITIAL",

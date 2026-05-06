@@ -122,19 +122,37 @@ class IronEngine:
                     velocity = IronAnalytics.get_velocity(symbol, bridges=self.bridges)
                     self.logger.info(f"SCANNING: {symbol} | PRICE: {price:.2f} | BIAS: {bias} | ER: {er} | VEL: {velocity}")
                     
-                    # 5. POSITION GUARD
-                    # Check if we already have a position for this symbol
-                    has_pos = False
-                    if "USDT" in symbol:
-                        bal = self.bridges.binance.fetch_balance()
-                        pos = [p for p in bal['info']['positions'] if p['symbol'] == symbol and float(p['positionAmt']) != 0]
-                        has_pos = len(pos) > 0
-                    else:
-                        positions = mt5.positions_get(symbol=symbol)
-                        has_pos = len(positions) > 0 if positions is not None else False
+                    # 5. POSITION GUARD (Suffix-Aware)
+                    all_pos = self.bridges.get_active_positions()
+                    active_symbol_pos = [p for p in all_pos if symbol.upper() in p['symbol'].upper()]
+                    has_pos = len(active_symbol_pos) > 0
                     
                     if has_pos:
-                        self.logger.info(f" >> [GUARD] {symbol} position already active. Skipping.")
+                        self.logger.info(f" >> [GUARD] {symbol} position already active.")
+                        
+                        # --- INSTITUTIONAL HARVESTER (Scale-In Logic) ---
+                        # If profitable (> 1% profit on account), consider scaling in
+                        if drawdown < -0.01:
+                            try:
+                                target_pos = active_symbol_pos[0]
+                                self.logger.info(f" >> [HARVESTER] {symbol} is dominating. Scaling in reinforcements...")
+                                
+                                # Fetch symbol info for correct volume rounding
+                                info = mt5.symbol_info(target_pos['symbol'])
+                                if info:
+                                    min_lot = info.volume_min
+                                    v_step = info.volume_step
+                                    base_lot = target_pos['volume']
+                                    
+                                    # Scale in with micro-volume (10% of base), but at least min_lot
+                                    scale_lot = round((base_lot * 0.1) / v_step) * v_step
+                                    scale_lot = max(scale_lot, min_lot)
+                                    
+                                    if scale_lot <= (base_lot * 0.5): # Safety cap
+                                        self.bridges.execute_order(target_pos['symbol'], target_pos['side'], scale_lot, unit_id=self.unit_id)
+                            except Exception as e:
+                                self.logger.error(f" !! [HARVESTER_ERR] {symbol} scale-in failed: {e}")
+                        
                         continue
 
                     # 6. EXECUTION STRIKE
@@ -283,28 +301,6 @@ class IronEngine:
                         reason = lot_or_reason
                         self.logger.warning(f" !! [VAULT_BLOCK] {symbol}: {reason}")
                 
-                # 4. INSTITUTIONAL HARVESTER (Scale-In Logic)
-                if drawdown < -0.01: # Profitable (Negative DD)
-                    try:
-                        # Fetch the most recent trade symbol to scale in
-                        last_stats = self.forensics.get_unit_stats(self.unit_id)
-                        if last_stats['total'] > 0:
-                            self.logger.info(f" >> [HARVESTER] {self.unit_id} is dominating. Scaling in reinforcements...")
-                            
-                            # Fetch symbol info for correct volume rounding
-                            info = mt5.symbol_info(symbol)
-                            if info:
-                                min_lot = info.volume_min
-                                v_step = info.volume_step
-                                
-                                # Scale in with micro-volume (10% of last), but at least min_lot
-                                scale_lot = round((lot * 0.1) / v_step) * v_step
-                                scale_lot = max(scale_lot, min_lot)
-                                
-                                if scale_lot <= lot: # Only add if it's not a massive jump
-                                    self.bridges.execute_order(symbol, side, scale_lot, unit_id=self.unit_id)
-                    except Exception as e: 
-                        self.logger.error(f" !! [HARVESTER_ERR] {e}")
                 
                 time.sleep(10) 
                 
