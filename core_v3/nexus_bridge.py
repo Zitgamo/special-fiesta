@@ -264,11 +264,24 @@ def get_telemetry():
         
         conn.close()
         
-        return jsonify({
+        # Add Uptime
+        cursor.execute("SELECT value FROM hq_config WHERE key = 'SYSTEM_BOOT_TIME'")
+        boot_res = cursor.fetchone()
+        if not boot_res:
+            boot_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            cursor.execute("INSERT OR REPLACE INTO hq_config (key, value, description) VALUES ('SYSTEM_BOOT_TIME', ?, 'Persistent Uptime Tracker')", (boot_time,))
+            conn.commit()
+        else:
+            boot_time = boot_res[0]
+            
+        boot_dt = datetime.strptime(boot_time, "%Y-%m-%d %H:%M:%S")
+        uptime_sec = (datetime.now() - boot_dt).total_seconds()
+        
+        data = {
             "status": "ONLINE",
             "safety_status": "HARDENED",
-            "session_pnl_usd": session_pnl,
-            "session_pnl_vnd": session_pnl_vnd,
+            "session_pnl_usd": round(day_pnl_front, 2),
+            "session_pnl_vnd": int(day_pnl_back),
             "system_balance": system_balance,
             "stats_day": {"usd": round(day_pnl_front, 2), "vnd": int(day_pnl_back)},
             "stats_week": {"usd": round(week_pnl_front, 2), "vnd": int(week_pnl_back)},
@@ -286,23 +299,11 @@ def get_telemetry():
             "back_score": round(scale['back'], 1),
             "front_score": round(scale['front'], 1),
             "deploy_mode": get_deploy_mode(),
-            "current_time_utc": current_time_local
-        })
+            "current_time_utc": current_time_local,
+            "uptime_seconds": uptime_sec
+        }
         
-        # Add Uptime
-        cursor.execute("SELECT value FROM hq_config WHERE key = 'SYSTEM_BOOT_TIME'")
-        boot_res = cursor.fetchone()
-        if not boot_res:
-            boot_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            cursor.execute("INSERT OR REPLACE INTO hq_config (key, value, description) VALUES ('SYSTEM_BOOT_TIME', ?, 'Persistent Uptime Tracker')", (boot_time,))
-            conn.commit()
-        else:
-            boot_time = boot_res[0]
-            
-        boot_dt = datetime.strptime(boot_time, "%Y-%m-%d %H:%M:%S")
-        res.json['uptime_seconds'] = (datetime.now() - boot_dt).total_seconds()
-        
-        return res
+        return jsonify(data)
     except Exception as e:
         return jsonify({"status": "ERROR", "message": str(e)}), 500
 

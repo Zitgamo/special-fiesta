@@ -841,6 +841,23 @@
                     if (elUsdWeek && data.stats_week) elUsdWeek.innerText = `${(data.stats_week.usd >= 0 ? '+' : '')}${data.stats_week.usd.toFixed(2)} USD`;
                     if (elUsdMonth && data.stats_month) elUsdMonth.innerText = `${(data.stats_month.usd >= 0 ? '+' : '')}${data.stats_month.usd.toFixed(2)} USD`;
 
+                    // Update top clock & uptime
+                    if (data.current_time_utc) {
+                        document.getElementById('system-time').innerText = "LOCAL TIME: " + data.current_time_utc;
+                    }
+                    if (data.uptime_seconds) {
+                        const totalSec = Math.floor(data.uptime_seconds);
+                        const h = String(Math.floor(totalSec / 3600)).padStart(2, '0');
+                        const m = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
+                        const s = String(totalSec % 60).padStart(2, '0');
+                        document.getElementById('system-uptime').innerText = `UPTIME: ${h}:${m}:${s}`;
+                        
+                        // Pulse effect if running > 12h
+                        if (totalSec > 43200) {
+                            document.getElementById('system-uptime').style.boxShadow = "0 0 10px var(--neon-green)";
+                        }
+                    }
+
                     if (data.deploy_mode) {
                         const modeLock = document.getElementById('mode-lock');
                         const modeText = document.getElementById('mode-text');
@@ -1077,23 +1094,6 @@
                     `).join('');
                     
                     document.getElementById('git-warning').style.display = data.is_dirty ? 'block' : 'none';
-                    
-                    // Update top clock & uptime
-                    if (data.current_time_utc) {
-                        document.getElementById('system-time').innerText = "LOCAL TIME: " + data.current_time_utc;
-                    }
-                    if (data.uptime_seconds) {
-                        const totalSec = Math.floor(data.uptime_seconds);
-                        const h = String(Math.floor(totalSec / 3600)).padStart(2, '0');
-                        const m = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
-                        const s = String(totalSec % 60).padStart(2, '0');
-                        document.getElementById('system-uptime').innerText = `UPTIME: ${h}:${m}:${s}`;
-                        
-                        // Pulse effect if running > 12h
-                        if (totalSec > 43200) {
-                            document.getElementById('system-uptime').style.boxShadow = "0 0 10px var(--neon-green)";
-                        }
-                    }
                     
                     // Update SRS Score
                     const score = data.srs_score || 20;
