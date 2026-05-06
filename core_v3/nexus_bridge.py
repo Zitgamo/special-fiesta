@@ -80,41 +80,45 @@ def get_telemetry():
         cursor.execute("SELECT symbol, side, volume, price, pnl, timestamp, unit_id, sl, tp FROM trades WHERE type IN ('LIVE', 'CLOSED', 'PAPER') ORDER BY id DESC LIMIT 10")
         trades_raw = cursor.fetchall()
         
-        # 3. Session PnL (Realized Growth Today - Multi-Front)
-        # Using localtime to match user's actual day
-        cursor.execute("SELECT unit_id, symbol, pnl FROM trades WHERE date(timestamp, 'localtime') = date('now', 'localtime')")
-        today_trades = cursor.fetchall()
+        # 3. Multi-Timeframe PnL Audit
+        # --- DAY ---
+        cursor.execute("SELECT pnl, unit_id, symbol FROM trades WHERE date(timestamp, 'localtime') = date('now', 'localtime')")
+        day_trades = cursor.fetchall()
+        day_pnl_front = sum(t[0] for t in day_trades if "SOUTH" not in str(t[1]) and t[2] != "VN30F1M")
+        day_pnl_back = sum(t[0] for t in day_trades if "SOUTH" in str(t[1]) or t[2] == "VN30F1M") * 100000
+
+        # --- WEEK ---
+        cursor.execute("SELECT pnl, unit_id, symbol FROM trades WHERE strftime('%Y-%W', timestamp, 'localtime') = strftime('%Y-%W', 'now', 'localtime')")
+        week_trades = cursor.fetchall()
+        week_pnl_front = sum(t[0] for t in week_trades if "SOUTH" not in str(t[1]) and t[2] != "VN30F1M")
+        week_pnl_back = sum(t[0] for t in week_trades if "SOUTH" in str(t[1]) or t[2] == "VN30F1M") * 100000
+
+        # --- MONTH ---
+        cursor.execute("SELECT pnl, unit_id, symbol FROM trades WHERE strftime('%Y-%m', timestamp, 'localtime') = strftime('%Y-%m', 'now', 'localtime')")
+        month_trades = cursor.fetchall()
+        month_pnl_front = sum(t[0] for t in month_trades if "SOUTH" not in str(t[1]) and t[2] != "VN30F1M")
+        month_pnl_back = sum(t[0] for t in month_trades if "SOUTH" in str(t[1]) or t[2] == "VN30F1M") * 100000
+
+        session_pnl = round(day_pnl_front, 2)
+        session_pnl_vnd = int(day_pnl_back)
         
-        ex_realized = sum(t[2] for t in today_trades if "USDT" not in str(t[1]) and "SOUTH" not in str(t[0]) and t[1] != "VN30F1M")
-        bnc_realized = sum(t[2] for t in today_trades if "USDT" in str(t[1]))
-        
-        # South PnL is recorded in pts, must multiply by 100,000 for VND
-        south_realized_pts = sum(t[2] for t in today_trades if "SOUTH" in str(t[0]) or t[1] == "VN30F1M")
-        south_realized_vnd = int(south_realized_pts * 100000)
-        
-        session_pnl = round(ex_realized + bnc_realized, 2)
-        session_pnl_vnd = south_realized_vnd # Absolute truth from DB
-        
+        # Calculate Back/Front Efficiency %
+        total_pnl_abs = abs(day_pnl_front * 23500) + abs(day_pnl_back)
+        front_ratio = (abs(day_pnl_front * 23500) / total_pnl_abs * 100) if total_pnl_abs > 0 else 50
+        back_ratio = 100 - front_ratio
+
         from datetime import datetime, timedelta
         current_time_local = (datetime.utcnow() + timedelta(hours=7)).strftime('%H:%M:%S')
         
         # 2. MT5 Health (Exness)
         mt5_health = {"equity": 0, "drawdown": 0}
         try:
-            # Silent link ONLY to avoid UI-driven bouncing
             if mt5.initialize():
                 acc = mt5.account_info()
                 if acc:
                     mt5_health["equity"] = acc.equity
                     mt5_health["drawdown"] = (acc.equity / acc.balance - 1) if acc.balance != 0 else 0
-                else:
-                    # Don't print to avoid spamming bridge console
-                    pass
-            else:
-                # MT5 likely closed
-                pass
-        except Exception as e:
-            pass
+        except: pass
         
         # 4. Binance Health
         bnc_health = {"equity": 0, "drawdown": 0}
@@ -122,7 +126,6 @@ def get_telemetry():
             if BRIDGES.binance:
                 bal = BRIDGES.binance.fetch_balance()
                 bnc_health["equity"] = bal['total'].get('USDT', 0)
-                # Calculate floating PnL for Binance
                 positions = BRIDGES.binance.fetch_positions()
                 float_pnl = sum(float(p.get('unrealizedProfit', 0)) for p in positions if float(p.get('contracts', 0)) > 0)
                 if bnc_health["equity"] > 0:
@@ -147,17 +150,14 @@ def get_telemetry():
                         south_health["equity_vnd"] = first_unit.get("equity_vnd", last_vnd_equity)
                         south_health["active"] = any(u.get("active", False) for u in south_health["fleet"].values())
             
-            # Calculate floating PnL for Southern Front (as percentage)
             float_pnl_vnd = sum(u.get("pnl_vnd", 0) for u in south_health["fleet"].values())
             if south_health["equity_vnd"] > 0:
                 south_health["drawdown"] = float_pnl_vnd / south_health["equity_vnd"]
             
-            # Context v2.0 for Southern Front
             er_vn = IronAnalytics.get_efficiency_ratio("VN30F1M", BRIDGES)
             south_health["context"]["er"] = er_vn
             south_health["context"]["atr"] = IronAnalytics.get_atr("VN30F1M", BRIDGES)
             
-            # Neural Confidence for VN30F1M
             cursor.execute("""
                 SELECT AVG(CASE WHEN outcome_pnl > 0 THEN 1 ELSE 0 END) * 100, COUNT(*)
                 FROM empirical_learning 
@@ -176,9 +176,6 @@ def get_telemetry():
         if os.path.exists(SQUADRON_PATH):
             with open(SQUADRON_PATH, 'r') as f: squad = json.load(f)
             
-        # Update session_pnl_vnd with live floating data
-        session_pnl_vnd += int(south_health["drawdown"])
-            
         # 7. Unit Stats Audit
         unit_stats = {}
         for unit in ["ALPHA", "OMEGA", "GAMMA"]:
@@ -186,7 +183,6 @@ def get_telemetry():
             total, wins = cursor.fetchone()
             wr = (wins / total * 100) if total and total > 0 else 0
             
-            # Fetch Live Market Context (Context v2.0)
             m_ctx = {"er": 0.5, "atr": 0, "confidence": 50}
             if squad.get(unit):
                 main_sym = squad[unit][0]
@@ -194,7 +190,6 @@ def get_telemetry():
                 m_ctx["er"] = er
                 m_ctx["atr"] = IronAnalytics.get_atr(main_sym, BRIDGES)
                 
-                # Calculate Neural Confidence (Historical WR at similar ER)
                 try:
                     cursor.execute("""
                         SELECT AVG(CASE WHEN outcome_pnl > 0 THEN 1 ELSE 0 END) * 100, COUNT(*)
@@ -214,12 +209,14 @@ def get_telemetry():
         
         conn.close()
         
-        # 8. Report Route Mock (or actual redirect)
         return jsonify({
             "status": "ONLINE",
             "safety_status": "HARDENED",
             "session_pnl_usd": session_pnl,
             "session_pnl_vnd": session_pnl_vnd,
+            "performance_ratio": {"front": front_ratio, "back": back_ratio},
+            "stats_week": {"usd": round(week_pnl_front, 2), "vnd": int(week_pnl_back)},
+            "stats_month": {"usd": round(month_pnl_front, 2), "vnd": int(month_pnl_back)},
             "health_mt5": mt5_health,
             "health_bnc": bnc_health,
             "health_south": south_health,
