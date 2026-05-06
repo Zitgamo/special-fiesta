@@ -96,7 +96,7 @@ def get_telemetry():
         session_pnl_vnd = south_realized_vnd # Absolute truth from DB
         
         from datetime import datetime
-        current_time_utc = datetime.utcnow().strftime('%H:%M:%S')
+        current_time_local = datetime.now().strftime('%H:%M:%S')
         
         # 2. MT5 Health (Exness)
         mt5_health = {"equity": 0, "drawdown": 0}
@@ -220,7 +220,7 @@ def get_telemetry():
             "dna": dna,
             "squadron": squad,
             "unit_stats": unit_stats,
-            "current_time_utc": current_time_utc
+            "current_time_utc": current_time_local
         })
     except Exception as e:
         return jsonify({"status": "ERROR", "message": str(e)}), 500

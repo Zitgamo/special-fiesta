@@ -9,26 +9,26 @@
     "1895493585": {
         "hwm": 11.23,
         "hwm_state": "HWM_SET",
-        "lwm": 10.72,
+        "lwm": 10.2,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1895698087": {
-        "hwm": 17.62,
+        "hwm": 18.65,
         "hwm_state": "HWM_SET",
         "lwm": 14.08,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1897832538": {
-        "hwm": 18.89,
+        "hwm": 20.33,
         "hwm_state": "HWM_SET",
         "lwm": 10.37,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1897951990": {
-        "hwm": 9.2,
+        "hwm": 9.5,
         "hwm_state": "HWM_SET",
         "lwm": 2.1,
         "lwm_state": "INITIAL",
@@ -877,49 +877,63 @@
     "1898487233": {
         "hwm": -0.01,
         "hwm_state": "INITIAL",
-        "lwm": -0.07,
+        "lwm": -0.08,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1898487946": {
         "hwm": -0.03,
         "hwm_state": "INITIAL",
-        "lwm": -0.09,
+        "lwm": -0.1,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1898488823": {
         "hwm": -0.05,
         "hwm_state": "INITIAL",
-        "lwm": -0.11,
+        "lwm": -0.12,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1898489640": {
         "hwm": -0.02,
         "hwm_state": "INITIAL",
-        "lwm": -0.08,
+        "lwm": -0.09,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1898490649": {
         "hwm": -0.02,
         "hwm_state": "INITIAL",
-        "lwm": -0.06,
+        "lwm": -0.09,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1898491306": {
         "hwm": -0.04,
         "hwm_state": "INITIAL",
-        "lwm": -0.07,
+        "lwm": -0.1,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1898491683": {
         "hwm": -0.08,
         "hwm_state": "INITIAL",
-        "lwm": -0.08,
+        "lwm": -0.11,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898492102": {
+        "hwm": -0.03,
+        "hwm_state": "INITIAL",
+        "lwm": -0.06,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898492555": {
+        "hwm": -0.05,
+        "hwm_state": "INITIAL",
+        "lwm": -0.05,
         "lwm_state": "INITIAL",
         "banked": 0.0
     }
