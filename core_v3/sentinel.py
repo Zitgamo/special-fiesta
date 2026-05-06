@@ -84,8 +84,26 @@ class IronSentinel:
             # 4. HEARTBEAT AUDIT (Squadron Population Enforcement)
             self.heartbeat_audit()
             
-            # 5. AUTO-SCRIBE (Cloud Synchronization)
-            if time.time() - self.last_scribe > 7200: # Every 2 hours
+            # 5. INTELLIGENT AUTO-SCRIBE (Evolution Tracking)
+            # Trigger if: 1 hour passed OR significant changes (> 50 lines) detected
+            time_since_scribe = time.time() - self.last_scribe
+            
+            should_scribe = False
+            if time_since_scribe > 3600: # 1 Hour Hard-cap
+                should_scribe = True
+            else:
+                try:
+                    diff_stat = subprocess.check_output(["git", "diff", "--shortstat"]).decode().strip()
+                    if diff_stat:
+                        # Extract number of insertions/deletions
+                        import re
+                        changes = sum(int(x) for x in re.findall(r'(\d+) (?:insertion|deletion)', diff_stat))
+                        if changes > 50: # Significant Evolution Threshold
+                            print(f" >> [SENTINEL] Significant evolution detected ({changes} lines). Triggering Scribe...")
+                            should_scribe = True
+                except: pass
+
+            if should_scribe:
                 self.auto_scribe()
                 self.last_scribe = time.time()
             
@@ -99,13 +117,33 @@ class IronSentinel:
             
             try:
                 with open(log_file, "r") as f:
-                    # Look at the tail
-                    content = f.readlines()[-20:]
-                    if any("Invalid volume (Code: 10014)" in line for line in content):
-                        print(f" !! [CRITICAL] {unit} UNIT hitting VOLUME ERRORS. System requires optimization.")
-                    if any("Invalid stops (Code: 10016)" in line for line in content):
-                        print(f" !! [CRITICAL] {unit} UNIT hitting STOP ERRORS. ATR/SL logic may be too tight.")
+                    content = f.read().splitlines()[-20:] # Check last 20 lines
+                    for line in content:
+                        if "FATAL" in line or "Order failed" in line:
+                            print(f" !! [SENTINEL] Alert detected in {log_file}: {line}")
+                            self.report_to_war_room(unit, line)
+                        if "Invalid volume (Code: 10014)" in line:
+                            print(f" !! [CRITICAL] {unit} UNIT hitting VOLUME ERRORS. System requires optimization.")
+                        if "Invalid stops (Code: 10016)" in line:
+                            print(f" !! [CRITICAL] {unit} UNIT hitting STOP ERRORS. ATR/SL logic may be too tight.")
             except: pass
+
+    def report_to_war_room(self, component, error):
+        """Escalates critical failures to the BUG_WAR_ROOM.md for AI attention."""
+        try:
+            war_room_path = os.path.join(os.getcwd(), "BUG_WAR_ROOM.md")
+            timestamp = time.strftime("%Y-%m-%d %H:%M")
+            entry = f"\n### [ACTIVE_BUG] [{timestamp}] {component}_CRITICAL_FAILURE\n- **Error**: {error}\n- **Status**: UNRESOLVED - REQUIRES AI INTERVENTION\n"
+            
+            with open(war_room_path, "r") as f:
+                content = f.read()
+            
+            if error[:50] not in content: # Avoid duplicate spam
+                new_content = content.replace("## 🚨 ACTIVE BUGS [PRIORITY: OMEGA]", f"## 🚨 ACTIVE BUGS [PRIORITY: OMEGA]\n{entry}")
+                with open(war_room_path, "w") as f:
+                    f.write(new_content)
+                print(f" >> [SENTINEL] Escalated to BUG_WAR_ROOM: {component}")
+        except: pass
 
     def heartbeat_audit(self):
         """

@@ -144,27 +144,54 @@ class IronEngine:
                     if has_pos:
                         self.logger.info(f" >> [GUARD] {symbol} position already active.")
                         
-                        # --- INSTITUTIONAL HARVESTER (Scale-In Logic) ---
-                        # If profitable (> 1% profit on account), consider scaling in
-                        if drawdown < -0.01:
+                        # --- ELITE HARVESTER v5.0 (Expectancy-Driven) ---
+                        symbol_pnl = sum(p['pnl'] for p in active_symbol_pos)
+                        max_layers = self.dna.get(self.unit_id, {}).get("ACTIVE_RISK", {}).get("MAX_LAYERS", 1)
+                        
+                        # Calculate Unit Expectancy
+                        wr_str = stats.get("win_rate", "50%").replace('%','')
+                        wr = float(wr_str) / 100
+                        expectancy = (wr * 2.0) - ((1-wr) * 1.0) # Simplified R:R proxy
+                        
+                        # Scaling is allowed if:
+                        # 1. Expectancy is positive (> 0.2) OR it's OMEGA (aggressive)
+                        # 2. We haven't reached MAX_LAYERS
+                        # 3. We are NOT in the Milking zone (PnL < 3.0 ATR)
+                        is_high_odds = expectancy > 0.2 or self.unit_id == "OMEGA"
+                        in_milking_zone = symbol_pnl > (atr * 3.0) 
+                        
+                        if is_high_odds and not in_milking_zone and len(active_symbol_pos) < max_layers:
                             try:
                                 target_pos = active_symbol_pos[0]
                                 current_symbol = target_pos['symbol']
-                                self.logger.info(f" >> [HARVESTER] {current_symbol} is dominating. Scaling in reinforcements...")
                                 
-                                # Fetch symbol info for correct volume rounding
+                                # Cooldown Guard (15 minutes for high-odds)
+                                last_scale = self.dna.get(self.unit_id, {}).get("LAST_SCALE", 0)
+                                if time.time() - last_scale < 900:
+                                    continue
+
+                                self.logger.info(f" >> [HARVESTER] High Expectancy ({expectancy:.2f}). Scaling in Layer {len(active_symbol_pos)+1} on {current_symbol}...")
+                                
                                 info = mt5.symbol_info(current_symbol)
                                 if info:
                                     min_lot = info.volume_min
                                     v_step = info.volume_step
                                     base_lot = target_pos['volume']
                                     
-                                    # Scale in with micro-volume (10% of base), but at least min_lot
-                                    scale_lot = round((base_lot * 0.1) / v_step) * v_step
+                                    # Dynamic Scale Lot based on confidence
+                                    scale_ratio = 0.2 if expectancy > 0.5 else 0.1
+                                    scale_lot = round((base_lot * scale_ratio) / v_step) * v_step
                                     scale_lot = max(scale_lot, min_lot)
                                     
-                                    if scale_lot <= (base_lot * 0.5): # Safety cap
-                                        self.bridges.execute_order(current_symbol, target_pos['side'], scale_lot, unit_id=self.unit_id)
+                                    res = self.bridges.execute_order(current_symbol, target_pos['side'], scale_lot, unit_id=self.unit_id)
+                                    if res:
+                                        # Track Delta (Expectancy Improvement)
+                                        self.forensics.log_event(self.unit_id, "REINFORCEMENT", f"{current_symbol} Layer {len(active_symbol_pos)+1} | Lot: {scale_lot}")
+                                        
+                                        if self.unit_id not in self.dna: self.dna[self.unit_id] = {}
+                                        self.dna[self.unit_id]["LAST_SCALE"] = time.time()
+                                        with open(self.dna_path, 'w') as f: json.dump(self.dna, f, indent=4)
+
                             except Exception as harvester_err:
                                 self.logger.error(f" !! [HARVESTER_ERR] {self.unit_id} scale-in failed: {harvester_err}")
                         
