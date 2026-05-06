@@ -314,26 +314,6 @@ def get_intelligence():
     except Exception as e:
         return jsonify({"status": "ERROR", "message": str(e)}), 500
 
-@app.route('/api/reports/equity_curve', methods=['GET'])
-def get_equity_curve():
-    try:
-        conn = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
-        # Fetch last 100 trades to build a curve
-        cursor.execute("SELECT timestamp, pnl FROM trades WHERE type IN ('LIVE', 'CLOSED') ORDER BY id ASC LIMIT 100")
-        rows = cursor.fetchall()
-        conn.close()
-        
-        curve = []
-        balance = 100.0 # Virtual start for curve
-        for r in rows:
-            balance += r[1]
-            curve.append({"t": r[0], "e": round(balance, 2)})
-            
-        return jsonify(curve)
-    except Exception as e:
-        return jsonify([]), 500
-
 @app.route('/api/sync', methods=['POST'])
 def force_sync():
     try:
