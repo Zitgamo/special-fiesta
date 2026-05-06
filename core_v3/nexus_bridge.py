@@ -6,15 +6,15 @@ import json
 import subprocess
 import MetaTrader5 as mt5
 import sys
+import time
 from datetime import datetime, timedelta
+
+START_TIME = time.time()
 
 # Ensure core_v3 is in path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from bridges import IronBridges
 from analytics import IronAnalytics
-
-# Track when the server started for uptime monitoring
-START_TIME = datetime.now()
 
 app = Flask(__name__)
 CORS(app)
@@ -285,10 +285,24 @@ def get_telemetry():
             "git_status": _get_git_metadata(),
             "back_score": round(scale['back'], 1),
             "front_score": round(scale['front'], 1),
-            "uptime_seconds": (datetime.now() - START_TIME).total_seconds(),
             "deploy_mode": get_deploy_mode(),
             "current_time_utc": current_time_local
         })
+        
+        # Add Uptime
+        cursor.execute("SELECT value FROM hq_config WHERE key = 'SYSTEM_BOOT_TIME'")
+        boot_res = cursor.fetchone()
+        if not boot_res:
+            boot_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            cursor.execute("INSERT OR REPLACE INTO hq_config (key, value, description) VALUES ('SYSTEM_BOOT_TIME', ?, 'Persistent Uptime Tracker')", (boot_time,))
+            conn.commit()
+        else:
+            boot_time = boot_res[0]
+            
+        boot_dt = datetime.strptime(boot_time, "%Y-%m-%d %H:%M:%S")
+        res.json['uptime_seconds'] = (datetime.now() - boot_dt).total_seconds()
+        
+        return res
     except Exception as e:
         return jsonify({"status": "ERROR", "message": str(e)}), 500
 
@@ -441,7 +455,9 @@ def get_git_status():
             "status": "SUCCESS", 
             "commits": commits, 
             "is_dirty": is_dirty,
-            "srs_score": 65 # Auditor manually injected score
+            "srs_score": 65, # Auditor manually injected score
+            "uptime_seconds": time.time() - START_TIME,
+            "current_time_utc": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
         })
     except Exception as e:
         return jsonify({"status": "ERROR", "message": str(e)}), 500
