@@ -40,8 +40,9 @@ class GhostComm:
                     f" 🔸 <b>MONTH</b>: <code>${data.get('stats_month', {}).get('usd', 0):+.2f}</code> | <code>{data.get('stats_month', {}).get('vnd', 0):+,} đ</code>\n\n"
                     
                     "<b>⚖️ SYSTEM BALANCE (RUỘT vs VỎ)</b>\n"
-                    f" [<code>{'█' * int(data.get('system_balance', {}).get('back', 70) / 10)}{'░' * (10 - int(data.get('system_balance', {}).get('back', 70) / 10))}</code>]\n"
-                    f" <i>Back (Logic): {data.get('system_balance', {}).get('back', 0):.1f}% | Front (UI): {data.get('system_balance', {}).get('front', 0):.1f}%</i>\n"
+                    f" [<code>{'█' * int(data.get('system_balance', {}).get('back', 73) / 10)}{'░' * (10 - int(data.get('system_balance', {}).get('back', 73) / 10))}</code>]\n"
+                    f" <i>Back: {data.get('system_balance', {}).get('back', 0):.1f}% ({data.get('system_balance', {}).get('back_lines', 0)} L)</i>\n"
+                    f" <i>Front: {data.get('system_balance', {}).get('front', 0):.1f}% ({data.get('system_balance', {}).get('front_lines', 0)} L)</i>\n"
                     "━━━━━━━━━━━━━━━━━━\n"
                     "🔗 <a href='http://127.0.0.1:5050/'>OPEN NEXUS DASHBOARD</a>"
                 )
