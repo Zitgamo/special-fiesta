@@ -89,6 +89,19 @@ class IronSafety:
         if price <= 0:
             return False, "PRICE_DATA_CORRUPT"
 
+        # 5. MARKET SESSION AUDIT (DE30/HK50 Cutoff)
+        if "USDT" not in symbol:
+            info = mt5.symbol_info(symbol)
+            if info:
+                # Check trade mode (0=Disabled, 4=Full)
+                if info.trade_mode != mt5.SYMBOL_TRADE_MODE_FULL:
+                    return False, f"MARKET_RESTRICTED ({info.trade_mode})"
+                
+                # Check for recent tick (within last 5 minutes)
+                tick = mt5.symbol_info_tick(symbol)
+                if not tick or (time.time() - tick.time) > 300:
+                    return False, "MARKET_CLOSED_OR_STALE"
+
         # Update symbol tracker
         symbol_tracker[symbol] = now
         try:

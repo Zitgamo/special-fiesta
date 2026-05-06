@@ -2,6 +2,7 @@ import MetaTrader5 as mt5
 import json
 import os
 import logging
+import time
 import analytics
 
 class IronVault:
@@ -10,6 +11,7 @@ class IronVault:
         self.dna = self._load_dna()
         self.bridges = bridges
         self.logger = logging.getLogger("IronVault")
+        self.equity_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "virtual_equity.json")
         
         # --- SOVEREIGN PROTOCOL CONSTANTS (Line 13-15) ---
         self.NAV_RISK = {
@@ -17,10 +19,46 @@ class IronVault:
             "OMEGA": 0.005, # 0.5%
             "GAMMA": 0.005  # 0.5%
         }
+        
+        self.virtual_pools = self._load_virtual_pools()
 
     def _load_dna(self):
         with open(self.dna_path, "r") as f:
             return json.load(f)
+
+    def _load_virtual_pools(self):
+        if os.path.exists(self.equity_path):
+            try:
+                with open(self.equity_path, "r") as f:
+                    return json.load(f)
+            except: pass
+            
+        # Initialization: Divide current total equity by 3
+        acc = mt5.account_info()
+        total = acc.equity if acc else 100.0
+        pools = {
+            "ALPHA": total / 3,
+            "OMEGA": total / 3,
+            "GAMMA": total / 3,
+            "LAST_SYNC": time.time()
+        }
+        self._save_virtual_pools(pools)
+        return pools
+
+    def _save_virtual_pools(self, pools):
+        with open(self.equity_path, "w") as f:
+            json.dump(pools, f, indent=4)
+            
+    def update_pool_profit(self, unit_id, pnl_usd):
+        """
+        Settles a strike by adding/subtracting profit from the unit's virtual pool.
+        """
+        self.virtual_pools = self._load_virtual_pools()
+        if unit_id in self.virtual_pools:
+            self.virtual_pools[unit_id] += pnl_usd
+            self.virtual_pools["LAST_SYNC"] = time.time()
+            self._save_virtual_pools(self.virtual_pools)
+            self.logger.info(f" >> [SETTLEMENT] {unit_id} virtual pool updated by ${pnl_usd:+.2f}")
 
     def get_gradient_risk(self):
         """
@@ -51,9 +89,15 @@ class IronVault:
                 current_balance = bal_data['total']['USDT']
             except: return False, "BINANCE_OFFLINE"
         else:
-            acc = mt5.account_info()
-            if not acc: return False, "MT5_OFFLINE"
-            current_balance = acc.equity
+            # Protocol Isolation: Use Virtual Pool for MT5 Units
+            current_balance = self.virtual_pools.get(unit_id, 0)
+            if current_balance <= 0:
+                # Fallback to global if pool is empty/uninitialized
+                acc = mt5.account_info()
+                if not acc: return False, "MT5_OFFLINE"
+                current_balance = acc.equity / 3
+                self.virtual_pools[unit_id] = current_balance
+                self._save_virtual_pools(self.virtual_pools)
 
         # 2. Dynamic Volatility (ATR)
         atr_now = analytics.IronAnalytics.get_atr(symbol, self.bridges)

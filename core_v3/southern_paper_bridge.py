@@ -328,12 +328,36 @@ class SouthernPaperBridge:
 
     def start(self):
         self.logger.info("Southern Front Expansion: Online.")
+        loop_count = 0
         while True:
             try:
-                # Check Market Hours (Vietnam: 08:45 - 11:30, 13:00 - 15:00)
+                # ... existing logic ...
                 now = datetime.now()
-                # Simplified check for testing
-                self.run_cycle()
+                h, m = now.hour, now.minute
+                
+                is_open = False
+                if (h == 8 and m >= 45) or (9 <= h < 11) or (h == 11 and m <= 30):
+                    is_open = True
+                elif (13 <= h < 14) or (h == 14 and m <= 45):
+                    is_open = True
+                
+                if is_open:
+                    self.run_cycle()
+                else:
+                    # Market Closed: Clear all paper positions for the day
+                    has_pos = any(u['pos'] != 0 for u in self.units.values())
+                    if has_pos:
+                        self.logger.info(" !! [MARKET_END] VN30 Session Ended. Liquating all active paper positions.")
+                        for uid, u in self.units.items():
+                            if u['pos'] != 0:
+                                u['pos'] = 0
+                        self.export_state(0) # Final state save
+                    
+                    # Hibernate to save CPU
+                    if loop_count % 60 == 0: # Log every hour during hibernation
+                        self.logger.info(" >> [HIBERNATION] VN30 Market Closed. Waiting for next session (08:45 ICT).")
+                
+                loop_count += 1
             except Exception as e:
                 self.logger.error(f"Bridge Cycle Error: {e}")
             time.sleep(60)

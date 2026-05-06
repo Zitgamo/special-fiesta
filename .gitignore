@@ -11,7 +11,15 @@ secrets.json
 core_v3/iron_core.db
 core_v3/dna.json
 core_v3/squadron.json
+core_v3/strike_frequency.json
+core_v3/symbol_cooldown.json
+core_v3/pos_tracker.json
+core_v3/virtual_equity.json
 03_DATA/
+
+# Logs
+*.log
+logs/
 
 # Python Environment
 __pycache__/
