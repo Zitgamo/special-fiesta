@@ -75,7 +75,27 @@ python -c "import sqlite3; print(sqlite3.connect('core_v3/iron_core.db').execute
 
 ---
 
-If you want, I can:
-- Apply a dynamic broker-minimum lot check to avoid `Invalid volume` errors automatically.
-- Roll out the blacklist enforcement to `core_real` when ready.
-- Push this handover into a `handover/` folder and create a quick checklist ticket.
+**Critical Operational Update (May 06, 2026 - Hardening Phase)**
+
+**1. Emergency Physical Kill-Switch:**
+- Created [**`KILL_SWITCH.bat`**](file:///c:/Users/ADMIN/Desktop/IRON_COMMANDER_ELITE/KILL_SWITCH.bat) in the root directory.
+- **Function:** Forcefully terminates all `python.exe` processes and updates `iron_core.db` (`GLOBAL_PAUSE = 1`) to lock the system state. Use this if the Web UI is unreachable.
+
+**2. Tactical API Expansion (`nexus_bridge.py`):**
+- `/api/sync` [POST]: Forces a re-fetch of MT5 health and clears internal cache.
+- `/api/tactical/stop` [POST]: Triggers a database-level Global Pause.
+- `/api/tactical/reinforce` [POST]: Scales unit `LOT_SIZE` (x1.5) and `DCA_LAYERS` (+2) in `DNA.json`. Supports `action='reset'`.
+- `/api/reports/equity_curve` [GET]: Serves 100-point equity data from `trades` table for the Battle Report.
+
+**3. UI & Report Synchronization:**
+- `sovereign_nexus.html`: Hardened the `updateHUD` loop with defensive null-checks. Linked all Control Bar buttons to live APIs.
+- `elite_report.html`: Fixed broken Chart.js binding and restored the `strike-log` tactical container. Served via `/report`.
+
+**4. Coder's Self-Correction Protocol (To be archived by Docs):**
+- **Endpoint Collision:** Always `grep` for route names before adding new ones to Flask.
+- **Import Scoping:** Core libs (`datetime`, `os`) must be global to prevent `NameError` during async execution.
+- **Foreground Testing:** New bridge scripts must be validated in the terminal (foreground) before running with `start` (background).
+
+---
+**Handover Status:** Technical details ready for Docs integration.
+**Coder Agent:** Antigravity

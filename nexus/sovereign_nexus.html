@@ -869,9 +869,15 @@
             }
         };
 
-        window.emergencyStop = function() {
-            if (confirm("ACTIVATE GLOBAL KILL-SWITCH? All bot logic will be suspended.")) {
-                alert("EMERGENCY SIGNAL SENT TO HQ_CONFIG [GLOBAL_PAUSE=1]");
+        window.emergencyStop = async function() {
+            if (confirm("⚠️ ACTIVATE GLOBAL KILL-SWITCH?\n\nThis will suspend all bot logic across the fleet immediately.")) {
+                try {
+                    const res = await fetch('http://127.0.0.1:5050/api/tactical/stop', { method: 'POST' });
+                    const data = await res.json();
+                    if (data.status === "SUCCESS") {
+                        alert("🔴 EMERGENCY SIGNAL SENT. GLOBAL_PAUSE ACTIVATED.");
+                    }
+                } catch (e) { alert("FAIL: Could not send signal to HQ."); }
             }
         };
 
@@ -889,10 +895,20 @@
             btn.disabled = false;
         };
 
-        window.reinforce = function(unit) {
-            if (confirm(`INITIATE REINFORCEMENT FOR ${unit}?\n\nThis will increase LOT_SIZE and DCA_LAYERS by 20%.\nTo REVERT, click again and select 'De-escalate'.`)) {
-                alert(`UNIT ${unit} REINFORCED. Parameters updated in DNA.json`);
-            }
+        window.reinforce = async function(unit) {
+            const action = confirm(`INITIATE REINFORCEMENT FOR ${unit}?\n\nOK: Increase Scale (x1.5)\nCancel: De-escalate (Reset)`) ? 'reinforce' : 'reset';
+            try {
+                const res = await fetch('http://127.0.0.1:5050/api/tactical/reinforce', { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ unit: unit, action: action })
+                });
+                const data = await res.json();
+                if (data.status === "SUCCESS") {
+                    alert(`TACTICAL UPDATE: ${unit} ${action.toUpperCase()}ED.`);
+                    updateHUD();
+                }
+            } catch (e) { alert("REINFORCE FAILED: Check DNA access."); }
         };
 
         setInterval(updateHUD, 3000);
