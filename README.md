@@ -27,6 +27,14 @@ To launch the full sovereign fleet:
    ```
 3. Monitor the fleet via the [**Sovereign Nexus Dashboard**](file:///c:/Users/ADMIN/Desktop/IRON_COMMANDER_ELITE/nexus/sovereign_nexus.html).
 
+## 🛡️ Fail-Safe & Emergency Protocols
+
+**Sovereign Philosophy:** Hệ thống được thiết kế để **Tự động hóa & Tự phục hồi**. Nó không bao giờ yêu cầu sự can thiệp thủ công để giữ an toàn (Auto-Trailing, Auto-SL, Equity Guard).
+
+**Manual Overrides:**
+- **Web UI:** Sử dụng nút **MASTER ARM** + **EMERGENCY STOP** trên Dashboard.
+- **Physical Kill-Switch:** Nếu giao diện web bị treo, hãy chạy file [**`KILL_SWITCH.bat`**](file:///c:/Users/ADMIN/Desktop/IRON_COMMANDER_ELITE/KILL_SWITCH.bat) tại thư mục gốc. File này sẽ dừng ngay lập tức các tiến trình Python và khóa Database (`GLOBAL_PAUSE=1`).
+
 ---
 **Documentation Agent:** *Sovereign Docs*
 **Coder Agent:** *Antigravity*
