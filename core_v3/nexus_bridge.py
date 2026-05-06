@@ -262,8 +262,6 @@ def get_telemetry():
                 "context": m_ctx
             }
         
-        conn.close()
-        
         # Add Uptime
         cursor.execute("SELECT value FROM hq_config WHERE key = 'SYSTEM_BOOT_TIME'")
         boot_res = cursor.fetchone()
@@ -276,6 +274,8 @@ def get_telemetry():
             
         boot_dt = datetime.strptime(boot_time, "%Y-%m-%d %H:%M:%S")
         uptime_sec = (datetime.now() - boot_dt).total_seconds()
+        
+        conn.close()
         
         data = {
             "status": "ONLINE",
