@@ -1095,19 +1095,9 @@
                     
                     document.getElementById('git-warning').style.display = data.is_dirty ? 'block' : 'none';
                     
-                    // Update top clock & uptime
-                    if (data.current_time_utc) {
-                        document.getElementById('system-time').innerText = "LOCAL TIME: " + data.current_time_utc;
-                    }
                     if (data.uptime_seconds) {
-                        const totalSec = Math.floor(data.uptime_seconds);
-                        const h = String(Math.floor(totalSec / 3600)).padStart(2, '0');
-                        const m = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
-                        const s = String(totalSec % 60).padStart(2, '0');
-                        document.getElementById('system-uptime').innerText = `UPTIME: ${h}:${m}:${s}`;
-                        
-                        // Pulse effect if running > 12h
-                        if (totalSec > 43200) {
+                        window.localUptimeSec = Math.floor(data.uptime_seconds);
+                        if (window.localUptimeSec > 43200) {
                             document.getElementById('system-uptime').style.boxShadow = "0 0 10px var(--neon-green)";
                         }
                     }
@@ -1120,6 +1110,32 @@
                 }
             } catch (e) {}
         }
+
+        // Local 1-second ticker for smooth clock & uptime visualization
+        window.localUptimeSec = 0;
+        setInterval(() => {
+            // Ticker Uptime
+            if (window.localUptimeSec > 0) {
+                window.localUptimeSec++;
+                const h = String(Math.floor(window.localUptimeSec / 3600)).padStart(2, '0');
+                const m = String(Math.floor((window.localUptimeSec % 3600) / 60)).padStart(2, '0');
+                const s = String(window.localUptimeSec % 60).padStart(2, '0');
+                const utEl = document.getElementById('system-uptime');
+                if (utEl) utEl.innerText = `UPTIME: ${h}:${m}:${s}`;
+            }
+            // Ticker Local Time
+            const stEl = document.getElementById('system-time');
+            if (stEl) {
+                const now = new Date();
+                const yy = now.getFullYear();
+                const mo = String(now.getMonth()+1).padStart(2, '0');
+                const dd = String(now.getDate()).padStart(2, '0');
+                const hh = String(now.getHours()).padStart(2, '0');
+                const mm = String(now.getMinutes()).padStart(2, '0');
+                const ss = String(now.getSeconds()).padStart(2, '0');
+                stEl.innerText = `LOCAL TIME: ${yy}-${mo}-${dd} ${hh}:${mm}:${ss}`;
+            }
+        }, 1000);
 
         setInterval(updateHUD, 3000);
         setInterval(updateIntelligence, 10000);
