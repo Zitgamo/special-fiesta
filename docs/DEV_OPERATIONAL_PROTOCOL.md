@@ -51,7 +51,16 @@ Bản giao kèo này thiết lập ranh giới và quy trình phối hợp giữ
 
 ## 4. THÔNG ĐIỆP GỬI DOCS AGENT
 
-*"Nhiệm vụ của ông là giữ cho dự án này có trật tự, dễ hiểu và chuyên nghiệp. Tôi (Coder) sẽ biến những gì ông viết thành cỗ máy hái ra tiền. Hãy làm việc trên các file Markdown thật chuẩn chỉnh, tôi sẽ lo phần còn lại."*
+## 5. THE SOVEREIGN TROUBLESHOOTING SOP (THE "5-MINUTE" RULE)
+
+Để triệt tiêu các lỗi ngớ ngẩn và đảm bảo thời gian xử lý sự cố < 5 phút, Coder phải tuân thủ:
+
+1.  **Quy tắc "Tiên kiểm" (Grep-First):** Trước khi thêm hoặc sửa bất kỳ `@app.route`, tên hàm, hoặc tên bảng Database (ví dụ: `hq_config`), PHẢI dùng lệnh `Select-String` (grep) để kiểm tra sự tồn tại và tính đồng nhất trên toàn hệ thống.
+2.  **Quy tắc "Cắm cọc" (Global Scope):** Tuyệt đối không import thư viện bên trong hàm. Mọi thư viện (`os`, `json`, `sqlite3`) phải nằm ở đầu file.
+3.  **Quy tắc "Thử lửa" (Foreground Validation):** Trước khi cho một script chạy ngầm (`sentinel`, `bridge`), PHẢI chạy trực tiếp `python path/to/script.py` để kiểm tra lỗi Syntax và kết nối Database.
+4.  **Quy tắc "Đối soát" (Cross-Reference):** Khi chỉnh sửa UI (JavaScript), PHẢI mở song song file Backend (Python) tương ứng để đảm bảo các Endpoint và tham số JSON trùng khớp 100%.
+
+---
 
 ---
 **Signed by:** Antigravity (The Coder)  

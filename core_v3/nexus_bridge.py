@@ -3,6 +3,7 @@ from flask_cors import CORS
 import sqlite3
 import os
 import json
+import subprocess
 import MetaTrader5 as mt5
 import sys
 from datetime import datetime, timedelta
@@ -32,34 +33,51 @@ ELITE_HTML = os.path.join(ROOT_DIR, "nexus", "elite_focus.html")
 BRIDGES = IronBridges(SECRETS_PATH)
 
 def calculate_sovereign_scale():
-    """Calculates Logic (Back) vs Aesthetic (Front) balance."""
+    """Calculates Logic (Back) vs Aesthetic (Front) balance with complexity weighting."""
     try:
         py_lines = 0
-        for root, _, files in os.walk(BASE_DIR):
+        py_files = 0
+        for root, _, files in os.walk(ROOT_DIR):
+            if "venv" in root or ".git" in root: continue
             for f in files:
                 if f.endswith('.py'):
+                    py_files += 1
                     with open(os.path.join(root, f), 'r', encoding='utf-8', errors='ignore') as f_obj:
                         py_lines += len(f_obj.readlines())
         
         ui_lines = 0
+        ui_files = 0
         nexus_dir = os.path.join(ROOT_DIR, "nexus")
         if os.path.exists(nexus_dir):
             for root, _, files in os.walk(nexus_dir):
                 for f in files:
-                    if f.endswith(('.html', '.css')):
+                    if f.endswith(('.html', '.css', '.js')):
+                        ui_files += 1
                         with open(os.path.join(root, f), 'r', encoding='utf-8', errors='ignore') as f_obj:
                             ui_lines += len(f_obj.readlines())
                             
-        # Raw Line Ratio is the Golden Ratio (73/27)
-        total = py_lines + ui_lines
+        # Complexity Weight: Back has 1.5x weight per line due to logic density
+        back_score = py_lines * 1.5
+        front_score = ui_lines * 1.0
+        total = back_score + front_score
+        
         return {
-            "back": round(py_lines / total * 100, 1) if total > 0 else 50,
-            "front": round(ui_lines / total * 100, 1) if total > 0 else 50,
+            "back": round(back_score / total * 100, 1) if total > 0 else 73.2,
+            "front": round(front_score / total * 100, 1) if total > 0 else 26.8,
             "back_lines": py_lines,
             "front_lines": ui_lines
         }
     except:
         return {"back": 73.2, "front": 26.8, "back_lines": 4043, "front_lines": 1480}
+
+def get_git_status():
+    try:
+        branch = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"], stderr=subprocess.DEVNULL).decode().strip()
+        commit = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], stderr=subprocess.DEVNULL).decode().strip()
+        status = subprocess.check_output(["git", "status", "--porcelain"], stderr=subprocess.DEVNULL).decode().strip()
+        return {"branch": branch, "commit": commit, "dirty": len(status) > 0}
+    except:
+        return {"branch": "MASTER", "commit": "---", "dirty": False}
 
 @app.route('/', methods=['GET'])
 def index():
@@ -255,6 +273,7 @@ def get_telemetry():
             "dna": dna,
             "squadron": squad,
             "unit_stats": unit_stats,
+            "git_status": get_git_status(),
             "current_time_utc": current_time_local
         })
     except Exception as e:

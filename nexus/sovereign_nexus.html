@@ -454,7 +454,10 @@
 <body>
     <div class="scanline"></div>
     <header>
-        <div class="title">SOVEREIGN NEXUS <span class="tag-status">HARDENED</span></div>
+        <div class="title">
+            SOVEREIGN NEXUS <span class="tag-status">HARDENED</span>
+            <span id="git-tag" style="font-size:10px; margin-left:15px; padding:2px 8px; border:1px solid rgba(255,255,255,0.1); border-radius:3px; opacity:0.6; font-family:Orbitron; letter-spacing:1px;">GIT: MASTER [---]</span>
+        </div>
         <div class="pnl-container">
             <div class="pnl-box">
                 <label>GLOBAL ASSETS // FRONT</label>
@@ -706,6 +709,16 @@
                 if (data.status === "ONLINE") {
                     const elClock = document.getElementById('clock-local');
                     if (elClock) elClock.innerText = data.current_time_utc || '00:00:00';
+
+                    if (data.git_status) {
+                        const gitEl = document.getElementById('git-tag');
+                        if (gitEl) {
+                            gitEl.innerText = `GIT: ${data.git_status.branch.toUpperCase()} [${data.git_status.commit}]${data.git_status.dirty ? ' *' : ''}`;
+                            gitEl.style.borderColor = data.git_status.dirty ? 'var(--neon-gold)' : 'rgba(255,255,255,0.1)';
+                            gitEl.style.color = data.git_status.dirty ? 'var(--neon-gold)' : 'inherit';
+                            gitEl.style.opacity = data.git_status.dirty ? '1' : '0.6';
+                        }
+                    }
 
                     const elUsdPnl = document.getElementById('usd-pnl');
                     if (elUsdPnl) {

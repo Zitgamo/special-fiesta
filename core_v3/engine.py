@@ -122,6 +122,11 @@ class IronEngine:
                     blacklist = []
                     
                 for symbol in symbols:
+                    # --- DEMO BLACKLIST: skip trading restricted tickers on demo accounts ---
+                    if symbol.upper() in [s.upper() for s in blacklist]:
+                        self.logger.info(f" >> [BLACKLIST] Skipping restricted ticker: {symbol}")
+                        continue
+
                     price = self.bridges.get_price(symbol)
                     if not price: continue
 
