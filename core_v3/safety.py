@@ -15,8 +15,8 @@ except ImportError:
 class IronSafety:
     def __init__(self, db_path=None):
         self.logger = logging.getLogger("IRON_SAFETY")
-        self.MAX_TOTAL_LOTS = 0.20 # Absolute fleet-wide cap
-        self.MAX_UNIT_LOTS = 0.05  # Per-unit cap
+        self.MAX_TOTAL_LOTS = 50.0  # Increased for Index/Crypto scaling
+        self.MAX_UNIT_LOTS = 10.0   # Increased for Index/Crypto scaling
         self.MAX_STRIKES_PER_HOUR = 3
         self.MAX_SPREAD_ATR_RATIO = 0.20 # If spread > 20% of ATR, abort
         self.db_path = db_path
@@ -102,10 +102,18 @@ class IronSafety:
     def global_exposure_audit(self, active_positions):
         """
         Ensures the entire fleet doesn't over-leverage the mother ship.
+        Separates MT5 lots from Binance coin volume for accurate auditing.
         """
-        total_lots = sum(float(p.get('volume', 0)) for p in active_positions)
-        if total_lots >= self.MAX_TOTAL_LOTS:
-            return False, f"GLOBAL_EXPOSURE_LIMIT_REACHED ({total_lots})"
+        mt5_lots = sum(float(p.get('volume', 0)) for p in active_positions if "USDT" not in str(p.get('symbol', '')))
+        crypto_vol = sum(float(p.get('volume', 0)) for p in active_positions if "USDT" in str(p.get('symbol', '')))
+        
+        # We apply different caps based on platform characteristics
+        if mt5_lots >= 25.0: # Conservative cap for MT5 (Indices use high volume)
+            return False, f"MT5_EXPOSURE_LIMIT_REACHED ({mt5_lots})"
+            
+        if crypto_vol >= 1000.0: # High volume allowed for small coins (DOGE/SOL)
+            return False, f"CRYPTO_EXPOSURE_LIMIT_REACHED ({crypto_vol})"
+            
         return True, "SAFE"
 
     def system_integrity_audit(self):

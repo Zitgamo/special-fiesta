@@ -251,8 +251,8 @@ class SovereignMaster:
             except: pass
 
         # Sort by Efficiency Ratio (ER) Descending
-        results.sort(key=lambda x: x['er'], reverse=True)
-        crypto_results.sort(key=lambda x: x['er'], reverse=True)
+        combined_results = results + crypto_results
+        combined_results.sort(key=lambda x: x['er'], reverse=True)
 
         # 4. Uniqueness Protocol (Correlation Clustering)
         def get_correlation_cluster(s):
@@ -290,7 +290,7 @@ class SovereignMaster:
         # 5. Elite Assignment (Balanced Distribution)
         all_units = ["ALPHA", "OMEGA", "GAMMA"]
         u_idx = 0
-        for item in results:
+        for item in combined_results:
             unit = all_units[u_idx]
             if len(squadron[unit]) < 2:
                 squadron[unit].append(item['symbol'])
@@ -299,10 +299,13 @@ class SovereignMaster:
 
         # FALLBACK: If results are poor, inject Iron Classics (Exness)
         if sum(len(v) for v in squadron.values()) < 6:
-            print(" !! [FAIL_SAFE] Scanner returned low signal. Injecting Iron Classics...")
-            if len(squadron["ALPHA"]) < 2: squadron["ALPHA"] = list(set(squadron["ALPHA"] + ["XAUUSD", "US30"]))[:2]
-            if len(squadron["OMEGA"]) < 2: squadron["OMEGA"] = list(set(squadron["OMEGA"] + ["GBPUSD", "EURUSD"]))[:2]
-            if len(squadron["GAMMA"]) < 2: squadron["GAMMA"] = list(set(squadron["GAMMA"] + ["NAS100", "XAGUSD"]))[:2]
+            print(" !! [FAIL_SAFE] Scanner returned low signal. Injecting Iron Classics to fill gaps...")
+            for asset in ["XAUUSD", "US30"]:
+                if len(squadron["ALPHA"]) < 2 and asset not in squadron["ALPHA"]: squadron["ALPHA"].append(asset)
+            for asset in ["GBPUSD", "EURUSD"]:
+                if len(squadron["OMEGA"]) < 2 and asset not in squadron["OMEGA"]: squadron["OMEGA"].append(asset)
+            for asset in ["NAS100", "XAGUSD"]:
+                if len(squadron["GAMMA"]) < 2 and asset not in squadron["GAMMA"]: squadron["GAMMA"].append(asset)
 
         # 6. Save
         with open("core_v3/squadron.json", "w") as f:
