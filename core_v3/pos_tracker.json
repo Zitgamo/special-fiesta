@@ -9,7 +9,7 @@
     "1895493585": {
         "hwm": 11.23,
         "hwm_state": "HWM_SET",
-        "lwm": 10.2,
+        "lwm": 10.03,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
@@ -21,7 +21,7 @@
         "banked": 0.0
     },
     "1897832538": {
-        "hwm": 20.33,
+        "hwm": 23.29,
         "hwm_state": "HWM_SET",
         "lwm": 10.37,
         "lwm_state": "INITIAL",
@@ -842,98 +842,217 @@
     "1898484115": {
         "hwm": 0.05,
         "hwm_state": "INITIAL",
-        "lwm": -0.06,
+        "lwm": -0.46,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1898484697": {
         "hwm": 0.02,
         "hwm_state": "INITIAL",
-        "lwm": -0.07,
+        "lwm": -0.49,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1898484995": {
         "hwm": 0.02,
         "hwm_state": "INITIAL",
-        "lwm": -0.05,
+        "lwm": -0.49,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1898485781": {
         "hwm": 0.0,
         "hwm_state": "INITIAL",
-        "lwm": -0.07,
+        "lwm": -0.51,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1898486625": {
         "hwm": 0.01,
         "hwm_state": "INITIAL",
-        "lwm": -0.06,
+        "lwm": -0.5,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1898487233": {
         "hwm": -0.01,
         "hwm_state": "INITIAL",
-        "lwm": -0.08,
+        "lwm": -0.52,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1898487946": {
         "hwm": -0.03,
         "hwm_state": "INITIAL",
-        "lwm": -0.1,
+        "lwm": -0.54,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1898488823": {
         "hwm": -0.05,
         "hwm_state": "INITIAL",
-        "lwm": -0.12,
+        "lwm": -0.56,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1898489640": {
         "hwm": -0.02,
         "hwm_state": "INITIAL",
-        "lwm": -0.09,
+        "lwm": -0.53,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1898490649": {
         "hwm": -0.02,
         "hwm_state": "INITIAL",
-        "lwm": -0.09,
+        "lwm": -0.53,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1898491306": {
         "hwm": -0.04,
         "hwm_state": "INITIAL",
-        "lwm": -0.1,
+        "lwm": -0.54,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1898491683": {
         "hwm": -0.08,
         "hwm_state": "INITIAL",
-        "lwm": -0.11,
+        "lwm": -0.55,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1898492102": {
         "hwm": -0.03,
         "hwm_state": "INITIAL",
-        "lwm": -0.06,
+        "lwm": -0.5,
         "lwm_state": "INITIAL",
         "banked": 0.0
     },
     "1898492555": {
         "hwm": -0.05,
         "hwm_state": "INITIAL",
+        "lwm": -0.52,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898536912": {
+        "hwm": 0.28,
+        "hwm_state": "INITIAL",
+        "lwm": -0.12,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898537103": {
+        "hwm": 0.28,
+        "hwm_state": "INITIAL",
+        "lwm": -0.12,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898537298": {
+        "hwm": 0.28,
+        "hwm_state": "INITIAL",
+        "lwm": -0.12,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898537912": {
+        "hwm": 0.35,
+        "hwm_state": "INITIAL",
         "lwm": -0.05,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898538172": {
+        "hwm": 0.28,
+        "hwm_state": "INITIAL",
+        "lwm": -0.06,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898538610": {
+        "hwm": 0.28,
+        "hwm_state": "INITIAL",
+        "lwm": -0.05,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898539009": {
+        "hwm": 0.23,
+        "hwm_state": "INITIAL",
+        "lwm": -0.02,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898539382": {
+        "hwm": 0.12,
+        "hwm_state": "INITIAL",
+        "lwm": 0.01,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898540180": {
+        "hwm": 0.03,
+        "hwm_state": "INITIAL",
+        "lwm": -0.06,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898540654": {
+        "hwm": -0.01,
+        "hwm_state": "INITIAL",
+        "lwm": -0.08,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898540929": {
+        "hwm": 0.0,
+        "hwm_state": "INITIAL",
+        "lwm": -0.07,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898541124": {
+        "hwm": -0.02,
+        "hwm_state": "INITIAL",
+        "lwm": -0.09,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898542388": {
+        "hwm": -0.01,
+        "hwm_state": "INITIAL",
+        "lwm": -0.08,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898542932": {
+        "hwm": 0.0,
+        "hwm_state": "INITIAL",
+        "lwm": -0.07,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898547978": {
+        "hwm": 0.0,
+        "hwm_state": "INITIAL",
+        "lwm": -0.07,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898552853": {
+        "hwm": -0.01,
+        "hwm_state": "INITIAL",
+        "lwm": -0.06,
+        "lwm_state": "INITIAL",
+        "banked": 0.0
+    },
+    "1898554330": {
+        "hwm": -0.06,
+        "hwm_state": "INITIAL",
+        "lwm": -0.06,
         "lwm_state": "INITIAL",
         "banked": 0.0
     }
