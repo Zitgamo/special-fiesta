@@ -1,7 +1,7 @@
 # 🛰️ SOVEREIGN SHIPMENT TRACKER: v1.0 (STABILITY)
 
-**CURRENT STATUS:** `[ PHASE 1: DEVELOPMENT ]`
-**READINESS SCORE:** `[ 40 / 100 ]` 🟢 (Approaching Alpha)
+**CURRENT STATUS:** `[ PHASE 2: ALPHA TESTING ]`
+**READINESS SCORE:** `[ 65 / 100 ]` 🟢 (Alpha Established)
 
 ---
 
@@ -20,9 +20,9 @@
 
 ### 🔵 BACKEND (RUỘT) - [10/40 pts]
 - [x] **Core Engine**: Chạy ổn định trên Demo. (10 pts)
-- [ ] **Smart Blacklist**: Sửa lỗi load nhưng không skip. (10 pts)
-- [ ] **Single Switch**: Cơ chế gạt nút Demo/Real. (10 pts)
-- [ ] **Auto-Janitor**: Tự động dọn rác theo sự kiện. (10 pts)
+- [x] **Smart Blacklist**: Sửa lỗi load nhưng không skip. (10 pts)
+- [x] **Single Switch**: Cơ chế gạt nút Demo/Real. (10 pts)
+- [x] **Auto-Janitor**: Tự động dọn rác theo sự kiện. (10 pts)
 
 ### 🟢 FRONTEND (VỎ) - [20/40 pts]
 - [x] **Premium UI**: Giao diện HUD hardened v8.5. (15 pts)

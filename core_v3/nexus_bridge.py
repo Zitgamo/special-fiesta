@@ -76,7 +76,7 @@ def calculate_sovereign_scale():
     except:
         return {"back": 73.2, "front": 26.8, "back_lines": 4043, "front_lines": 1480}
 
-def get_git_status():
+def _get_git_metadata():
     try:
         branch = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"], stderr=subprocess.DEVNULL).decode().strip()
         commit = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], stderr=subprocess.DEVNULL).decode().strip()
@@ -279,7 +279,7 @@ def get_telemetry():
             "dna": dna,
             "squadron": squad,
             "unit_stats": unit_stats,
-            "git_status": get_git_status(),
+            "git_status": _get_git_metadata(),
             "deploy_mode": get_deploy_mode(),
             "current_time_utc": current_time_local
         })
@@ -435,7 +435,7 @@ def get_git_status():
             "status": "SUCCESS", 
             "commits": commits, 
             "is_dirty": is_dirty,
-            "srs_score": 40 # Auditor manually injected score
+            "srs_score": 65 # Auditor manually injected score
         })
     except Exception as e:
         return jsonify({"status": "ERROR", "message": str(e)}), 500

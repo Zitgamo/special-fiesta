@@ -99,16 +99,15 @@ class IronEngine:
                 # 2. LOG SNAPSHOT
                 self.forensics.log_snapshot(balance, equity, drawdown)
 
-                # --- AUTO-JANITOR: Tactical maintenance every 100 cycles ---
-                if not hasattr(self, 'cycle_count'): self.cycle_count = 0
-                self.cycle_count += 1
-                if self.cycle_count % 100 == 0:
-                    self.logger.info(" >> [MAINTENANCE] Triggering Auto-Janitor cleanup...")
+                # --- AUTO-JANITOR: Tactical maintenance if logs are "dirty" (> 5MB) ---
+                log_file = f"{self.unit_id.lower()}_engine.log"
+                if os.path.exists(log_file) and os.path.getsize(log_file) > 5 * 1024 * 1024:
+                    self.logger.info(f" >> [MAINTENANCE] Log size exceeded 5MB. Triggering Auto-Janitor...")
                     try:
                         from janitor import SovereignJanitor
                         janitor = SovereignJanitor()
                         janitor.cleanup_temp_files()
-                        janitor.cleanup_old_logs(days=3)
+                        janitor.cleanup_old_logs(days=1)
                     except Exception as e:
                         self.logger.warning(f" !! [MAINTENANCE] Janitor failed: {e}")
 
