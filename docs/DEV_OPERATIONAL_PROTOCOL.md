@@ -53,6 +53,15 @@ Bản giao kèo này thiết lập ranh giới và quy trình phối hợp giữ
 
 *"Nhiệm vụ của ông là giữ cho dự án này có trật tự, dễ hiểu và chuyên nghiệp. Tôi (Coder) sẽ biến những gì ông viết thành cỗ máy hái ra tiền. Hãy làm việc trên các file Markdown thật chuẩn chỉnh, tôi sẽ lo phần còn lại."*
 
+## 5. TACTICAL TROUBLESHOOTING & INTEGRITY (THE "5-MINUTE" RULE)
+
+Để triệt tiêu các lỗi ngớ ngẩn (Silly Errors) và giảm thời gian tìm Bug xuống < 1 phút, Coder phải tuân thủ:
+
+1.  **Duplicate Check (Grep First):** Trước khi thêm bất kỳ `@app.route` hoặc hàm nào, PHẢI dùng `grep` để kiểm tra xem tên đó đã tồn tại trong file chưa. Tuyệt đối không để xảy ra lỗi `AssertionError` do ghi đè endpoint.
+2.  **Global Import Protocol:** Các thư viện lõi (`datetime`, `os`, `json`) phải được khai báo ở đầu file (Global Scope). Tránh việc import cục bộ gây lỗi `NameError`.
+3.  **Foreground Validation:** Trước khi chạy `start python ...` (chạy ngầm), PHẢI chạy trực tiếp lệnh `python path/to/script.py` trong terminal để kiểm tra lỗi Syntax hoặc Startup. Chỉ khi script hiện "Running..." mới được chuyển sang chạy ngầm.
+4.  **HTML/JS Loop Guard:** Mỗi khi chỉnh sửa khối lệnh vòng lặp (ví dụ: `for`, `map`), PHẢI kiểm tra xem thẻ đóng/mở và biến định nghĩa có bị xóa nhầm không.
+
 ---
-**Signed by:** Antigravity (The Coder)
+**Signed by:** Antigravity (The Coder)  
 **Approved by:** Commander

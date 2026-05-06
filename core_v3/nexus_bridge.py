@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 import sqlite3
 import os
@@ -319,9 +319,46 @@ def force_sync():
     try:
         # Trigger actual MT5/Binance re-poll
         mt5.initialize()
-        # This forces the singleton or internal states to refresh
         IronBridges.refresh_all()
         return jsonify({"status": "SUCCESS", "message": "FLEET SYNCHRONIZED"})
+    except Exception as e:
+        return jsonify({"status": "ERROR", "message": str(e)}), 500
+
+@app.route('/api/tactical/stop', methods=['POST'])
+def tactical_stop():
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("UPDATE config SET value = '1' WHERE key = 'GLOBAL_PAUSE'")
+        conn.commit()
+        conn.close()
+        return jsonify({"status": "SUCCESS", "message": "GLOBAL KILL-SWITCH ACTIVATED"})
+    except Exception as e:
+        return jsonify({"status": "ERROR", "message": str(e)}), 500
+
+@app.route('/api/tactical/reinforce', methods=['POST'])
+def tactical_reinforce():
+    try:
+        data = request.json
+        unit = data.get('unit')
+        action = data.get('action', 'reinforce') # 'reinforce' or 'reset'
+        
+        if not unit or not os.path.exists(DNA_PATH):
+            return jsonify({"status": "ERROR", "message": "INVALID_UNIT_OR_DNA"}), 400
+            
+        with open(DNA_PATH, 'r') as f: dna_data = json.load(f)
+        
+        if unit in dna_data:
+            if action == 'reinforce':
+                dna_data[unit]['LOT_SIZE'] = round(dna_data[unit].get('LOT_SIZE', 0.01) * 1.5, 2)
+                dna_data[unit]['DCA_LAYERS'] = dna_data[unit].get('DCA_LAYERS', 5) + 2
+            else:
+                dna_data[unit]['LOT_SIZE'] = 0.01 # Reset to base
+                
+            with open(DNA_PATH, 'w') as f: json.dump(dna_data, f, indent=4)
+            return jsonify({"status": "SUCCESS", "message": f"UNIT {unit} {action.upper()}ED"})
+            
+        return jsonify({"status": "ERROR", "message": "UNIT_NOT_IN_DNA"}), 404
     except Exception as e:
         return jsonify({"status": "ERROR", "message": str(e)}), 500
 
