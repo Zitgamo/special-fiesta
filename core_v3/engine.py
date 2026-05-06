@@ -56,22 +56,25 @@ class IronEngine:
                 # 1. LIVE MT5 HANDSHAKE
                 import MetaTrader5 as mt5
                 
-                # Check if already connected to avoid redundant overhead
+                # Silent Check: If already linked, don't disturb the terminal
                 if not mt5.terminal_info():
-                    self.logger.info(" >> [HANDSHAKE] Terminal link lost. Re-establishing...")
+                    self.logger.info(" >> [HANDSHAKE] Linking to active terminal...")
                     if not mt5.initialize():
+                        # Only use path if silent init fails (Terminal likely closed)
                         path = r"C:\Program Files\MetaTrader 5 EXNESS\terminal64.exe"
                         if not mt5.initialize(path=path):
                             self.logger.warning(" !! [HANDSHAKE] Neural Link Fracture. Retrying...")
                             time.sleep(10)
                             continue
 
+                # Account Audit
                 account = mt5.account_info()
                 if not account:
-                    self.logger.warning(" !! [ACCOUNT] Session Expired. Re-Linking...")
+                    # Try a silent re-init in case of timeout
                     mt5.initialize()
                     account = mt5.account_info()
                     if not account:
+                        self.logger.warning(" !! [ACCOUNT] No active account session found. Please login to MT5.")
                         time.sleep(10)
                         continue
 

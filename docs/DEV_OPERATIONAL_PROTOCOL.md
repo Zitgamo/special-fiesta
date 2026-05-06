@@ -28,10 +28,15 @@ Bản giao kèo này thiết lập ranh giới và quy trình phối hợp giữ
 2.  **Giai đoạn Thực thi (Coder):**
     *   Coder đọc spec từ Docs.
     *   Coder triển khai code, bao gồm cả UI và Unit Test.
-    *   Coder báo cáo hoàn thành thông qua chat (không sửa file md).
-3.  **Giai đoạn Kiểm chứng (Commander):**
-    *   Commander chạy thử. 
-    *   Nếu cần điều chỉnh, Commander ra lệnh cho Docs (sửa spec) hoặc Coder (sửa logic).
+    *   **Handover Step:** Coder cập nhật tình trạng vào file `docs/DEV_HANDOVER.md` ngay sau khi xong việc.
+    *   Coder báo cáo hoàn thành thông qua chat và mời Docs Agent vào kiểm tra.
+3.  **Giai đoạn Kiểm chứng & Cập nhật (Docs):**
+    *   Docs nhận lệnh từ Commander hoặc lời mời từ Coder.
+    *   Docs đọc `docs/DEV_HANDOVER.md` và audit code thực tế.
+    *   Docs cập nhật trạng thái trong `docs/AGENT_PROTOCOL.md` và `README.md`.
+    *   Docs báo cáo kết quả cuối cùng cho Commander.
+4.  **Giai đoạn Phê duyệt (Commander):**
+    *   Commander chạy thử và chốt kết quả.
 
 ---
 

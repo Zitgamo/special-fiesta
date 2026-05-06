@@ -174,9 +174,15 @@ class IronVault:
             raw_lot = min_lot
 
         # Rounding according to Broker Step
-        import math
+        # Use decimal-like rounding to avoid floating point artifacts
         lot = round(raw_lot / volume_step) * volume_step
-        lot = round(lot, 5) # Clean precision issues
+        
+        # Determine precision from volume_step
+        precision = 0
+        vs_str = str(float(volume_step)).rstrip('0')
+        if '.' in vs_str:
+            precision = len(vs_str.split('.')[1])
+        lot = round(lot, precision)
         
         if lot < min_lot: 
             lot = min_lot

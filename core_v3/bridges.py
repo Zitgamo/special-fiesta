@@ -46,15 +46,28 @@ class IronBridges:
         return self._binance
 
     def _init_mt5(self):
-        """Lazy-load MT5 only when needed."""
-        if not self._mt5_initialized:
-            import MetaTrader5 as mt5
-            if mt5.initialize():
+        """Lazy-load MT5 only when needed. Silent link preferred."""
+        import MetaTrader5 as mt5
+        
+        # 1. Check if already linked in this process
+        if mt5.terminal_info():
+            self._mt5_initialized = True
+            return True
+            
+        # 2. Try silent initialization
+        if mt5.initialize():
+            self._mt5_initialized = True
+            # print("[BRIDGE] MT5 Neural Link Active.")
+            return True
+        else:
+            # 3. Last resort: use path (might cause window focus)
+            path = r"C:\Program Files\MetaTrader 5 EXNESS\terminal64.exe"
+            if os.path.exists(path) and mt5.initialize(path=path):
                 self._mt5_initialized = True
-                print("[BRIDGE] MT5 Neural Link Active.")
-            else:
-                print("[BRIDGE_ERR] MT5 Link Failed.")
-        return self._mt5_initialized
+                return True
+            
+            print("[BRIDGE_ERR] MT5 Link Failed.")
+            return False
 
     def get_price(self, symbol):
         if "USDT" in symbol:

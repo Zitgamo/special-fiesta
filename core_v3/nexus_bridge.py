@@ -101,18 +101,20 @@ def get_telemetry():
         # 2. MT5 Health (Exness)
         mt5_health = {"equity": 0, "drawdown": 0}
         try:
-            terminal_path = "C:\\Program Files\\MetaTrader 5 EXNESS\\terminal64.exe"
-            if mt5.initialize(path=terminal_path):
+            # Silent link ONLY to avoid UI-driven bouncing
+            if mt5.initialize():
                 acc = mt5.account_info()
                 if acc:
                     mt5_health["equity"] = acc.equity
                     mt5_health["drawdown"] = (acc.equity / acc.balance - 1) if acc.balance != 0 else 0
                 else:
-                    print(f"!! [MT5_ERR] Account info failed: {mt5.last_error()}")
+                    # Don't print to avoid spamming bridge console
+                    pass
             else:
-                print(f"!! [MT5_ERR] Init failed: {mt5.last_error()}")
+                # MT5 likely closed
+                pass
         except Exception as e:
-            print(f"!! [MT5_EXC] {e}")
+            pass
         
         # 4. Binance Health
         bnc_health = {"equity": 0, "drawdown": 0}

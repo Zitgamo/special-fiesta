@@ -42,22 +42,34 @@ def run_watchdog():
     print("--- SOVEREIGN SELF-HEAL WATCHDOG ACTIVE ---")
     while True:
         try:
-            # 1. Check if MT5 can initialize
-            if not mt5.initialize():
-                print(" !! [WATCHDOG] Connection fractured. Terminal may be frozen.")
-                kill_terminal()
-                time.sleep(5)
+            # 1. Check if MT5 process is running
+            mt5_proc = None
+            for proc in psutil.process_iter(['name']):
+                if proc.info['name'] == 'terminal64.exe':
+                    mt5_proc = proc
+                    break
+            
+            if not mt5_proc:
+                print(" !! [WATCHDOG] MT5 Terminal not running. Launching...")
                 restart_terminal()
+                continue
+
+            # 2. Check if MT5 can initialize (Silent Check)
+            if not mt5.initialize():
+                print(" !! [WATCHDOG] Connection fractured. Checking process health...")
                 
-                # 2. Verify recovery
-                if verify_connection():
-                    print(" >> [SUCCESS] Terminal recovered successfully.")
+                # If process is not responding or we've failed too many times, then kill
+                if not mt5_proc.is_running():
+                    print(" !! [WATCHDOG] Process found dead. Restarting...")
+                    restart_terminal()
                 else:
-                    print(" !! [FAILURE] Recovery failed. Manual intervention may be required.")
+                    # Maybe it's just busy. Let's not kill it immediately.
+                    # Instead, we'll try to re-initialize with path ONLY IF it's really stuck.
+                    print(" >> [WATCHDOG] Process is alive but busy. Waiting for next cycle.")
             else:
-                # MT5 is fine, just shutdown the temp link
-                mt5.shutdown()
+                # MT5 is fine. Keep the link alive, don't shutdown.
                 # print(" >> [WATCHDOG] MT5 Heartbeat: OK")
+                pass
                 
             time.sleep(CHECK_INTERVAL)
         except Exception as e:
