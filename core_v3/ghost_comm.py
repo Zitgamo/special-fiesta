@@ -39,9 +39,9 @@ class GhostComm:
                     f" 🔸 <b>WEEK</b>: <code>${data.get('stats_week', {}).get('usd', 0):+.2f}</code> | <code>{data.get('stats_week', {}).get('vnd', 0):+,} đ</code>\n"
                     f" 🔸 <b>MONTH</b>: <code>${data.get('stats_month', {}).get('usd', 0):+.2f}</code> | <code>{data.get('stats_month', {}).get('vnd', 0):+,} đ</code>\n\n"
                     
-                    "<b>⚡ FRONT VS BACK RATIO</b>\n"
-                    f" [<code>{'█' * int(data.get('performance_ratio', {}).get('front', 50) / 10)}{'░' * (10 - int(data.get('performance_ratio', {}).get('front', 50) / 10))}</code>]\n"
-                    f" <i>Front: {data.get('performance_ratio', {}).get('front', 0):.0f}% | Back: {data.get('performance_ratio', {}).get('back', 0):.0f}%</i>\n"
+                    "<b>⚖️ SYSTEM BALANCE (RUỘT vs VỎ)</b>\n"
+                    f" [<code>{'█' * int(data.get('system_balance', {}).get('back', 70) / 10)}{'░' * (10 - int(data.get('system_balance', {}).get('back', 70) / 10))}</code>]\n"
+                    f" <i>Back (Logic): {data.get('system_balance', {}).get('back', 0):.1f}% | Front (UI): {data.get('system_balance', {}).get('front', 0):.1f}%</i>\n"
                     "━━━━━━━━━━━━━━━━━━\n"
                     "🔗 <a href='http://127.0.0.1:5050/'>OPEN NEXUS DASHBOARD</a>"
                 )
