@@ -5,6 +5,7 @@ import os
 import json
 import MetaTrader5 as mt5
 import sys
+from datetime import datetime, timedelta
 
 # Ensure core_v3 is in path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -135,7 +136,6 @@ def get_telemetry():
         # Calculate Sovereign System Balance (Ruột vs Vỏ)
         system_balance = calculate_sovereign_scale()
 
-        from datetime import datetime, timedelta
         current_time_local = (datetime.utcnow() + timedelta(hours=7)).strftime('%H:%M:%S')
         
         # 2. MT5 Health (Exness)
