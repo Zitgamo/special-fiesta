@@ -111,22 +111,20 @@ def get_telemetry():
         trades_raw = cursor.fetchall()
         
         # 3. Multi-Timeframe PnL Audit
-        today_str = datetime.now().strftime('%Y-%m-%d')
-        
-        # --- DAY ---
-        cursor.execute("SELECT pnl, unit_id, symbol FROM trades WHERE timestamp LIKE ?", (f"{today_str}%",))
+        # --- DAY (Last 24h) ---
+        cursor.execute("SELECT pnl, unit_id, symbol FROM trades WHERE timestamp >= datetime('now', '-1 day')")
         day_trades = cursor.fetchall()
         day_pnl_front = sum(t[0] for t in day_trades if "SOUTH" not in str(t[1]) and t[2] != "VN30F1M")
         day_pnl_back = sum(t[0] for t in day_trades if "SOUTH" in str(t[1]) or t[2] == "VN30F1M") * 100000
 
-        # --- WEEK ---
-        cursor.execute("SELECT pnl, unit_id, symbol FROM trades WHERE strftime('%Y-%W', timestamp) = strftime('%Y-%W', 'now')")
+        # --- WEEK (Last 7d) ---
+        cursor.execute("SELECT pnl, unit_id, symbol FROM trades WHERE timestamp >= datetime('now', '-7 days')")
         week_trades = cursor.fetchall()
         week_pnl_front = sum(t[0] for t in week_trades if "SOUTH" not in str(t[1]) and t[2] != "VN30F1M")
         week_pnl_back = sum(t[0] for t in week_trades if "SOUTH" in str(t[1]) or t[2] == "VN30F1M") * 100000
 
-        # --- MONTH ---
-        cursor.execute("SELECT pnl, unit_id, symbol FROM trades WHERE strftime('%Y-%m', timestamp) = strftime('%Y-%m', 'now')")
+        # --- MONTH (Last 30d) ---
+        cursor.execute("SELECT pnl, unit_id, symbol FROM trades WHERE timestamp >= datetime('now', '-30 days')")
         month_trades = cursor.fetchall()
         month_pnl_front = sum(t[0] for t in month_trades if "SOUTH" not in str(t[1]) and t[2] != "VN30F1M")
         month_pnl_back = sum(t[0] for t in month_trades if "SOUTH" in str(t[1]) or t[2] == "VN30F1M") * 100000

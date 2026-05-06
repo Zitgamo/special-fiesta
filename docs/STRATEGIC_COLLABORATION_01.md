@@ -11,15 +11,14 @@ The system will now monitor the following metrics per unit (ALPHA/OMEGA/GAMMA) i
 3. **Confidence Level:** Threshold > 70%
 
 ### 🚀 Scaling Action
-When all thresholds are met, the **Master Brain** will automatically:
-- Increase `LOT_SIZE` by 50%.
-- Enable aggressive DCA layering (if applicable).
-- Visual feedback: Activate the **Gold Pulsing Indicator** on the tactical unit card.
+When all thresholds are met (or Unit PnL > $10 profit flow), the **Master Brain** will automatically:
+- Increase `LOT_SIZE` by 50% (SCALED UP status).
+- Visual feedback: Activate the **High-Intensity Pulsing Gold Beacon** (20px diameter with ⚡ icon).
 
 ### 🛑 De-escalation Action
-If any threshold drops below the safety margin (ER < 1.0 or WR < 50%), the system will:
+If any threshold drops below the safety margin (ER < 1.0 or WR < 50% or PnL drawdown > $5), the system will:
 - Revert `LOT_SIZE` to base parameters.
-- Visual feedback: Deactivate the indicator light.
+- Visual feedback: Deactivate the beacon (Dim mode).
 
 ## 📊 UI Integrity Audit
 - **Day/Week/Month Report:** Fixed SQL logic to fetch correct localized timestamps.
