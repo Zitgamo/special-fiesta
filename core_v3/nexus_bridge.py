@@ -95,8 +95,8 @@ def get_telemetry():
         session_pnl = round(ex_realized + bnc_realized, 2)
         session_pnl_vnd = south_realized_vnd # Absolute truth from DB
         
-        from datetime import datetime
-        current_time_local = datetime.now().strftime('%H:%M:%S')
+        from datetime import datetime, timedelta
+        current_time_local = (datetime.utcnow() + timedelta(hours=7)).strftime('%H:%M:%S')
         
         # 2. MT5 Health (Exness)
         mt5_health = {"equity": 0, "drawdown": 0}

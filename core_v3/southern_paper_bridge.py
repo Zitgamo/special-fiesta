@@ -143,7 +143,7 @@ class SouthernPaperBridge:
             
             cursor.execute("""
                 INSERT INTO trades (unit_id, symbol, side, volume, price, sl, tp, sl_mult, tp_mult, er_at_entry, type, pnl, timestamp)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', '+7 hours'))
             """, (
                 unit_id, SYMBOL, trade['side'], 1.0, 
                 trade['entry_p'], trade['sl'], trade['tp'], 
@@ -211,7 +211,7 @@ class SouthernPaperBridge:
             
             cursor.execute("""
                 INSERT INTO equity_history (balance, equity, drawdown, timestamp)
-                VALUES (?, ?, ?, datetime('now', 'localtime'))
+                VALUES (?, ?, ?, datetime('now', '+7 hours'))
             """, (self.current_balance_vnd, current_equity, drawdown))
             conn.commit()
             conn.close()
