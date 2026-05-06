@@ -22,18 +22,22 @@ class PositionMonitor:
             
         print(f" >> [CO-PILOT] Real-Monitor Active. Tracking Account: {real_secrets['login']}")
         
+        # Initial Handshake
+        if not mt5.initialize():
+            print(" !! [FATAL] MT5 Init Failed.")
+            return
+
         while True:
             try:
-                if not mt5.initialize():
-                    time.sleep(5)
-                    continue
+                # Only Login if not already logged in to the correct account
+                acc_info = mt5.account_info()
+                if not acc_info or acc_info.login != real_secrets['login']:
+                    print(f" >> [AUTH] Synchronizing session for Account: {real_secrets['login']}...")
+                    if not mt5.login(real_secrets['login'], password=real_secrets['password'], server=real_secrets['server']):
+                        print(f" !! [AUTH_ERR] Failed to login: {mt5.last_error()}")
+                        time.sleep(30)
+                        continue
                 
-                # Login to REAL account
-                if not mt5.login(real_secrets['login'], password=real_secrets['password'], server=real_secrets['server']):
-                    print(f" !! [AUTH_ERR] Failed to login to REAL account: {mt5.last_error()}")
-                    time.sleep(30)
-                    continue
-
                 # Load squadron for filtering
                 try:
                     with open("core_v3/squadron.json", "r") as f:

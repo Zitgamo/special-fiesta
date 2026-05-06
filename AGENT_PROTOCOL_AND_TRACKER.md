@@ -22,7 +22,7 @@
 - **Hardening (Bảo mật & Chống Spam)**: Đã triển khai Cooldown 30 phút theo symbol và Persistent Signal Tracking.
 - **Task 9 (Fix NULL Engine)**: Đã hoàn thành triệt để. Context trade được bảo toàn qua restart. Database đã sạch record lỗi.
 - **Task 11 (AUDUSD Spam)**: Đã fix lỗi race condition. AUDUSD và các symbol khác đã có cơ chế chặn spam an toàn.
-- **Giao diện Nexus (v8.0)**: Đã nâng cấp Glassmorphism, Neural Scan radar và Southern Audit panel (soi lệnh VN30).
+- **Giao diện Nexus (v8.0)**: Đã nâng cấp Glassmorphism, Neural Scan radar và Ao Làng Audit panel (soi lệnh VN30).
 - **Đội hình (Squadron)**: Đã cân bằng lại logic gán lệnh. GAMMA đã được triển khai (NAS100/XAGUSD).
 
 ## 3. TACTICAL TASKS (Danh sách nhiệm vụ)
@@ -31,7 +31,7 @@
 - [x] **Task 3**: Sửa logic hiển thị `intel-list` (Learning Engine) trong `sovereign_nexus.html`.
 - [x] **Task 4**: Rà soát tổng thể bố cục Nexus để đảm bảo không bị tràn.
 - [x] **Task 5**: Kiểm tra cuối cùng (Final Audit) về tính đồng bộ thời gian.
-- [x] **Task 6**: Sửa lỗi hiển thị DD (Drawdown) cho Binance và Southern (Vn30).
+- [x] **Task 6**: Sửa lỗi hiển thị DD (Drawdown) cho Binance và Ao Làng (Vn30).
 - [x] **Task 7**: Nâng cấp Neural Scan (Thêm hiệu ứng Hover/Radar).
 - [x] **Task 8**: Khôi phục hiển thị ER Configuration.
 - [x] **Task 9**: Fix triệt để lỗi NULL trong Learning Engine (Persistence Guard).

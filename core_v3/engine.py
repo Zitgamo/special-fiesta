@@ -56,19 +56,19 @@ class IronEngine:
                 # 1. LIVE MT5 HANDSHAKE
                 import MetaTrader5 as mt5
                 
-                # Try to connect to ALREADY RUNNING terminal first
-                if not mt5.initialize():
-                    path = r"C:\Program Files\MetaTrader 5 EXNESS\terminal64.exe"
-                    self.logger.info(" >> [ACCOUNT] No active MT5 found. Starting fresh...")
-                    if not mt5.initialize(path=path):
-                        self.logger.warning(" !! [ACCOUNT] MT5 Neural Link Failed. Retrying...")
-                        import random
-                        time.sleep(5 + random.random() * 5)
-                        continue
+                # Check if already connected to avoid redundant overhead
+                if not mt5.terminal_info():
+                    self.logger.info(" >> [HANDSHAKE] Terminal link lost. Re-establishing...")
+                    if not mt5.initialize():
+                        path = r"C:\Program Files\MetaTrader 5 EXNESS\terminal64.exe"
+                        if not mt5.initialize(path=path):
+                            self.logger.warning(" !! [HANDSHAKE] Neural Link Fracture. Retrying...")
+                            time.sleep(10)
+                            continue
 
                 account = mt5.account_info()
                 if not account:
-                    self.logger.warning(" !! [ACCOUNT] MT5 Session Expired. Re-Linking...")
+                    self.logger.warning(" !! [ACCOUNT] Session Expired. Re-Linking...")
                     mt5.initialize()
                     account = mt5.account_info()
                     if not account:

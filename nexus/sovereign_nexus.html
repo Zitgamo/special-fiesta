@@ -176,23 +176,41 @@
         }
 
         .metric-label { font-size: 11px; opacity: 0.6; margin-bottom: 8px; letter-spacing: 1px; }
-        .metric-value { font-family: 'Orbitron'; font-weight: 900; font-size: 22px; text-shadow: 0 0 10px currentColor; }
+        .metric-value { font-family: 'Orbitron'; font-weight: 900; font-size: 26px; text-shadow: 0 0 15px currentColor; }
+
+        #intel-list {
+            font-size: 13px;
+            font-family: monospace;
+            line-height: 1.8;
+            color: var(--neon-blue);
+            text-shadow: 0 0 5px var(--neon-blue);
+            padding: 15px;
+        }
+
+        .intel-item {
+            margin-bottom: 12px;
+            padding-left: 15px;
+            border-left: 2px solid var(--neon-blue);
+            animation: slideRight 0.3s ease-out;
+        }
+
+        @keyframes slideRight { from { transform: translateX(-10px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
         .unit-deployment { margin-bottom: 25px; }
         .deploy-label { font-size: 12px; opacity: 0.5; margin-bottom: 12px; letter-spacing: 2px; }
-        .symbol-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+        .symbol-grid { display: flex; flex-wrap: wrap; gap: 10px; }
         
         .symbol-badge {
-            font-size: 16px; /* Larger badges */
+            font-size: 15px;
             font-weight: 900;
-            padding: 8px 16px;
-            border-radius: 6px;
+            padding: 6px 12px;
+            border-radius: 4px;
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.1);
         }
         .symbol-badge.mt5 { border-bottom: 3px solid var(--neon-blue); }
         .symbol-badge.bnc { border-bottom: 3px solid var(--neon-gold); }
-        .symbol-badge small { font-size: 10px; opacity: 0.6; margin-left: 8px; }
+        .symbol-badge small { font-size: 10px; opacity: 0.6; margin-left: 6px; }
 
         .unit-footer {
             display: flex;
@@ -217,14 +235,60 @@
 
         .logic-overlay {
             display: none;
-            padding: 15px;
-            background: rgba(0,0,0,0.95);
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.98);
+            padding: 30px;
+            box-sizing: border-box;
             z-index: 10;
-            animation: fadeIn 0.3s;
+            border-radius: 8px;
+            border: 2px solid var(--unit-color);
+            animation: fadeIn 0.3s ease-out;
+            font-size: 16px; 
+            line-height: 1.6;
         }
-        .logic-overlay p { font-size: 13px; line-height: 1.4; margin-bottom: 15px; }
+
+        .logic-overlay p { font-size: 18px; font-weight: 700; margin-bottom: 20px; color: #fff; }
+        .logic-diagram {
+            font-family: monospace;
+            color: var(--unit-color);
+            font-size: 14px;
+            background: rgba(0,0,0,0.4);
+            padding: 15px;
+            border: 1px dashed var(--unit-color);
+            margin-top: 15px;
+            white-space: pre;
+            line-height: 1.2;
+        }
+
+        .tab-switcher {
+            display: flex;
+            background: rgba(0,0,0,0.5);
+            border: 2px solid var(--neon-blue);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            font-family: 'Orbitron';
+            font-size: 13px;
+            font-weight: 900;
+            color: rgba(0, 242, 255, 0.4);
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 2px;
+        }
+
+        .tab-btn.active {
+            background: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 20px var(--neon-blue);
+        }
 
         @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 
@@ -414,20 +478,7 @@
         }
 
         .system-status-overlay {
-            position: fixed;
-            bottom: 40px;
-            left: 60px; /* Moved to left to avoid grid overlap */
-            text-align: left;
-            pointer-events: none;
-            opacity: 0.8;
-        }
-
-        .system-status-overlay .status-text {
-            font-family: 'Orbitron';
-            font-size: 56px;
-            color: var(--neon-blue);
-            text-shadow: 0 0 30px var(--neon-blue);
-            font-weight: 900;
+            display: none; /* Purged per directive */
         }
 
         .scanline {
@@ -463,15 +514,18 @@
             justify-content: space-between;
             align-items: center;
             background: rgba(0, 242, 255, 0.1);
-            padding: 10px 20px;
-            border: 1px solid var(--neon-blue);
+            padding: 12px 20px;
+            border: 2px solid var(--neon-blue);
             font-family: 'Orbitron';
             font-size: 14px;
             font-weight: 900;
             color: var(--neon-blue);
             cursor: pointer;
-            border-radius: 8px 8px 0 0;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
         }
+        .pager-header:hover { background: rgba(0, 242, 255, 0.2); box-shadow: 0 0 20px rgba(0, 242, 255, 0.2); }
 
         .pager-content {
             display: none;
@@ -484,12 +538,11 @@
         .pager-content.active { display: flex; }
 
         @keyframes flipIn {
-            from { opacity: 0; transform: translateX(-20px); }
+            from { opacity: 0; transform: translateX(20px); }
             to { opacity: 1; transform: translateX(0); }
         }
 
-        .nav-arrow { font-size: 20px; color: var(--neon-blue); font-weight: 900; }
-        .nav-arrow:hover { text-shadow: 0 0 15px var(--neon-blue); }
+        .nav-arrow { font-size: 24px; color: var(--neon-blue); font-weight: 900; }
 
         .scan-line-mini {
             font-size: 13px;
@@ -515,7 +568,7 @@
         <div class="title">SOVEREIGN NEXUS <span class="tag-status">HARDENED</span></div>
         <div class="pnl-container">
             <div class="pnl-box">USD <span id="usd-pnl" class="pnl-pos">$0.00</span></div>
-            <div class="pnl-box" style="border-left-color: var(--neon-purple)">VND <span id="vnd-pnl" class="pnl-pos">0đ</span></div>
+            <div class="pnl-box" style="border-left-color: var(--neon-purple)">AO LÀNG <span id="vnd-pnl" class="pnl-pos">0đ</span></div>
         </div>
         <div style="text-align: right">
             <div id="clock-local">00:00:00</div>
@@ -524,70 +577,70 @@
     </header>
 
     <main class="dashboard-grid">
-        <!-- LEFT: EQUITY & STATS (PAGER) -->
+        <!-- LEFT: TABBED CONTROL PANEL -->
         <div class="column">
-            <div class="pager-header" onclick="flipPage()">
-                <span id="pager-title">OPERATIONAL POOLS</span>
-                <span class="nav-arrow">❱</span>
+            <div class="tab-switcher">
+                <div id="tab-pools" class="tab-btn active" onclick="flipPage('pools')">POOLS</div>
+                <div id="tab-radar" class="tab-btn" onclick="flipPage('radar')">NEURAL RADAR</div>
             </div>
 
             <div class="pager-container">
                 <!-- PAGE 1: POOLS -->
                 <div id="page-pools" class="pager-content active">
-                    <div class="card" style="height: auto; margin-bottom: 0; border-top: none; border-radius: 0 0 8px 8px;">
-                        <div class="card-body">
-                            <div class="metric-card">
+                    <div class="card" style="height: auto; margin-bottom: 0; border: none; background: transparent;">
+                        <div class="card-body" style="padding:0">
+                            <div class="metric-card" style="padding:15px; margin-bottom:12px;">
                                 <div class="metric-label">EXNESS POOL (USD)</div>
-                                <div id="equity-mt5" class="metric-val" style="color: var(--neon-blue)">$0.00</div>
-                                <div style="font-size: 12px; opacity:0.6">DD: <span id="drawdown-mt5">0.00%</span></div>
+                                <div id="equity-mt5" class="metric-val" style="color: var(--neon-blue); font-size:38px;">$0.00</div>
+                                <div style="font-size: 11px; opacity:0.6">DD: <span id="drawdown-mt5">0.00%</span></div>
                             </div>
-                            <div class="metric-card" style="border-left: 4px solid var(--neon-gold); margin-bottom: 15px;">
+                            <div class="metric-card" style="border-left: 4px solid var(--neon-gold); padding:15px; margin-bottom:12px;">
                                 <div class="metric-label">BINANCE POOL (USDT)</div>
-                                <div id="equity-bnc" class="metric-val" style="color: var(--neon-gold)">$0.00</div>
-                                <div style="font-size: 12px; opacity:0.6">DD: <span id="drawdown-bnc">0.00%</span></div>
+                                <div id="equity-bnc" class="metric-val" style="color: var(--neon-gold); font-size:38px;">$0.00</div>
+                                <div style="font-size: 11px; opacity:0.6">DD: <span id="drawdown-bnc">0.00%</span></div>
                             </div>
-                            <div class="metric-card" style="border-left: 4px solid var(--neon-purple)">
-                                <div class="metric-label">SOUTHERN POOL (VND)</div>
-                                <div id="equity-south" class="metric-val" style="color: var(--neon-purple)">0 đ</div>
-                                <div style="font-size: 12px; opacity:0.6">DD: <span id="drawdown-south">0.00%</span></div>
+                            <div class="metric-card" style="border-left: 4px solid var(--neon-purple); padding:15px; margin-bottom:12px;">
+                                <div class="metric-label">AO LÀNG POOL (VND)</div>
+                                <div id="equity-south" class="metric-val" style="color: var(--neon-purple); font-size:32px;">0 đ</div>
+                                <div style="font-size: 11px; opacity:0.6">DD: <span id="drawdown-south">0.00%</span></div>
                             </div>
-                            <div style="margin-top: 10px;">
-                                <a href="southern_command.html" target="_blank" style="display:block; text-align:center; padding:12px; background:rgba(188,19,254,0.1); border:1px solid var(--neon-purple); color:var(--neon-purple); text-decoration:none; font-family:'Orbitron'; font-size:11px; font-weight:700">SOUTHERN COMMAND ></a>
-                            </div>
+                            <a href="southern_command.html" target="_blank" style="display:block; text-align:center; padding:15px; background:rgba(188,19,254,0.15); border:1px solid var(--neon-purple); color:var(--neon-purple); text-decoration:none; font-family:'Orbitron'; font-size:12px; font-weight:900; letter-spacing:2px; border-radius:4px;">AO LÀNG COMMAND ></a>
                         </div>
                     </div>
                 </div>
 
                 <!-- PAGE 2: RADAR -->
                 <div id="page-radar" class="pager-content">
-                    <div class="card" style="flex: 1; min-height: 0; border-top: none; border-radius: 0 0 8px 8px;">
-                        <div class="card-body scroll-area" style="position:relative; padding:10px;">
-                            <div class="radar-sweep" style="width: 150px; height: 150px;"></div>
-                            <div id="scan-list-mini" style="position:relative; z-index:1; font-family:monospace; font-size:12px; color:var(--neon-blue);">
+                    <div class="card" style="flex: 1; min-height: 0; border: none; background: transparent;">
+                        <div class="card-body scroll-area" style="position:relative; padding:10px; background: rgba(0,0,0,0.3); border-radius:8px;">
+                            <div id="scan-list-mini" style="position:relative; z-index:1; font-family:monospace; font-size:13px; color:var(--neon-blue);">
                                 <!-- Quick Scan Items -->
                             </div>
                         </div>
-                        <div class="radar-trigger" onclick="toggleRadar(true)" style="padding:10px; font-size:12px; margin:10px;">
-                            FULL OVERLAY >
+                        <div class="radar-trigger" onclick="toggleRadar(true)" style="padding:15px; font-size:14px; margin-top:15px;">
+                            FULL RADAR OVERLAY >
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- TACTICAL OVERLAY MODAL -->
+        <!-- TACTICAL OVERLAY MODAL (RADAR) -->
         <div id="radar-modal" class="overlay-modal">
             <div class="modal-header">
                 <div class="modal-title">NEURAL SCAN // DEEP PULSE</div>
                 <div class="modal-close" onclick="toggleRadar(false)">×</div>
             </div>
-            <div id="scan-list-full" class="scan-grid-full">
-                <!-- Infinite assets here -->
+            <div id="scan-list-full" class="scan-grid-full"></div>
+        </div>
+
+        <!-- TACTICAL LOGIC MODAL (PERSISTENT) -->
+        <div id="logic-modal" class="overlay-modal" style="border-color: var(--logic-color, var(--neon-blue))">
+            <div class="modal-header" style="border-bottom-color: var(--logic-color, var(--neon-blue))">
+                <div id="logic-modal-title" class="modal-title" style="color: var(--logic-color, var(--neon-blue))">UNIT PROTOCOL</div>
+                <div class="modal-close" onclick="toggleLogic(false)">×</div>
             </div>
-            <div class="system-status-overlay">
-                <div class="status-text">SYSTEM ACTIVE</div>
-                <div style="font-size:16px; opacity:0.5; letter-spacing:12px; margin-top:10px">SCANNING GLOBAL MARKETS // ER-SORTED</div>
-            </div>
+            <div id="logic-modal-body" style="color: #fff;"></div>
         </div>
 
         <div class="column">
@@ -606,7 +659,7 @@
                 </div>
             </div>
             <div class="card" style="flex: 1; min-height: 0;">
-                <div class="card-header">Southern Strike Audit // VN30</div>
+                <div class="card-header">Ao Làng Strike Audit // VN30</div>
                 <div id="south-strikes" class="card-body scroll-area" style="padding:0">
                     <!-- VN30 Trades -->
                 </div>
@@ -628,19 +681,22 @@
             modal.style.display = show ? 'block' : 'none';
         };
 
-        window.flipPage = function() {
+        window.flipPage = function(target) {
             const p1 = document.getElementById('page-pools');
             const p2 = document.getElementById('page-radar');
-            const title = document.getElementById('pager-title');
+            const t1 = document.getElementById('tab-pools');
+            const t2 = document.getElementById('tab-radar');
             
-            if (p1.classList.contains('active')) {
+            if (target === 'radar') {
                 p1.classList.remove('active');
                 p2.classList.add('active');
-                title.innerText = "NEURAL RADAR";
+                t1.classList.remove('active');
+                t2.classList.add('active');
             } else {
                 p2.classList.remove('active');
                 p1.classList.add('active');
-                title.innerText = "OPERATIONAL POOLS";
+                t2.classList.remove('active');
+                t1.classList.add('active');
             }
         };
 
@@ -736,17 +792,56 @@
                     if (dnaDiv) dnaDiv.innerHTML = '';
 
                     const unitStyles = {
-                        "ALPHA": { name: "GUARDIAN", icon: "🛡️", style: "Trend-Follower", desc: "Defensive Trend-Follower. High-conviction, low-frequency strikes. Scaling restricted to high-expectancy regimes." },
-                        "OMEGA": { name: "HARVESTER", icon: "⚔️", style: "Aggressive-Scaling", desc: "Momentum Dominator. Aggressively scales into winning trends using ATR-based layering. High Risk/Reward focus." },
-                        "GAMMA": { name: "SCALPER", icon: "⚡", style: "Mean-Reversion", desc: "Rapid-fire Scalper. No scaling. Closes 50% at 1:1 RR to neutralize risk instantly." }
+                        "ALPHA": { 
+                            name: "GUARDIAN", icon: "🛡️", 
+                            desc: "Trend-Follower. High-conviction strikes.",
+                            diagram: "[PRICE] ───( ATR-CHANNEL )─── [ENTRY]\n          ▲                 ▼\n      ( VOL-CONF ) ──── ( TREND-LOCK )"
+                        },
+                        "OMEGA": { 
+                            name: "HARVESTER", icon: "⚔️", 
+                            desc: "Momentum Dominator. Aggressive ATR layering.",
+                            diagram: "[MOMENTUM] ──► [SCALE-IN] ──► [SCALE-MAX]\n     │            │             │\n     └─ ATR-ADJ ──┴─ RISK-PAR ──┘"
+                        },
+                        "GAMMA": { 
+                            name: "SCALPER", icon: "⚡", 
+                            desc: "Rapid Scalper. Mean-Reversion.",
+                            diagram: "[DEV] ── ( REVERSION ) ── [TARGET]\n  │            │            │\n  └─ BB-OUT ───┴─ RSI-DIV ──┘"
+                        }
+                    };
+
+                    window.toggleLogic = function(unit) {
+                        const modal = document.getElementById('logic-modal');
+                        if (!unit) { modal.style.display = 'none'; return; }
+                        
+                        const meta = unitStyles[unit];
+                        const color = unit==='ALPHA'?'var(--neon-blue)':unit==='OMEGA'?'var(--neon-gold)':'var(--neon-purple)';
+                        
+                        document.getElementById('logic-modal-title').innerText = `${unit} // TACTICAL PROTOCOL`;
+                        document.getElementById('logic-modal-title').style.color = color;
+                        modal.style.borderColor = color;
+                        
+                        document.getElementById('logic-modal-body').innerHTML = `
+                            <div style="font-size:24px; margin-bottom:30px; opacity:0.8">${meta.desc}</div>
+                            <div class="logic-diagram" style="--unit-color:${color}; font-size:20px; line-height:1.5; padding:40px;">${meta.diagram}</div>
+                            <div style="margin-top:40px; display:grid; grid-template-columns:1fr 1fr; gap:30px;">
+                                <div style="background:rgba(255,255,255,0.05); padding:20px; border-left:4px solid var(--neon-gold)">
+                                    <div style="font-size:12px; opacity:0.5">REINFORCEMENT</div>
+                                    <div style="font-size:20px; font-weight:900">${unit==='OMEGA'?'ATR-DRIVEN SCALE ENABLED':'RESTRICTED'}</div>
+                                </div>
+                                <div style="background:rgba(255,255,255,0.05); padding:20px; border-left:4px solid var(--neon-green)">
+                                    <div style="font-size:12px; opacity:0.5">PROFIT PROTECTION</div>
+                                    <div style="font-size:20px; font-weight:900">SHAVE-PROFIT ACTIVE</div>
+                                </div>
+                            </div>
+                        `;
+                        modal.style.display = 'block';
                     };
 
                     for (const [unit, symbols] of Object.entries(data.squadron)) {
                         const color = unit==='ALPHA'?'var(--neon-blue)':unit==='OMEGA'?'var(--neon-gold)':'var(--neon-purple)';
                         const dna = data.dna[unit] || {};
                         const stats = data.unit_stats[unit] || { win_rate: "0%", strikes: 0, context: { er: 0, confidence: 0 } };
-                        const meta = unitStyles[unit] || { name: "RECON", icon: "🛰️", style: "Scout", desc: "Standard surveillance unit." };
-                        
+                        const meta = unitStyles[unit] || { name: "RECON", icon: "🛰️" };
                         const rr = Math.abs(dna.TP / (dna.SL || 0.1)).toFixed(1);
                         
                         squadDiv.innerHTML += `
@@ -762,7 +857,7 @@
                                 
                                 <div class="unit-metrics">
                                     <div class="metric-box">
-                                        <div class="metric-label">ER (EFFICIENCY)</div>
+                                        <div class="metric-label">EFFICIENCY</div>
                                         <div class="metric-value">${stats.context.er.toFixed(2)}</div>
                                     </div>
                                     <div class="metric-box">
@@ -786,14 +881,8 @@
                                 </div>
 
                                 <div class="unit-footer">
-                                    <div class="allocation">ALLOCATED LOT: <span style="color:var(--neon-blue)">${dna.LOT_SIZE || 'AUTO'}</span></div>
+                                    <div class="allocation">LOT: <span style="color:var(--neon-blue)">${dna.LOT_SIZE || 'AUTO'}</span></div>
                                     <div class="tactical-btn" onclick="toggleLogic('${unit}')">TACTICAL LOGIC</div>
-                                </div>
-
-                                <div id="logic-${unit}" class="logic-overlay">
-                                    <p>${meta.desc}</p>
-                                    <div style="font-size:11px; color:var(--neon-gold)">>> ATR-REINFORCE: ${unit==='OMEGA'?'ENABLED':'RESTRICTED'}</div>
-                                    <div style="font-size:11px; color:var(--neon-green)">>> SHAVE-PROFIT: ACTIVE</div>
                                 </div>
                             </div>
                         `;
@@ -820,7 +909,7 @@
                             `;
                         }).join('');
                     } else {
-                        southDiv.innerHTML = '<div style="text-align:center; padding:20px; opacity:0.3; font-size:11px">NO RECENT SOUTHERN STRIKES</div>';
+                        southDiv.innerHTML = '<div style="text-align:center; padding:20px; opacity:0.3; font-size:11px">NO RECENT AO LÀNG STRIKES</div>';
                     }
 
                     tradeDiv.innerHTML = otherTrades.map(t => {
