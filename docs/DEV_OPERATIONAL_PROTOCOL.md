@@ -12,11 +12,11 @@ Bản giao kèo này thiết lập ranh giới và quy trình phối hợp giữ
 *   **Cấm:** Tuyệt đối không can thiệp vào file code (`.py`, `.js`, `.css`, `.db`, v.v.).
 *   **Nhiệm vụ phụ (DevOps Documentation):** Viết hướng dẫn setup, vẽ sơ đồ Mermaid, quản lý lộ trình (Roadmap).
 
-### 🔵 AI CODER - ANTIGRAVITY (Gã Thợ Máy)
-*   **Trách nhiệm chính:** Hiện thực hóa logic thành Code chạy được.
-*   **Quyền hạn:** Toàn quyền trên các file logic, database và giao diện.
-*   **Cấm:** Tuyệt đối không sửa file `.md`. Chỉ được phép ĐỌC để hiểu yêu cầu.
-*   **Nhiệm vụ phụ (QC & UI/UX):** Tự viết script Test (Quality Control) và đảm bảo giao diện phải "Premium/Aesthetics" (UI/UX).
+### 🟠 SOVEREIGN AUDITOR (Ông Thần Soi Lỗi - NEW)
+*   **Trách nhiệm chính:** Kiểm chứng tính xác thực của code.
+*   **Quyền hạn:** Truy cập sâu vào từng dòng code thực thi, database và logs.
+*   **Nhiệm vụ:** Tuyệt đối KHÔNG TIN lời Coder. Phải chứng minh được code chạy đúng logic mới được phê duyệt Task.
+*   **Audit Step**: Mỗi khi Coder báo "Done", Auditor phải trích xuất code thực thi và giải thích logic cho Commander.
 
 ---
 
