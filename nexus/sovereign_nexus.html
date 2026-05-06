@@ -567,80 +567,113 @@
                 const data = await response.json();
 
                 if (data.status === "ONLINE") {
-                    document.getElementById('clock-local').innerText = data.current_time_utc;
-                    document.getElementById('usd-pnl').innerText = `$${(data.session_pnl_usd || 0).toFixed(2)}`;
-                    document.getElementById('usd-pnl').className = data.session_pnl_usd >= 0 ? 'pnl-pos' : 'pnl-neg';
-                    document.getElementById('usd-week').innerText = `W: ${(data.stats_week.usd >= 0 ? '+' : '')}${data.stats_week.usd.toFixed(2)}`;
-                    document.getElementById('usd-month').innerText = `M: ${(data.stats_month.usd >= 0 ? '+' : '')}${data.stats_month.usd.toFixed(2)}`;
+                    const elClock = document.getElementById('clock-local');
+                    if (elClock) elClock.innerText = data.current_time_utc || '00:00:00';
 
-                    document.getElementById('vnd-pnl').innerText = formatVND(data.session_pnl_vnd || 0);
-                    document.getElementById('vnd-pnl').className = data.session_pnl_vnd >= 0 ? 'pnl-pos' : 'pnl-neg';
-                    document.getElementById('vnd-week').innerText = `W: ${(data.stats_week.vnd >= 0 ? '+' : '')}${Math.floor(data.stats_week.vnd/1000)}K`;
-                    document.getElementById('vnd-month').innerText = `M: ${(data.stats_month.vnd >= 0 ? '+' : '')}${Math.floor(data.stats_month.vnd/1000)}K`;
-
-                    const bRatio = data.system_balance.back;
-                    const fRatio = data.system_balance.front;
-                    document.getElementById('ratio-back').style.width = `${bRatio}%`;
-                    document.getElementById('ratio-front').style.width = `${fRatio}%`;
-                    document.getElementById('ratio-back-text').innerText = `BACK: ${bRatio.toFixed(1)}%`;
-                    document.getElementById('ratio-front-text').innerText = `FRONT: ${fRatio.toFixed(1)}%`;
-                    document.getElementById('back-lines').innerText = data.system_balance.back_lines;
-                    document.getElementById('front-lines').innerText = data.system_balance.front_lines;
-                    
-                    const statusEl = document.getElementById('balance-status');
-                    if (fRatio > bRatio + 30) {
-                        statusEl.innerText = "STATUS: LÃNG PHÍ HÌNH THỨC";
-                        statusEl.style.color = "var(--neon-red)";
-                    } else {
-                        statusEl.innerText = "STATUS: OPTIMAL BALANCE";
-                        statusEl.style.color = "var(--neon-green)";
+                    const elUsdPnl = document.getElementById('usd-pnl');
+                    if (elUsdPnl) {
+                        elUsdPnl.innerText = `$${(data.session_pnl_usd || 0).toFixed(2)}`;
+                        elUsdPnl.className = data.session_pnl_usd >= 0 ? 'pnl-pos' : 'pnl-neg';
                     }
 
-                    document.getElementById('equity-mt5').innerText = `$${(data.health_mt5.equity || 0).toFixed(2)}`;
-                    document.getElementById('equity-bnc').innerText = `$${(data.health_bnc.equity || 0).toFixed(2)}`;
-                    document.getElementById('equity-south').innerText = formatVND(data.health_south.equity_vnd || 0);
+                    const elUsdWeek = document.getElementById('usd-week');
+                    const elUsdMonth = document.getElementById('usd-month');
+                    if (elUsdWeek && data.stats_week) elUsdWeek.innerText = `WEEKLY: ${(data.stats_week.usd >= 0 ? '+' : '')}${data.stats_week.usd.toFixed(2)} USD`;
+                    if (elUsdMonth && data.stats_month) elUsdMonth.innerText = `MONTHLY: ${(data.stats_month.usd >= 0 ? '+' : '')}${data.stats_month.usd.toFixed(2)} USD`;
+
+                    const elVndPnl = document.getElementById('vnd-pnl');
+                    if (elVndPnl) {
+                        elVndPnl.innerText = formatVND(data.session_pnl_vnd || 0);
+                        elVndPnl.className = data.session_pnl_vnd >= 0 ? 'pnl-pos' : 'pnl-neg';
+                    }
+
+                    const elVndWeek = document.getElementById('vnd-week');
+                    const elVndMonth = document.getElementById('vnd-month');
+                    if (elVndWeek && data.stats_week) elVndWeek.innerText = `${(data.stats_week.vnd >= 0 ? '+' : '')}${Math.floor(data.stats_week.vnd/1000)}K VND`;
+                    if (elVndMonth && data.stats_month) elVndMonth.innerText = `${(data.stats_month.vnd >= 0 ? '+' : '')}${Math.floor(data.stats_month.vnd/1000)}K VND`;
+
+                    if (data.system_balance) {
+                        const bRatio = data.system_balance.back;
+                        const fRatio = data.system_balance.front;
+                        const elBack = document.getElementById('ratio-back');
+                        const elFront = document.getElementById('ratio-front');
+                        if (elBack) elBack.style.width = `${bRatio}%`;
+                        if (elFront) elFront.style.width = `${fRatio}%`;
+                        
+                        const elBackText = document.getElementById('ratio-back-text');
+                        const elFrontText = document.getElementById('ratio-front-text');
+                        if (elBackText) elBackText.innerText = `BACK: ${bRatio.toFixed(1)}%`;
+                        if (elFrontText) elFrontText.innerText = `FRONT: ${fRatio.toFixed(1)}%`;
+                        
+                        const elBackLines = document.getElementById('back-lines');
+                        const elFrontLines = document.getElementById('front-lines');
+                        if (elBackLines) elBackLines.innerText = data.system_balance.back_lines;
+                        if (elFrontLines) elFrontLines.innerText = data.system_balance.front_lines;
+                        
+                        const statusEl = document.getElementById('balance-status');
+                        if (statusEl) {
+                            if (fRatio > bRatio + 30) {
+                                statusEl.innerText = "STATUS: LÃNG PHÍ HÌNH THỨC";
+                                statusEl.style.color = "var(--neon-red)";
+                            } else {
+                                statusEl.innerText = "STATUS: OPTIMAL BALANCE";
+                                statusEl.style.color = "var(--neon-green)";
+                            }
+                        }
+                    }
+
+                    const elEquityMt5 = document.getElementById('equity-mt5');
+                    const elEquityBnc = document.getElementById('equity-bnc');
+                    const elEquitySouth = document.getElementById('equity-south');
+                    if (elEquityMt5) elEquityMt5.innerText = `$${(data.health_mt5?.equity || 0).toFixed(2)}`;
+                    if (elEquityBnc) elEquityBnc.innerText = `$${(data.health_bnc?.equity || 0).toFixed(2)}`;
+                    if (elEquitySouth) elEquitySouth.innerText = formatVND(data.health_south?.equity_vnd || 0);
 
                     const squadDiv = document.getElementById('squadron-list');
-                    if (!squadDiv) return;
-                    squadDiv.innerHTML = '';
-
-                    for (const [unit, symbols] of Object.entries(data.squadron)) {
-                        const meta = unitStyles[unit] || { name: "RECON", icon: "🛰️", color: "var(--neon-blue)" };
-                        const stats = data.unit_stats[unit] || { win_rate: "0%", context: { er: 0, confidence: 0 } };
-                        
-                        squadDiv.innerHTML += `
-                            <div class="unit-card" style="--unit-color: ${meta.color}">
-                                <div class="unit-name">${meta.icon} ${unit} <span style="font-size:10px; opacity:0.4; letter-spacing:2px; margin-left:auto;">${meta.name}</span></div>
-                                <div class="metric-grid">
-                                    <div class="metric-item"><label>ER</label><value>${stats.context.er.toFixed(2)}</value></div>
-                                    <div class="metric-item"><label>WIN%</label><value style="color:var(--neon-green)">${stats.win_rate}</value></div>
-                                    <div class="metric-item"><label>CONF</label><value>${stats.context.confidence}%</value></div>
+                    if (squadDiv && data.squadron) {
+                        squadDiv.innerHTML = '';
+                        for (const [unit, symbols] of Object.entries(data.squadron)) {
+                            const meta = unitStyles[unit] || { name: "RECON", icon: "🛰️", color: "var(--neon-blue)" };
+                            const stats = data.unit_stats?.[unit] || { win_rate: "0%", context: { er: 0, confidence: 0 } };
+                            
+                            squadDiv.innerHTML += `
+                                <div class="unit-card" style="--unit-color: ${meta.color}">
+                                    <div class="unit-name">${meta.icon} ${unit} <span style="font-size:10px; opacity:0.4; letter-spacing:2px; margin-left:auto;">${meta.name}</span></div>
+                                    <div class="metric-grid">
+                                        <div class="metric-item"><label>ER</label><value>${(stats.context?.er || 0).toFixed(2)}</value></div>
+                                        <div class="metric-item"><label>WIN%</label><value style="color:var(--neon-green)">${stats.win_rate}</value></div>
+                                        <div class="metric-item"><label>CONF</label><value>${stats.context?.confidence || 0}%</value></div>
+                                    </div>
+                                    <div style="margin-top:15px; display:flex; flex-wrap:wrap; gap:5px;">
+                                        ${symbols.map(s => `<span style="font-size:10px; padding:2px 6px; background:rgba(255,255,255,0.05); border-radius:2px;">${s}</span>`).join('')}
+                                    </div>
+                                    <div style="margin-top:15px; border-top:1px solid rgba(255,255,255,0.05); padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
+                                        <span style="font-size:11px; opacity:0.5">LOT: ${data.dna?.[unit]?.LOT_SIZE || 'AUTO'}</span>
+                                        <span style="font-size:10px; color:${meta.color}; cursor:pointer; font-weight:700;" onclick="toggleLogic('${unit}')">STRATEGY ></span>
+                                    </div>
                                 </div>
-                                <div style="margin-top:15px; display:flex; flex-wrap:wrap; gap:5px;">
-                                    ${symbols.map(s => `<span style="font-size:10px; padding:2px 6px; background:rgba(255,255,255,0.05); border-radius:2px;">${s}</span>`).join('')}
-                                </div>
-                                <div style="margin-top:15px; border-top:1px solid rgba(255,255,255,0.05); padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
-                                    <span style="font-size:11px; opacity:0.5">LOT: ${data.dna[unit]?.LOT_SIZE || 'AUTO'}</span>
-                                    <span style="font-size:10px; color:${meta.color}; cursor:pointer; font-weight:700;" onclick="toggleLogic('${unit}')">STRATEGY ></span>
-                                </div>
-                            </div>
-                        `;
+                            `;
+                        }
                     }
 
                     const tradeDiv = document.getElementById('trade-log');
-                    if (tradeDiv) {
-                        tradeDiv.innerHTML = data.trades.slice(0, 10).map(t => `
-                            <div style="padding:15px; border-bottom:1px solid rgba(255,255,255,0.03); display:flex; justify-content:space-between;">
-                                <div>
-                                    <div style="font-weight:700; font-family:Orbitron;">${t.symbol}</div>
-                                    <div style="font-size:10px; opacity:0.4;">${t.unit} // ${t.side}</div>
+                    if (tradeDiv && data.trades) {
+                        tradeDiv.innerHTML = data.trades.slice(0, 15).map(t => {
+                            const tTime = t.time || "";
+                            const timeStr = tTime.includes(' ') ? tTime.split(' ')[1] : tTime;
+                            return `
+                                <div style="padding:15px; border-bottom:1px solid rgba(255,255,255,0.03); display:flex; justify-content:space-between; align-items:center;">
+                                    <div>
+                                        <div style="font-weight:700; font-family:Orbitron; font-size:13px;">${t.symbol}</div>
+                                        <div style="font-size:9px; opacity:0.4; letter-spacing:1px;">${t.unit} // ${t.side}</div>
+                                    </div>
+                                    <div style="text-align:right;">
+                                        <div class="${t.pnl >= 0 ? 'pnl-pos' : 'pnl-neg'}" style="font-size:16px; font-weight:900;">$${(t.pnl || 0).toFixed(2)}</div>
+                                        <div style="font-size:9px; opacity:0.3;">${timeStr}</div>
+                                    </div>
                                 </div>
-                                <div style="text-align:right;">
-                                    <div class="${t.pnl >= 0 ? 'pnl-pos' : 'pnl-neg'}" style="font-size:18px; font-weight:900;">$${t.pnl.toFixed(2)}</div>
-                                    <div style="font-size:10px; opacity:0.3;">${t.time.split(' ')[1] || t.time}</div>
-                                </div>
-                            </div>
-                        `).join('');
+                            `;
+                        }).join('');
                     }
                 }
             } catch (e) { console.error("HUD Error:", e); }
