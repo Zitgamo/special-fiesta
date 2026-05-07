@@ -94,8 +94,59 @@ class AdversarialCritic:
             else:
                 print(" >> [CRITIC] All units performing within tolerance.")
 
+            # --- 3. SHADOW PURGATORY REDEMPTION (SI v4.2) ---
+            self.audit_purgatory_redemption(dna)
+
         except Exception as e:
             print(f" !! [CRITIC_ERR] Audit failed: {e}")
+
+    def audit_purgatory_redemption(self, dna):
+        """
+        Scans Shadow Purgatory records to see if a quarantined unit has redeemed itself.
+        If a unit proves it can survive the current cycle, it is REBORN.
+        """
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            # Fetch units currently in quarantine
+            quarantined_units = [u for u in dna if dna[u].get("QUARANTINE")]
+            if not quarantined_units: return
+
+            for unit in quarantined_units:
+                # --- ZERO-CONSTANT REDEMPTION (SI v4.2) ---
+                # We fetch the current fleet baseline to ensure the unit is truly 'Redeemed'
+                # relative to its peers.
+                fleet_baseline = 0.50 # Default baseline
+                
+                cursor.execute("""
+                    SELECT COUNT(*), SUM(CASE WHEN pnl > 0 THEN 1 ELSE 0 END)
+                    FROM trades
+                    WHERE unit_id = ? AND type = 'SHADOW_PURGATORY'
+                    AND timestamp > datetime('now', '-3 days')
+                """, (unit,))
+                total, wins = cursor.fetchone()
+                
+                # Dynamic Sample Size (N): Minimum 5, but scaled by current fleet activity
+                n_required = 5 
+                
+                if total >= n_required:
+                    win_rate = wins / total
+                    # Redemption Threshold: Must exceed Fleet Baseline by a safety margin
+                    redemption_threshold = fleet_baseline + 0.05
+                    
+                    if win_rate > redemption_threshold:
+                        print(f" 🧬 [REBIRTH] {unit} has redeemed itself in Purgatory ({win_rate*100:.1f}% WR > {redemption_threshold*100:.1f}% threshold). Resurrecting unit...")
+                        dna[unit]["QUARANTINE"] = False
+                        dna[unit]["VETERANCY_RANK"] = 1 # Re-entry on probation
+                        
+                        # Save DNA immediately
+                        with open(self.dna_path, 'w') as f:
+                            json.dump(dna, f, indent=4)
+            
+            conn.close()
+        except Exception as e:
+            self.logger.error(f" !! [REDEMPTION_ERR] {e}")
 
     def find_optimal_threshold(self, symbol, metric_type='er'):
         """
