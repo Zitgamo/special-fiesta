@@ -53,12 +53,21 @@ class AdversarialCritic:
                 win_rate = wins / total
                 print(f" >> [CRITIC] Unit {unit_id}: {total} strikes, {win_rate*100:.1f}% Win Rate, Avg PnL: ${avg_pnl:.2f}")
 
-                # 1. ATROPHY LOGIC: If win rate is trash (< 40%)
-                if win_rate < 0.40:
-                    print(f" !! [CRITIC_WARNING] {unit_id} performance critical. Tightening SL...")
-                    if unit_id in dna:
-                        dna[unit_id]["SL"] = round(dna[unit_id]["SL"] * 0.9, 2)
-                        mutations += 1
+                # 1. ATROPHY / QUARANTINE LOGIC
+                if total >= 10:
+                    if win_rate < 0.35 or (win_rate < 0.45 and avg_pnl < -10):
+                        print(f" !! [QUARANTINE_TRIGGER] {unit_id} performance critical ({win_rate*100:.1f}% WR). Isolating unit...")
+                        if unit_id in dna:
+                            dna[unit_id]["QUARANTINE"] = True
+                            mutations += 1
+                        continue
+
+                    # Mild Atrophy
+                    elif win_rate < 0.40:
+                        print(f" !! [CRITIC_WARNING] {unit_id} performance slipping. Tightening SL...")
+                        if unit_id in dna:
+                            dna[unit_id]["SL"] = round(dna[unit_id]["SL"] * 0.9, 2)
+                            mutations += 1
 
                 # 2. OVER-EXTENDED LOGIC: If win rate is high but avg_pnl is negative (Bad R:R)
                 elif win_rate > 0.60 and avg_pnl < 0:

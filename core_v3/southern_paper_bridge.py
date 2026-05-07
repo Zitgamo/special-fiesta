@@ -114,16 +114,12 @@ class SouthernPaperBridge:
             self.logger.info(f" >> [WALLET] Resumed Southern Balance: {self.current_balance_vnd:,.0f} VND")
         except: pass
         
-        # Load existing state if available
-        if os.path.exists(STATE_JSON):
-            try:
-                with open(STATE_JSON, "r") as f:
-                    saved_units = json.load(f)
-                    for uid, data in saved_units.items():
-                        if uid in self.units:
-                            self.units[uid].update(data)
-                    self.logger.info(f" >> [RESTORE] Resumed Dragon Fleet from state file.")
-            except: pass
+        # DNA Handshake
+        try:
+            with open("core_v3/dna.json", "r") as f:
+                self.dna = json.load(f)
+        except:
+            self.dna = {}
 
         if not os.path.exists(TRADES_CSV):
             pd.DataFrame(columns=['unit_id', 'entry_t', 'exit_t', 'side', 'entry_p', 'exit_p', 'pnl_pts', 'reason']).to_csv(TRADES_CSV, index=False)
@@ -315,13 +311,16 @@ class SouthernPaperBridge:
                     
                     # --- SIGNAL RELAY (ALPHA ONLY as per User Request) ---
                     if uid == "SOUTH_ALPHA":
-                        try:
-                            from signal_commander import SignalCommander
-                            sc = SignalCommander()
-                            # 1 hđ = 1 contract for VN30. We use 1.0 as lot for visual consistency.
-                            sc.send_signal(SYMBOL, s_id, price, u['sl'], u['tp'], er, lot=1.0, reason="South Alpha (Index Strike)")
-                        except Exception as sig_err:
-                            self.logger.error(f" !! [SIGNAL_ERR] Failed to relay South Alpha strike: {sig_err}")
+                        # Quarantine Check: Do not spam Tele if not good enough
+                        if self.dna.get("SOUTH_ALPHA", {}).get("QUARANTINE"):
+                            self.logger.info(f" >> [QUARANTINE_SUPPRESS] Skipping Telegram signal for {SYMBOL} (Unit in Re-R&D).")
+                        else:
+                            try:
+                                from signal_commander import SignalCommander
+                                sc = SignalCommander()
+                                sc.send_signal(SYMBOL, s_id, price, u['sl'], u['tp'], er, lot=1.0, reason="South Alpha (Index Strike)")
+                            except Exception as sig_err:
+                                self.logger.error(f" !! [SIGNAL_ERR] Failed to relay South Alpha strike: {sig_err}")
 
         self.export_state(price)
 
