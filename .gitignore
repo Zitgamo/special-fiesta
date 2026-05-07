@@ -39,3 +39,5 @@ venv/
 .gemini/
 .DS_Store
 Thumbs.db
+
+core_v3/secrets_real.json
