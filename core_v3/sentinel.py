@@ -23,6 +23,7 @@ class IronSentinel:
         }
         self.is_running = True
         self.last_scribe = 0
+        self.alert_buffer = []
         try:
             self.comm = GhostComm()
         except:
@@ -71,9 +72,7 @@ class IronSentinel:
             
         time.sleep(5) # SI v3.4: Staggered Resurrection (Anti-Lag)
         
-        if self.comm:
-            self.comm.notify(f"🛠️ [RESURRECTED] {name} has been restored to service.")
-            
+        self.alert_buffer.append(f"🛠️ [RESURRECTED] {name} has been restored to service.")
         print(f" >> [SUCCESS] {name} is back online.")
 
     def run(self):
@@ -131,6 +130,9 @@ class IronSentinel:
             # 6. AUTONOMOUS CLEANUP (The Janitor Handshake)
             self.autonomous_cleanup()
             
+            # 7. CONSOLIDATED DISPATCH (SI v3.6 - Anti-Spam)
+            self.dispatch_consolidated_report()
+            
             time.sleep(5)
 
     def autonomous_cleanup(self):
@@ -168,17 +170,16 @@ class IronSentinel:
                     for line in content:
                         if "FATAL" in line or "Order failed" in line:
                             print(f" !! [SENTINEL] Alert detected in {log_file}: {line}")
-                            if self.comm:
-                                self.comm.notify(f"⚠️ [FRACTURE] {unit} UNIT: {line}")
+                            self.alert_buffer.append(f"⚠️ [FRACTURE] {unit} UNIT: {line}")
                             self.report_to_war_room(unit, line)
                         if "Invalid volume (Code: 10014)" in line:
                             msg = f"❌ [CRITICAL] {unit} UNIT: VOLUME ERRORS. System requires optimization."
                             print(f" !! {msg}")
-                            if self.comm: self.comm.notify(msg)
+                            self.alert_buffer.append(msg)
                         if "Invalid stops (Code: 10016)" in line:
                             msg = f"❌ [CRITICAL] {unit} UNIT: STOP ERRORS. ATR/SL logic may be too tight."
                             print(f" !! {msg}")
-                            if self.comm: self.comm.notify(msg)
+                            self.alert_buffer.append(msg)
             except: pass
 
     def report_to_war_room(self, component, error):
@@ -256,10 +257,62 @@ class IronSentinel:
             subprocess.Popen(["git", "push", "origin", "main"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             
             if self.comm:
-                self.comm.notify("📜 [AUTO-SCRIBE] System Evolution Recorded. State pushed to GitHub.")
+                self.alert_buffer.append("📜 [AUTO-SCRIBE] System Evolution Recorded. State pushed to GitHub.")
             
         except Exception as e:
             print(f" !! [SENTINEL_ERR] Auto-Scribe failed: {e}")
+
+    def dispatch_consolidated_report(self):
+        """
+        SI v3.6: The Aggregator.
+        Collects all alerts + DNA evolution + Fleet status into one message.
+        """
+        # 1. Collect DNA Evolution Alerts from Master
+        evo_path = "core_v3/evolution_buffer.tmp"
+        if os.path.exists(evo_path):
+            try:
+                with open(evo_path, 'r') as f:
+                    evo_alerts = f.read().splitlines()
+                self.alert_buffer.extend(evo_alerts)
+                os.remove(evo_path)
+            except: pass
+
+        if not self.alert_buffer: return
+
+        print(" >> [SENTINEL] Dispatching Consolidated Tactical Summary...")
+        
+        # 2. Build the Report
+        timestamp = time.strftime("%H:%M:%S ICT")
+        report = (
+            f"🦅 **SOVEREIGN TACTICAL SUMMARY** [{timestamp}]\n"
+            f"━━━━━━━━━━━━━━━━━━━━\n\n"
+        )
+        
+        # A. Tactical Events
+        report += "<b>🛠️ OPERATIONAL EVENTS</b>\n"
+        for alert in self.alert_buffer:
+            report += f" • {alert}\n"
+        report += "\n"
+
+        # B. Fleet Status (Integrated from FleetReporter)
+        try:
+            from fleet_report import FleetReporter
+            fr = FleetReporter()
+            report += fr.get_status()
+        except Exception as e:
+            report += f"❌ Status Integration Failed: {e}"
+
+        report += "\n━━━━━━━━━━━━━━━━━━━━"
+
+        # 3. Send via GhostComm (HTML Mode)
+        if self.comm:
+            try:
+                self.comm.bot.send_message(self.comm.chat_id, report, parse_mode='HTML')
+            except Exception as e:
+                print(f" !! [DISPATCH_ERR] {e}")
+        
+        # 4. Clear Buffer
+        self.alert_buffer = []
 
 if __name__ == "__main__":
     sentinel = IronSentinel()
