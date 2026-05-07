@@ -123,15 +123,23 @@ Return ONLY a JSON object with this structure:
             except: pass
 
             print(" >> [SUCCESS] High Council Verdict Saved.")
-            self.send_telegram_alert(f"Morning Prophecy Received:\nUptime: {uptime}\nBias: {verdict.get('bias')}\nRange: [{verdict.get('min_boundary')} - {verdict.get('max_boundary')}]")
             
-        except Exception as e:
-            print(f" !! [ERROR] Council consultation failed: {str(e)}")
-            self.save_mock_verdict()
+        finally:
+            # --- INTEGRATED REPORTING (v10.6) ---
+            # This ensures the report is sent regardless of Live/Mock success
+            try:
+                from fleet_report import FleetReporter
+                reporter = FleetReporter()
+                reporter.send_report(forced=True)
+            except Exception as re:
+                print(f" !! [ERROR] Reporting bridge failed: {str(re)}")
 
     def save_mock_verdict(self):
         verdict = {
             "council_advice": "No API key found. Operating on Safe Baseline DNA.",
+            "bias": "NEUTRAL-BULLISH",
+            "min_boundary": 1250.0,
+            "max_boundary": 1350.0,
             "overrides": {
                 "governor_sensitivity": 1.0,
                 "sentinel_threshold": 0.8

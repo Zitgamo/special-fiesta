@@ -80,7 +80,8 @@ class FleetReporter:
         return report
 
     def load_state(self):
-        state_path = "core_v3/report_state.json"
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        state_path = os.path.join(base_dir, "report_state.json")
         if os.path.exists(state_path):
             with open(state_path, "r") as f:
                 return json.load(f)
@@ -96,12 +97,16 @@ class FleetReporter:
         }
 
     def save_state(self, state):
-        with open("core_v3/report_state.json", "w") as f:
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        state_path = os.path.join(base_dir, "report_state.json")
+        with open(state_path, "w") as f:
             json.dump(state, f, indent=4)
 
     def send_report(self, forced=False):
         state = self.load_state()
         current_time = time.time()
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        data_dir = os.path.join(os.path.dirname(base_dir), "03_DATA")
         
         # 1. CHECK IF REPORT IS DUE
         if not forced and (current_time - state['last_report_time']) < state['interval_seconds']:
@@ -116,7 +121,7 @@ class FleetReporter:
         # Get Current Equity for Profit calculation
         try:
             import sqlite3
-            db_path = "core_v3/iron_core.db"
+            db_path = os.path.join(base_dir, "iron_core.db")
             conn = sqlite3.connect(db_path)
             cursor = conn.cursor()
             cursor.execute("SELECT equity FROM equity_history ORDER BY id DESC LIMIT 1")
@@ -127,13 +132,31 @@ class FleetReporter:
         
         if state['streak_start_equity'] == 0:
             state['streak_start_equity'] = current_equity
+            self.save_state(state) # Save immediately to lock in the start point
             
         profit = current_equity - state['streak_start_equity']
         
         # Estimation of decision cycles (Assuming 30s loop)
         cycles = int((current_time - state['streak_start_time']) / 30)
 
-        # 4. CONSTRUCT TACTICAL CARD
+        # 4. FETCH COUNCIL PROPHECY
+        council_info = "<i>Prophecy Loading...</i>"
+        try:
+            v_path = os.path.join(data_dir, "council_verdict.json")
+            if os.path.exists(v_path):
+                # Persistence Guard: Small wait for disk sync
+                time.sleep(0.5) 
+                with open(v_path, "r") as f:
+                    v = json.load(f)
+                    # Use .get with robust defaults
+                    bias = v.get('bias') or v.get('bias_verdict', 'NEUTRAL')
+                    min_b = v.get('min_boundary', 0)
+                    max_b = v.get('max_boundary', 0)
+                    council_info = f"<b>BIAS</b>: {bias} | <b>RANGE</b>: [{min_b} - {max_b}]"
+        except Exception as e:
+            council_info = f"<i>Council Syncing... ({str(e)})</i>"
+
+        # 5. CONSTRUCT TACTICAL CARD
         title = "🛡️ **SOVEREIGN STABILITY STREAK** 🛡️"
         if state.get("reset_occurred"):
             title = "⚠️ **STREAK RESET: INCIDENT DETECTED** ⚠️"
@@ -145,6 +168,7 @@ class FleetReporter:
             f"🏆 **STABILITY**: `{uptime_hours:.1f} HOURS`\n"
             f"🔄 **CYCLES**: `{cycles:,} GREEN`\n"
             f"💰 **PROFIT**: `${profit:+.2f}`\n\n"
+            f"🔮 **COUNCIL**: {council_info}\n"
             f"💎 **STATUS**: `INTERVAL x2 ({state['interval_seconds']/3600:.0f}H)`\n"
             f"━━━━━━━━━━━━━━━━━━\n"
             f"{status_report}"

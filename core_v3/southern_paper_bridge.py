@@ -133,6 +133,10 @@ class SouthernPaperBridge:
         
         if not os.path.exists(TRADES_CSV):
             pd.DataFrame(columns=['unit_id', 'entry_t', 'exit_t', 'side', 'entry_p', 'exit_p', 'pnl_pts', 'reason']).to_csv(TRADES_CSV, index=False)
+        
+        # --- INITIAL PULSE (v10.4) ---
+        # Export state immediately so report data is available
+        self.export_state(0)
 
         # --- CIRCUIT BREAKER STATE (v9.6) ---
         self.daily_pnl = 0
