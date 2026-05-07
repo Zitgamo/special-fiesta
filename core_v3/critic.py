@@ -2,6 +2,8 @@ import sqlite3
 import json
 import os
 import logging
+import pandas as pd
+import numpy as np
 
 class AdversarialCritic:
     """
