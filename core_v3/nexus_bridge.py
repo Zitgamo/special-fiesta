@@ -126,9 +126,18 @@ def get_equity_curve():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# Global Cache for Telemetry to prevent PC Lag
+_TELEMETRY_CACHE = {"data": None, "timestamp": 0}
+_CACHE_TTL = 10 # 10 Seconds
+
 @app.route('/api/telemetry', methods=['GET'])
 def get_telemetry():
+    global _TELEMETRY_CACHE
     try:
+        now = time.time()
+        if _TELEMETRY_CACHE["data"] and (now - _TELEMETRY_CACHE["timestamp"]) < _CACHE_TTL:
+            return jsonify(_TELEMETRY_CACHE["data"])
+
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         
@@ -302,6 +311,11 @@ def get_telemetry():
         }
         
         conn.close()
+        
+        # SI v3.5: Update Cache
+        _TELEMETRY_CACHE["data"] = data
+        _TELEMETRY_CACHE["timestamp"] = time.time()
+        
         return jsonify(data)
     except Exception as e:
         import traceback

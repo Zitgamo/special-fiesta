@@ -379,7 +379,7 @@ class IronEngine:
                         self.logger.warning(f" !! [VAULT_BLOCK] {symbol}: {reason}")
                 
                 
-                time.sleep(10) 
+                time.sleep(30) # SI v3.5: Hyper-Slow Pulse
                 
             except Exception as e:
                 self.logger.error(f"CORE_LOOP_EXCEPTION: {e}")
