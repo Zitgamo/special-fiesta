@@ -23,7 +23,7 @@ class FleetReporter:
             "ALPHA": "engine.py alpha",
             "OMEGA": "engine.py omega",
             "GAMMA": "engine.py gamma",
-            "DRAGON": "southern_paper_bridge.py"
+            "HANG_DA": "southern_paper_bridge.py"
         }
         try:
             self.comm = GhostComm()

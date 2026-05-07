@@ -79,7 +79,7 @@ def prepare_index_df(df):
 class SouthernPaperBridge:
     def __init__(self):
         self.logger = logger
-        self.logger.info("Vietnam Dragon Front Bridge Initializing...")
+        self.logger.info("Vietnam Hàng Da Front Bridge Initializing...")
         
         # Unit Configurations (Mapped to Sovereign DNA)
         self.units = {

@@ -14,12 +14,6 @@ class IronVault:
         self.equity_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "virtual_equity.json")
         
         # --- SOVEREIGN PROTOCOL CONSTANTS (Line 13-15) ---
-        self.NAV_RISK = {
-            "ALPHA": 0.010, # 1.0%
-            "OMEGA": 0.005, # 0.5%
-            "GAMMA": 0.005  # 0.5%
-        }
-        
         self.virtual_pools = self._load_virtual_pools()
 
     def _load_dna(self):
@@ -115,29 +109,35 @@ class IronVault:
         unit_dna = self.dna.get(unit_id, {"SL": 2.0, "TP": 4.0})
         rr = unit_dna["TP"] / unit_dna["SL"] if unit_dna["SL"] > 0 else 2.0
         
-        # 5. The Dynamic Risk Formula (Strike Veteran Protocol)
-        protocol_risk = self.NAV_RISK.get(unit_id, 0.005)
-        kelly_adj = 1.0 # Default to Neutral
+        # 5. The Dynamic Risk Formula (Strike Veteran Protocol - SI v4.0)
+        # Instead of static 1.0%, we derive base risk from current unit win-rate.
+        base_risk = 0.005 # Default safety floor (0.5%)
+        kelly_adj = 1.0 
         veterancy_mult = 1.0
         
         if forensics:
             stats = forensics.get_unit_stats(unit_id)
             win_rate = stats.get("win_rate", 0.50)
-            total_strikes = stats.get("total", 0) # Fixed from 'strikes'
+            total_strikes = stats.get("total", 0)
             
-            # A. Kelly Warm-up
+            # A. Dynamic Base Risk (Derived from Win Rate stability)
+            # Higher Win Rate = Higher Base confidence (up to 1.5%)
+            base_risk = max(0.005, min(0.015, win_rate * 0.02))
+
+            # B. Kelly Warm-up (The Math-First Rule)
             if total_strikes >= 10:
+                # Kelly = (W*R - L) / R
                 kelly_adj = (win_rate * rr - (1 - win_rate)) / rr if rr > 0 else 1.0
-                kelly_adj = max(0.5, min(2.0, kelly_adj)) # Clamp
+                kelly_adj = max(0.5, min(2.0, kelly_adj)) # Clamp to prevent over-leveraging
             
-            # B. Veterancy Scaling
+            # C. Veterancy Scaling
             rank_data = forensics.get_unit_rank(unit_id)
             if rank_data['rank'] >= 1:
-                veterancy_mult = 2.0
-                self.logger.info(f" >> [VETERANCY] {unit_id} Rank {rank_data['rank']} detected. Applying 2x multiplier.")
+                veterancy_mult = 1.5 # Reward consistency
+                self.logger.info(f" >> [VETERANCY] {unit_id} Rank {rank_data['rank']} detected. Scaling risk.")
 
-        # Risk = Protocol_NAV * Kelly_Adjustment * Veterancy_Multiplier * Portfolio_Gradient
-        risk_pct = protocol_risk * kelly_adj * veterancy_mult * grad_risk
+        # Final Risk = Base (Dynamic) * Kelly (Math) * Rank (Performance) * Portfolio (Equity)
+        risk_pct = base_risk * kelly_adj * veterancy_mult * grad_risk
         
         # 6. Lot Size Calculation (Law of No Magic Numbers)
         MAX_LOT = 0.05 # SOVEREIGN SAFETY CAP (Intended for Forex/Gold)
