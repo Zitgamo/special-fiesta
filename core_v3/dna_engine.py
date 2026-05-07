@@ -17,8 +17,9 @@ class DNAEngine:
         self.critic = AdversarialCritic(db_path, dna_path)
         self.logger = logging.getLogger("DNA_ENGINE")
 
-    def mutate_dna(self, forensics, comm=None):
+    def mutate_dna(self, forensics):
         """The Evolutionary Loop."""
+        alerts = []
         try:
             with open(self.dna_path, 'r') as f:
                 dna = json.load(f)
@@ -26,24 +27,25 @@ class DNAEngine:
             # Audit LIVE units
             for unit in ["ALPHA", "OMEGA", "GAMMA"]:
                 stats = forensics.get_unit_stats(unit, trade_type='LIVE')
-                self.process_mutation(unit, stats, dna, comm)
+                alerts.extend(self.process_mutation(unit, stats, dna))
                 
             # Audit SOUTHERN units (Paper Staging)
             for unit in ["SOUTH_ALPHA", "SOUTH_OMEGA", "SOUTH_GAMMA"]:
                 stats = forensics.get_unit_stats(unit, trade_type='PAPER')
                 dna_key = unit.split("_")[1]
-                self.process_mutation(dna_key, stats, dna, comm, prefix=f"SOUTHERN_{unit}")
+                alerts.extend(self.process_mutation(dna_key, stats, dna, prefix=f"SOUTHERN_{unit}"))
 
             with open(self.dna_path, 'w') as f:
                 json.dump(dna, f, indent=4)
-            return True
+            return True, alerts
         except Exception as e:
             self.logger.error(f" >> [DNA_ERR] Mutation failed: {e}")
-            return False
+            return False, []
 
-    def process_mutation(self, dna_key, stats, dna, comm=None, prefix=""):
+    def process_mutation(self, dna_key, stats, dna, prefix=""):
         """SDS v2.0: Dynamic Scaling & Precision Guard."""
-        if not stats or stats.get("total", 0) < 5: return
+        alerts = []
+        if not stats or stats.get("total", 0) < 5: return alerts
 
         optimal_er = self.critic.find_optimal_threshold(dna_key, 'er')
         win_rate = stats.get("win_rate_val", 0.5)
@@ -63,8 +65,7 @@ class DNAEngine:
                 else:
                     dna[dna_key]["LOT_SIZE"] = max(0.01, round(new_lot, 2))
                 
-                if comm:
-                    comm.notify(f"🚀 [ESCALATION] {prefix or dna_key}: Scaled to {multiplier:.2f}x (Layers: {current_layers+1})")
+                alerts.append(f"🚀 [ESCALATION] {prefix or dna_key}: Scaled to {multiplier:.2f}x (Layers: {current_layers+1})")
 
         # ATROPHY
         elif er < (optimal_er * 0.7):
@@ -84,10 +85,12 @@ class DNAEngine:
         # REBIRTH HANDOVER
         if dna[dna_key].get("SHADOW"):
             if self.compare_realities(dna_key, dna):
-                print(f" >> [REBIRTH] {dna_key} Mutant proven superior.")
+                alerts.append(f"🧬 [REBIRTH] {dna_key} Mutant proven superior. DNA Replaced.")
                 dna[dna_key]["SL"] = dna[dna_key]["SHADOW"]["SL"]
                 dna[dna_key]["TP"] = dna[dna_key]["SHADOW"]["TP"]
                 dna[dna_key]["SHADOW"] = None
+        
+        return alerts
 
     def branch_dna(self, unit, dna):
         """Creates Adversarial Shadow DNA."""

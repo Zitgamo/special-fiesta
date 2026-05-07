@@ -31,9 +31,6 @@ class FleetReporter:
             self.comm = None
 
     def get_status(self):
-        report = "🛰️ **SOVEREIGN FLEET STATUS REPORT**\n"
-        report += "==============================\n"
-        
         procs = []
         for p in psutil.process_iter(['cmdline']):
             try:
@@ -41,17 +38,24 @@ class FleetReporter:
                 procs.append(cmd)
             except: continue
 
+        status_lines = []
         online_count = 0
         for name, identifier in self.fleet.items():
             is_online = any(identifier in cmd for cmd in procs)
-            status_icon = "✅" if is_online else "❌"
+            status_icon = "🟢" if is_online else "🔴"
             if is_online: online_count += 1
-            report += f"{status_icon} {name.ljust(12)}: {'ONLINE' if is_online else 'OFFLINE'}\n"
+            status_lines.append(f"{status_icon} {name.ljust(10)}")
 
-        report += "==============================\n"
-        report += f"📊 Fleet Readiness: {online_count}/{len(self.fleet)}\n"
-        report += f"⏰ Timestamp: {time.strftime('%H:%M:%S ICT')}"
-        
+        # Arrange in a grid for conciseness
+        grid = ""
+        for i in range(0, len(status_lines), 2):
+            line = status_lines[i]
+            if i + 1 < len(status_lines):
+                line += " | " + status_lines[i+1]
+            grid += line + "\n"
+
+        report = f"📊 **FLEET READINESS**: {online_count}/{len(self.fleet)}\n"
+        report += f"<code>{grid}</code>"
         return report
 
     def send_report(self):

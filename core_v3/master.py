@@ -70,9 +70,13 @@ class SovereignMaster:
                     loop_count += 1
                     if loop_count % 20 == 0:
                         print(" >> [MASTER] Triggering Evolutionary DNA Mutation...")
-                        self.dna_engine.mutate_dna(self.forensics)
+                        success, alerts = self.dna_engine.mutate_dna(self.forensics)
                         self.critic.audit_performance()
                         self.logistics.autonomous_asset_migration()
+                        
+                        if alerts:
+                            with open("core_v3/evolution_buffer.tmp", "a") as f:
+                                for a in alerts: f.write(a + "\n")
 
                     # 3. Security: Active Risk Governor
                     self.vault.active_risk_governor(self.bridges)
