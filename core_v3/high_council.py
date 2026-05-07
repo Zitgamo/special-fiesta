@@ -121,11 +121,11 @@ Return ONLY a JSON object with this structure:
             self.save_mock_verdict()
             
         finally:
-            # --- INTEGRATED REPORTING (v10.7) ---
+            # --- INTEGRATED REPORTING (v12.0) ---
             try:
                 from fleet_report import FleetReporter
                 reporter = FleetReporter()
-                reporter.send_report(forced=True)
+                reporter.send_council_report()
             except Exception as re:
                 print(f" !! [ERROR] Reporting bridge failed: {str(re)}")
 

@@ -217,8 +217,8 @@ class SouthernPaperBridge:
         try:
             from fleet_report import FleetReporter
             reporter = FleetReporter()
-            # Send the special Breach Card (v11.0 Recommended Format)
-            reporter.send_report(forced=True, is_breach=True)
+            # Send the dedicated Council Breach Card (v12.0)
+            reporter.send_council_report(is_breach=True)
         except Exception as e:
             self.logger.error(f" !! [ALERT_FAIL] Could not send breach alert: {e}")
 
