@@ -81,52 +81,47 @@ Return ONLY a JSON object with this structure:
 
     def consult_council(self, is_morning_ritual=False):
         """Consults the LLM and saves the verdict."""
-        if not self.api_key:
-            return self.save_mock_verdict()
-
-        briefing = self.generate_tactical_briefing()
-        pulse = self.get_global_pulse()
-        
-        if is_morning_ritual:
-            briefing += f"\n## GLOBAL PULSE (OVERNIGHT)\n- US30: {pulse['us30_close']}\n- Nikkei: {pulse['nikkei_open']}\n- Sentiment: {pulse['sentiment']}"
-
-        print(f" >> [COUNCIL] Consulting the High Council via Groq...")
-        
-        url = "https://api.groq.com/openai/v1/chat/completions"
-        headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json"
-        }
-        data = {
-            "model": "llama-3.1-70b-versatile",
-            "messages": [
-                {"role": "system", "content": "You are the High Council, a tactical AI auditor. You analyze global context and local trade logs to set price boundaries and bias for the VN30 index."},
-                {"role": "user", "content": briefing}
-            ],
-            "response_format": {"type": "json_object"}
-        }
-
         try:
-            response = requests.post(url, headers=headers, json=data)
-            verdict_str = response.json()['choices'][0]['message']['content']
-            verdict = json.loads(verdict_str)
-            
-            with open("03_DATA/council_verdict.json", "w") as f:
-                json.dump(verdict, f, indent=2)
+            if not self.api_key:
+                self.save_mock_verdict()
+            else:
+                briefing = self.generate_tactical_briefing()
+                pulse = self.get_global_pulse()
                 
-            # Uptime for Telegram
-            uptime = "UNKNOWN"
-            try:
-                with open("03_DATA/vn30_active_pos.json", "r") as f:
-                    state = json.load(f)
-                    uptime = state.get("meta", {}).get("uptime", "UNKNOWN")
-            except: pass
+                if is_morning_ritual:
+                    briefing += f"\n## GLOBAL PULSE (OVERNIGHT)\n- US30: {pulse['us30_close']}\n- Nikkei: {pulse['nikkei_open']}\n- Sentiment: {pulse['sentiment']}"
 
-            print(" >> [SUCCESS] High Council Verdict Saved.")
+                print(f" >> [COUNCIL] Consulting the High Council via Groq...")
+                
+                url = "https://api.groq.com/openai/v1/chat/completions"
+                headers = {
+                    "Authorization": f"Bearer {self.api_key}",
+                    "Content-Type": "application/json"
+                }
+                data = {
+                    "model": "llama-3.1-70b-versatile",
+                    "messages": [
+                        {"role": "system", "content": "You are the High Council, a tactical AI auditor. You analyze global context and local trade logs to set price boundaries and bias for the VN30 index."},
+                        {"role": "user", "content": briefing}
+                    ],
+                    "response_format": {"type": "json_object"}
+                }
+
+                response = requests.post(url, headers=headers, json=data)
+                verdict_str = response.json()['choices'][0]['message']['content']
+                verdict = json.loads(verdict_str)
+                
+                with open("03_DATA/council_verdict.json", "w") as f:
+                    json.dump(verdict, f, indent=2)
+                    
+                print(" >> [SUCCESS] High Council Verdict Saved.")
+            
+        except Exception as e:
+            print(f" !! [ERROR] Council consultation failed: {str(e)}")
+            self.save_mock_verdict()
             
         finally:
-            # --- INTEGRATED REPORTING (v10.6) ---
-            # This ensures the report is sent regardless of Live/Mock success
+            # --- INTEGRATED REPORTING (v10.7) ---
             try:
                 from fleet_report import FleetReporter
                 reporter = FleetReporter()
