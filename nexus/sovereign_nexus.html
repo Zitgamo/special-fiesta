@@ -244,6 +244,15 @@
             flex: 1;
             overflow-y: auto;
             min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- ENABLE NESTED SCROLLING --- */
+        #trade-log, #intel-list, #neural-scan-list {
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
         }
 
         /* --- TACTICAL UNITS --- */
@@ -253,7 +262,7 @@
             border-left: 5px solid var(--unit-color);
             padding: 20px;
             border-radius: 4px;
-            margin-bottom: 12px; /* Reduced to fit viewport */
+            margin-bottom: 12px;
             position: relative;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -583,6 +592,7 @@
             background: var(--panel-bg);
             border-radius: 12px;
             border: 1px solid var(--border);
+            height: 100%; /* Force full height inheritance */
         }
         .back { transform: rotateY(180deg); background: rgba(10, 15, 30, 0.98); }
 
@@ -786,7 +796,7 @@
                         </div>
                         <div style="margin-top: 20px; padding: 15px; background: rgba(0, 242, 255, 0.03); border: 1px dashed var(--neon-blue); border-radius: 4px;">
                             <label style="font-size: 9px; opacity: 0.6; display: block; margin-bottom: 10px; text-align: center;">STRATEGIC ACTION</label>
-                            <a href="/report" target="_blank" style="display:block; text-align:center; padding:12px; background:rgba(0, 242, 255, 0.1); color:var(--neon-blue); border:1px solid var(--neon-blue); text-decoration:none; font-family:Orbitron; font-size:11px; font-weight:900; letter-spacing:2px; border-radius:2px; transition:all 0.3s;" onmouseover="this.style.background='var(--neon-blue)'; this.style.color='#000'" onmouseout="this.style.background='rgba(0, 242, 255, 0.1)'; this.style.color='var(--neon-blue)'">VIEW BATTLE RECAP ></a>
+                            <a href="/report" target="_blank" style="display:block; text-align:center; padding:12px; background:var(--neon-blue); color:#000; text-decoration:none; font-family:Orbitron; font-size:11px; font-weight:900; letter-spacing:2px; border-radius:2px;">VIEW BATTLE RECAP ></a>
                         </div>
                     </div>
                 </div>
@@ -825,7 +835,7 @@
                                 TACTICAL SUMMARY
                                 <div class="flip-btn" style="color:var(--neon-purple); border-color:var(--neon-purple);" onclick="toggleFlip('engagement-flipper')">< RETURN</div>
                             </div>
-                            <div class="panel-body" style="display: flex; flex-direction: column; justify-content: center; gap: 20px;">
+                            <div class="panel-body" style="display: flex; flex-direction: column; justify-content: flex-start; gap: 20px;">
                                 <div style="padding: 15px; background: rgba(188, 19, 254, 0.05); border: 1px solid var(--neon-purple); border-radius: 4px;">
                                     <label style="font-size: 10px; opacity: 0.6; letter-spacing: 2px;">SESSION ALPHA HARVEST</label>
                                     <div style="font-size: 24px; font-family: Orbitron; margin-top: 10px;">
@@ -1178,7 +1188,9 @@
                     const elEquityBnc = document.getElementById('equity-bnc');
                     const elEquitySouth = document.getElementById('equity-south');
                     if (elEquityMt5) elEquityMt5.innerText = `$${(data.health_mt5?.equity || 0).toFixed(2)}`;
-                    if (elEquityBnc) elEquityBnc.innerText = `$${(data.health_bnc?.equity || 0).toFixed(                    const squadDiv = document.getElementById('squadron-list');
+                    if (elEquityBnc) elEquityBnc.innerText = `$${(data.health_bnc?.equity || 0).toFixed(2)}`;
+                    if (elEquitySouth) elEquitySouth.innerText = formatVND(data.health_south?.equity_vnd || 0);
+                    const squadDiv = document.getElementById('squadron-list');
                     if (squadDiv && data.squadron) {
                         squadDiv.innerHTML = '';
                         for (const [unit, symbols] of Object.entries(data.squadron)) {
@@ -1216,10 +1228,6 @@
                                         <span style="font-size:10px; color:${isEscalated ? 'var(--neon-gold)' : 'rgba(255,255,255,0.5)'}; font-weight:700; letter-spacing:1px;">LOT: ${data.dna?.[unit]?.LOT_SIZE || 'AUTO'}</span>
                                         <span style="font-size:10px; color:${meta.color}; cursor:pointer; font-weight:700; letter-spacing:1px;" onclick="toggleLogic('${unit}')">STRATEGY ></span>
                                     </div>
-                                </div>
-                            `;
-                        }
-                    } </div>
                                 </div>
                             `;
                         }
