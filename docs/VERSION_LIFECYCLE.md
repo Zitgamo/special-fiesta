@@ -20,14 +20,14 @@
 
 ---
 
-## 🛠️ CHIẾN LƯỢC TIẾP THEO: VERSION 1.0 (STABILITY)
-Mục tiêu của v1.0 là **Sự ổn định Tuyệt đối** trước khi sang v2.0 (Tính năng nâng cao).
+## 🛠️ CURRENT TARGET: VERSION 4.2 (FOREX/CRYPTO DOMINANCE)
+Mục tiêu của v4.2 là **Sự ổn định Tuyệt đối** của các đơn vị Oracle (Global) trước khi sang v5.0 (Hàng Da Ascension).
 
-### Các hạng mục v1.0:
-- [ ] **Single Switch**: Tự động chuyển Demo/Real qua 1 file config.
-- [ ] **Auto-Janitor**: Dọn rác tự động theo sự kiện (Event-driven).
-- [ ] **Git UI Status**: Giám sát Coder trên Dashboard.
-- [ ] **Smart Blacklist**: Fix lỗi bỏ qua danh sách đen trong Engine.
+### Các hạng mục v4.2 [SHIP READY]:
+- [x] **Zero-Constant Risk**: Dynamic Kelly & Math-Floor.
+- [x] **Consolidated Reporting**: Multi-unit event pings suppressed.
+- [x] **Autonomous Sentinel**: Self-healing process guard.
+- [x] **Premium Nexus UI**: Rebranded to Hàng Da (for observation).
 
 ---
 **Commander Directive:** *"Sửa Front => Back => Test => XYZ => SHIP. Xong là Loop lại, không làm quẩn quanh một chỗ."*

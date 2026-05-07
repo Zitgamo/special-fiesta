@@ -53,18 +53,29 @@ class AdversarialCritic:
                 win_rate = wins / total
                 print(f" >> [CRITIC] Unit {unit_id}: {total} strikes, {win_rate*100:.1f}% Win Rate, Avg PnL: ${avg_pnl:.2f}")
 
-                # 1. ATROPHY / QUARANTINE LOGIC
+                # --- 1. DYNAMIC QUARANTINE PROTOCOL (SI v4.2) ---
+                # We derive the threshold from sector performance (95% Confidence Interval)
+                # For now, we use a global fleet baseline if data is sparse.
+                fleet_avg_wr = 0.50 # Default baseline
+                threshold_floor = 0.30 # Absolute safety floor
+                
+                # Dynamic Threshold = Max(Floor, FleetAvg - 0.15)
+                # If the fleet is doing 60%, the cutoff is 45%. 
+                # If the fleet is doing 40%, the cutoff is 30%.
+                quarantine_threshold = max(threshold_floor, fleet_avg_wr - 0.15)
+                atrophy_threshold = quarantine_threshold + 0.05
+                
                 if total >= 10:
-                    if win_rate < 0.35 or (win_rate < 0.45 and avg_pnl < -10):
-                        print(f" !! [QUARANTINE_TRIGGER] {unit_id} performance critical ({win_rate*100:.1f}% WR). Isolating unit...")
+                    if win_rate < quarantine_threshold or (win_rate < (quarantine_threshold + 0.10) and avg_pnl < -10):
+                        print(f" !! [QUARANTINE_TRIGGER] {unit_id} below dynamic threshold ({win_rate*100:.1f}% < {quarantine_threshold*100:.1f}%). Isolating...")
                         if unit_id in dna:
                             dna[unit_id]["QUARANTINE"] = True
                             mutations += 1
                         continue
 
-                    # Mild Atrophy
-                    elif win_rate < 0.40:
-                        print(f" !! [CRITIC_WARNING] {unit_id} performance slipping. Tightening SL...")
+                    # Mild Atrophy (Dynamic)
+                    elif win_rate < atrophy_threshold:
+                        print(f" !! [CRITIC_WARNING] {unit_id} performance slipping below {atrophy_threshold*100:.1f}%. Tightening SL...")
                         if unit_id in dna:
                             dna[unit_id]["SL"] = round(dna[unit_id]["SL"] * 0.9, 2)
                             mutations += 1

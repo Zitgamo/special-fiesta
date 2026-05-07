@@ -3,9 +3,9 @@
 This document serves as the high-fidelity state-of-the-fleet record for the next AI assistant.
 
 ## 🗺️ Fleet Rebranding (Active)
-- **FOREX_FRONTIER** (Exness/MT5): Handles global currencies, gold, and indices.
-- **CRYPTO_FRONTIER** (Binance): High-volatility strike logic.
-- **DRAGON_FRONT** (Vietnam/VN30F1M): Specialized paper-trading and alpha harvesting.
+- **FOREX_FRONTIER** (Exness/MT5): [PRODUCTION READY]
+- **CRYPTO_FRONTIER** (Binance): [PRODUCTION READY]
+- **HÀNG DA COMMAND** (Vietnam/VN30F1M): [EXPERIMENTAL // IN DEVELOPMENT]
 
 ## 🧠 Architectural Distinctions
 ### 1. Global Units (ALPHA, OMEGA, GAMMA)

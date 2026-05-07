@@ -2,8 +2,8 @@
 
 ### CURRENT SHIPMENT STATUS: [ PHASE 3: TACTICAL BETA - HARDENED ]
 - **Tactical Readiness**: 99/100 (v10.7)
-- **Viewport Lock**: 100% Active (100vh Enforced // Zero Overflow)
-- **SUIS v1.1 Protocol**: Active (Deep Layer & Multi-State Audit Enforced)
+- **Primary Fronts**: Forex Frontier, Crypto Frontier (READY FOR SHIP)
+- **Secondary Front**: Hàng Da Command (STAGING // NEXT VERSION)
 - **Sentinel Relay**: 100% Vocal (Telegram Resurrections + Error Feed)
 - **Optimizer Regime**: Active (Trend vs. Range Awareness)
 - **Remote Control**: Active (/close_all, /scale, /rescan)
@@ -52,7 +52,12 @@
 **Author:** Sovereign Docs Agent (Secretary)
 
 ---
-## 🚩 PHASE 3: TACTICAL BETA (LIVE FEED)
+## 🚩 PHASE 3: TACTICAL BETA (FOREX/CRYPTO)
 - [x] **Live Bridge Activation**: DEPLOY_MODE set to REAL. (COMPLETED)
 - [x] **Consolidated Reporting**: Multi-unit event pings suppressed. (STABLE)
-- [/] **Empirical Auto-Tune**: Hàng Da Shadow Cycle running. (VERIFYING)
+- [x] **Zero-Constant Risk**: Dynamic Kelly & Math-Floor implemented. (HARDENED)
+
+## 🏗️ PHASE 4: HÀNG DA ASCENSION (DEVELOPING // NEXT GEN)
+- [/] **Shadow Cycle**: Running in background for alpha harvest.
+- [ ] **Oracle Port**: Migrating patterns from Western Front.
+- [ ] **VND Settlement**: Hardening for real contract sizes.
