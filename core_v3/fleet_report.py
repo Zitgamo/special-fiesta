@@ -12,7 +12,9 @@ if sys.stdout.encoding != 'utf-8':
 class FleetReporter:
     """
     Sovereign Status Aggregator.
-    Performs a full fleet scan and sends a SINGLE Telegram report.
+    Handles distinct report types:
+    1. SSS Heartbeat (Exponential Silence Protocol)
+    2. Council Verdicts (Event-Driven Tactical Cards)
     """
     def __init__(self):
         self.fleet = {
@@ -30,39 +32,39 @@ class FleetReporter:
         except:
             self.comm = None
 
-    def get_status(self):
+    def get_running_processes(self):
         procs = []
         for p in psutil.process_iter(['cmdline']):
             try:
                 cmd = " ".join(p.info['cmdline']).lower() if p.info['cmdline'] else ""
                 procs.append(cmd)
             except: continue
+        return procs
 
-        # Load DNA for quarantine checks
-        dna = {}
-        try:
-            with open("core_v3/dna.json", "r") as f:
-                dna = json.load(f)
-        except: pass
-
+    def get_status(self):
+        procs = self.get_running_processes()
         status_lines = []
         online_count = 0
         active_fleet_count = 0
-        quarantine_count = 0
+        
+        # Load DNA to check for Quarantine
+        dna = {}
+        try:
+            with open("03_DATA/iron_dna.json", "r") as f:
+                dna = json.load(f)
+        except: pass
 
         for name, identifier in self.fleet.items():
-            # Check for Quarantine status
             if dna.get(name, {}).get("QUARANTINE"):
-                quarantine_count += 1
                 continue
             
             active_fleet_count += 1
             is_online = any(identifier in cmd for cmd in procs)
-            status_icon = "🟢" if is_online else "🔴"
+            status_char = "√" if is_online else "X"
             if is_online: online_count += 1
-            status_lines.append(f"{status_icon} {name.ljust(10)}")
+            status_lines.append(f"{status_char} {name.ljust(10)}")
 
-        # Arrange in a grid for conciseness
+        # Arrange in a symmetric grid
         grid = ""
         for i in range(0, len(status_lines), 2):
             line = status_lines[i]
@@ -70,12 +72,9 @@ class FleetReporter:
                 line += " | " + status_lines[i+1]
             grid += line + "\n"
 
-        report = f"📊 **FLEET READINESS**: {online_count}/{active_fleet_count}\n"
+        report = f"📊 FLEET READINESS: {online_count}/{active_fleet_count}\n"
         if grid:
-            report += f"<code>{grid}</code>"
-        
-        if quarantine_count > 0:
-            report += f"\n<i>⚠️ {quarantine_count} units currently in Quarantine (Re-R&D)</i>"
+            report += f"<code>{grid.strip()}</code>"
         
         return report
 
@@ -102,7 +101,12 @@ class FleetReporter:
         with open(state_path, "w") as f:
             json.dump(state, f, indent=4)
 
-    def send_report(self, forced=False, is_breach=False):
+    def send_report(self, forced=False):
+        """
+        [SSS PROTOCOL]
+        Sends the standard Sovereign Heartbeat.
+        Uses exponential silence doubling (Capped at 8H).
+        """
         state = self.load_state()
         current_time = time.time()
         base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -112,9 +116,9 @@ class FleetReporter:
         if not forced and (current_time - state['last_report_time']) < state['interval_seconds']:
             return False
 
-        # 2. FETCH BRIDGE METRICS (Deterministic Retry)
+        # 2. FETCH BRIDGE METRICS
         bridge_meta = {}
-        for _ in range(5): # Retry loop instead of sleep
+        for _ in range(5):
             try:
                 with open(os.path.join(data_dir, "vn30_active_pos.json"), "r") as f:
                     bridge_data = json.load(f)
@@ -124,97 +128,111 @@ class FleetReporter:
 
         # 3. CALCULATE STREAK & PROFIT
         uptime_str = bridge_meta.get("uptime", "0:00:00")
-        
-        # Equity Calc (Unified to use Bridge Meta for consistency in PTS)
         VND_PER_PT = 100000
-        current_equity_pts = bridge_meta.get("peak_equity", 0) / VND_PER_PT # default to peak if current not found
-        # Actually bridge meta doesn't have current_equity, but we can calculate from peak - curr_dd
         peak_pts = bridge_meta.get("peak_equity", 0) / VND_PER_PT
         curr_dd_pts = bridge_meta.get("current_dd_vnd", 0) / VND_PER_PT
         max_dd_pts = bridge_meta.get("max_dd_vnd", 0) / VND_PER_PT
-        
         current_equity_pts = peak_pts - curr_dd_pts
         
         if state['streak_start_equity'] == 0:
             state['streak_start_equity'] = current_equity_pts
-            self.save_state(state)
             
         profit = current_equity_pts - state['streak_start_equity']
-        
         dd_pct = (curr_dd_pts / peak_pts) * 100 if peak_pts > 0 else 0
         max_dd_pct = (max_dd_pts / peak_pts) * 100 if peak_pts > 0 else 0
         
-        # Trade Stats
         ts = bridge_meta.get("trade_stats", {"total": 0, "wins": 0, "losses": 0, "last_t": "Never"})
-        last_t = ts.get("last_t", "Never")
-        if last_t != "Never" and last_t:
+        last_t_str = "Never"
+        if ts.get("last_t") and ts["last_t"] != "Never":
             try:
-                lt_dt = datetime.strptime(last_t, '%Y-%m-%d %H:%M:%S')
+                from datetime import datetime
+                lt_dt = datetime.strptime(ts["last_t"], '%Y-%m-%d %H:%M:%S')
                 mins_ago = int((datetime.now() - lt_dt).total_seconds() / 60)
                 last_t_str = f"{mins_ago} mins ago"
             except: last_t_str = "Unknown"
-        else:
-            last_t_str = "Never"
             
-        # Estimation of decision cycles (Assuming 30s loop)
         cycles = int((current_time - state['streak_start_time']) / 30)
+        interval_hours = state['interval_seconds']/3600
+        status_report = self.get_status()
 
-        # 4. FETCH COUNCIL PROPHECY
+        # 4. CONSTRUCT HEARTBEAT (SSS v12.0)
+        final_report = (
+            f"🛡️ SOVEREIGN HEARTBEAT — T+{uptime_str}\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"STABILITY  : {uptime_str} | {cycles} GREEN cycles\n"
+            f"EQUITY     : {current_equity_pts:,.2f} pts | Peak: {peak_pts:,.2f} pts\n"
+            f"DRAWDOWN   : Current -{curr_dd_pts:,.2f} pts (-{dd_pct:.1f}%) | Max -{max_dd_pts:,.2f} pts (-{max_dd_pct:.1f}%)\n"
+            f"TRADES     : {ts['total']} total | W/L: {ts['wins']}/{ts['losses']} | Last: {last_t_str}\n"
+            f"NEXT PULSE : T+{interval_hours:.1f}h (Interval x2 if stable)\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"{status_report}"
+        )
+
+        if self.comm:
+            self.comm.notify(final_report)
+            
+        # 5. UPDATE SSS STATE
+        state['last_report_time'] = current_time
+        state['interval_seconds'] = min(state['interval_seconds'] * 2, 8 * 3600)
+        self.save_state(state)
+        print(f" >> [SSS] Heartbeat dispatched. Next in {state['interval_seconds']/3600:.1f} hours.")
+        return True
+
+    def send_council_report(self, is_breach=False):
+        """
+        [EVENT-DRIVEN]
+        Sends a dedicated Tactical Card for Council Verdicts or Breaches.
+        Does NOT affect SSS timing.
+        """
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        data_dir = os.path.join(os.path.dirname(base_dir), "03_DATA")
+        
+        # 1. FETCH COUNCIL INFO
         council_info = "NEUTRAL"
         min_b, max_b = 0, 0
+        advice = "No advice found."
         try:
             with open(os.path.join(data_dir, "council_verdict.json"), "r") as f:
                 v = json.load(f)
                 council_info = v.get('bias') or v.get('bias_verdict', 'NEUTRAL')
                 min_b = v.get('min_boundary', 0)
                 max_b = v.get('max_boundary', 0)
+                advice = v.get('council_advice', advice)
         except: pass
 
-        # 5. CONSTRUCT RECOMMENDED FORMAT (v11.1)
-        status_report = self.get_status()
-        
-        header = f"🛡️ SOVEREIGN HEARTBEAT — T+{uptime_str}"
+        # 2. FETCH LIVE BREACH STATUS
+        breach_status = "SAFE ✅"
+        try:
+            with open(os.path.join(data_dir, "vn30_active_pos.json"), "r") as f:
+                meta = json.load(f).get("meta", {})
+                breach_status = meta.get("breach_status", "SAFE ✅")
+        except: pass
+
+        # 3. CONSTRUCT TACTICAL CARD
+        header = "🏛️ HIGH COUNCIL VERDICT — TACTICAL UPDATE"
         if is_breach:
-            header = "🚨 PROPHECY BREACH — IMMEDIATE ACTION REQUIRED"
+            header = "🚨 PROPHECY BREACH — IMMEDIATE ACTION"
         
-        breach_status = bridge_meta.get("breach_status", "SAFE ✅")
-        live_price_str = "LIVE" # Could be enhanced to show actual price if passed
-        if "⚠️ BREACH" in breach_status:
-            try:
-                live_price_str = breach_status.split(" ")[2] # Extract price from string
-            except: pass
-        
-        interval_hours = state['interval_seconds']/3600
-        
-        final_report = (
+        report = (
             f"{header}\n"
             f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"STABILITY  : {uptime_str} continuous | {cycles} GREEN cycles\n"
-            f"EQUITY     : ${current_equity_pts:,.2f} | Peak: ${peak_pts:,.2f}\n"
-            f"DRAWDOWN   : Current -${curr_dd_pts:,.2f} (-{dd_pct:.1f}%) | Max -${max_dd_pts:,.2f} (-{max_dd_pct:.1f}%)\n"
-            f"TRADES     : {ts['total']} total | W/L ratio: {ts['wins']}/{ts['losses']} | Last: {last_t_str}\n"
+            f"COUNCIL BIAS: [{council_info}]\n"
+            f"PROPHETIC BW: [{min_b}] ←——— {breach_status} ———→ [{max_b}]\n"
             f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"COUNCIL    : BIAS [{council_info}]\n"
-            f"BOUNDARY   : [{min_b}] ←——— {breach_status} ———→ [{max_b}]\n"
-            f"NEXT REPORT: T+{interval_hours:.1f}h (interval x2 if stable)\n"
+            f"ADVICE:\n<i>\"{advice}\"</i>\n"
             f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"{status_report}"
+            f"<i>Event-driven report. SSS Pulse unaffected.</i>"
         )
 
-        # 6. EXECUTE BROADCAST
         if self.comm:
-            self.comm.notify(final_report)
-            
-        # 7. UPDATE STATE (Exponential Silence - CAP AT 8H)
-        state['last_report_time'] = current_time
-        if not is_breach: # Only double if it was a normal report
-            state['interval_seconds'] = min(state['interval_seconds'] * 2, 8 * 3600)
-        
-        self.save_state(state)
-        return True
-    
-        print(f" >> [SSS] Report sent. Next in {state['interval_seconds']/3600:.0f} hours.")
-        return True
+            try:
+                self.comm.bot.send_message(self.comm.chat_id, report, parse_mode='HTML')
+                print(f" >> [COUNCIL] Tactical report dispatched.")
+                return True
+            except:
+                self.comm.notify(report)
+                return True
+        return False
 
 if __name__ == "__main__":
     reporter = FleetReporter()
