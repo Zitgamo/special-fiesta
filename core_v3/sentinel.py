@@ -69,6 +69,8 @@ class IronSentinel:
             cmd = ["python", os.path.join(base, path_data)]
             subprocess.Popen(cmd)
             
+        time.sleep(5) # SI v3.4: Staggered Resurrection (Anti-Lag)
+        
         if self.comm:
             self.comm.notify(f"🛠️ [RESURRECTED] {name} has been restored to service.")
             
