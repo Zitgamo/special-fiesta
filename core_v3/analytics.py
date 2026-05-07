@@ -3,48 +3,34 @@ import pandas as pd
 
 class IronAnalytics:
     @staticmethod
-    def get_session_bias(symbol, bridges=None):
+    def get_bias(df):
         """
-        Determines the directional bias based on price relative to session open.
+        Oracle Pattern Recognition Brain (SI v5.0).
+        Works on any OHLCV dataframe (MT5, Binance, or VN30).
+        Returns: bias (BULLISH/BEARISH/NEUTRAL), er (Efficiency), velocity
         """
-        if "USDT" in symbol and bridges:
-            try:
-                ohlcv = bridges.binance.fetch_ohlcv(symbol, timeframe='1h', limit=24)
-                if not ohlcv: return "NEUTRAL", 0.0
-                session_open = ohlcv[0][1] # Open of the first candle in the last 24h
-                current_price = ohlcv[-1][4] # Last close
-                distance_pct = (current_price - session_open) / session_open
-                
-                if current_price > session_open: return "BULLISH", distance_pct
-                if current_price < session_open: return "BEARISH", distance_pct
-                return "NEUTRAL", 0.0
-            except: return "NEUTRAL", 0.0
+        import talib
+        try:
+            close = df['c'].values
+            ema_f = talib.EMA(close, timeperiod=20)
+            ema_s = talib.EMA(close, timeperiod=50)
             
-        info = mt5.symbol_info(symbol)
-        tick = mt5.symbol_info_tick(symbol)
-        
-        if not info or not tick:
-            return "NEUTRAL", 0.0
+            last_f = ema_f[-1]
+            last_s = ema_s[-1]
+            last_price = close[-1]
             
-        session_open = info.session_open
-        if session_open == 0: 
-            rates = mt5.copy_rates_from_pos(symbol, mt5.TIMEFRAME_H1, 0, 1)
-            if rates is not None:
-                session_open = rates[0]['open']
-            else:
-                return "NEUTRAL", 0.0
-                
-        current_price = tick.ask
-        distance_pct = (current_price - session_open) / session_open
-        
-        if current_price > session_open:
-            bias = "BULLISH"
-        elif current_price < session_open:
-            bias = "BEARISH"
-        else:
+            # Efficiency Ratio calculation
+            net_change = abs(close[-1] - close[-20])
+            sum_changes = sum([abs(close[i] - close[i-1]) for i in range(len(close)-19, len(close))])
+            er = net_change / sum_changes if sum_changes > 0 else 0
+            
             bias = "NEUTRAL"
+            if last_price > last_f > last_s: bias = "BULLISH"
+            elif last_price < last_f < last_s: bias = "BEARISH"
             
-        return bias, distance_pct
+            return bias, er, 1.0 # Velocity placeholder
+        except:
+            return "NEUTRAL", 0.0, 1.0
 
     @staticmethod
     def get_atr(symbol, bridges, period=14):

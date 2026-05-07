@@ -8,6 +8,8 @@ import talib
 import logging
 import json
 from datetime import datetime, timedelta
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from analytics import IronAnalytics
 
 # --- CONFIG ---
 SYMBOL = "VN30F1M" # Automatic rolling handled by vnstock v4
@@ -232,14 +234,9 @@ class SouthernPaperBridge:
         
         for uid, u in self.units.items():
             df = df_raw.copy()
-            df['ema_f'] = talib.EMA(df['c'].values, u['ema_f'])
-            df['ema_s'] = talib.EMA(df['c'].values, u['ema_s'])
-            df['atr'] = talib.ATR(df['h'].values, df['l'].values, df['c'].values, 14)
-            
-            last = df.iloc[-1]
-            atr = last['atr']
-            ema_f = last['ema_f']
-            ema_s = last['ema_s']
+            # --- ORACLE BRAIN SCAN (SI v5.0) ---
+            bias, er, vel = IronAnalytics.get_bias(df)
+            atr = talib.ATR(df['h'].values, df['l'].values, df['c'].values, 14).iloc[-1]
             
             # --- MONITOR ---
             if u['pos'] != 0:
@@ -254,8 +251,8 @@ class SouthernPaperBridge:
                     if price >= u['sl']: hit = True; reason = "SL"
                     elif price <= u['tp']: hit = True; reason = "TP"
                 
-                if (u['pos'] == 1 and price < ema_s) or (u['pos'] == -1 and price > ema_s):
-                    hit = True; reason = "TREND_FLIP"
+                if (u['pos'] == 1 and bias == "BEARISH") or (u['pos'] == -1 and bias == "BULLISH"):
+                    hit = True; reason = "BIAS_FLIP"
 
                 if hit:
                     self.log_trade(uid, {
@@ -273,8 +270,8 @@ class SouthernPaperBridge:
             # --- ENTRY ---
             if u['pos'] == 0:
                 side = 0
-                if price > ema_f > ema_s: side = 1
-                elif price < ema_f < ema_s: side = -1
+                if bias == "BULLISH" and er > 0.3: side = 1
+                elif bias == "BEARISH" and er > 0.3: side = -1
                 
                 if side != 0:
                     # --- ADAPTIVE TARGETS ---

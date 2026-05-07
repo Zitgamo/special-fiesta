@@ -74,6 +74,34 @@ class IronSentinel:
         
         self.alert_buffer.append(f"🛠️ [RESURRECTED] {name} has been restored to service.")
         print(f" >> [SUCCESS] {name} is back online.")
+        
+        # --- SSS RESET: TRIGGERED BY CRASH (SI v4.3) ---
+        state_path = "core_v3/report_state.json"
+        if os.path.exists(state_path):
+            try:
+                with open(state_path, "r") as f:
+                    state = json.load(f)
+                
+                state['interval_seconds'] = 3600 # Reset to 1H
+                state['streak_start_time'] = time.time()
+                state['reset_occurred'] = True
+                
+                # Snapshot equity at the moment of failure
+                try:
+                    import sqlite3
+                    db_path = "core_v3/iron_core.db"
+                    conn = sqlite3.connect(db_path)
+                    cursor = conn.cursor()
+                    cursor.execute("SELECT equity FROM equity_history ORDER BY id DESC LIMIT 1")
+                    res = cursor.fetchone()
+                    state['streak_start_equity'] = res[0] if res else 0
+                    conn.close()
+                except: pass
+                
+                with open(state_path, "w") as f:
+                    json.dump(state, f, indent=4)
+                print(" >> [SSS] Stability Streak Reset due to Incident.")
+            except: pass
 
     def run(self):
         print("--- IRON SENTINEL v3.0: PROTOCOL LOCKDOWN ACTIVE ---")
