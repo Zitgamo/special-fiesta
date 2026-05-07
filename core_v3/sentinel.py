@@ -19,7 +19,7 @@ class IronSentinel:
             "ALPHA": ["core_v3/engine.py", "ALPHA"],
             "OMEGA": ["core_v3/engine.py", "OMEGA"],
             "GAMMA": ["core_v3/engine.py", "GAMMA"],
-            "SOUTHERN_FRONT": "core_v3/southern_paper_bridge.py"
+            "DRAGON_FRONT": "core_v3/southern_paper_bridge.py"
         }
         self.is_running = True
         self.last_scribe = 0
@@ -46,7 +46,7 @@ class IronSentinel:
                 if name == "MASTER" and "master.py" in cmd_str: return True
                 if name == "BRIDGE" and "nexus_bridge.py" in cmd_str: return True
                 if name == "GHOST_COMM" and "ghost_comm.py" in cmd_str: return True
-                if name == "SOUTHERN_FRONT" and "southern_paper_bridge.py" in cmd_str: return True
+                if name == "DRAGON_FRONT" and "southern_paper_bridge.py" in cmd_str: return True
             except: continue
         return False
 

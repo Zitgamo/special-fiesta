@@ -136,6 +136,12 @@ class IronEngine:
                     blacklist = []
                     
                 for symbol in symbols:
+                    # 0. QUARANTINE PROTOCOL (SI v3.7)
+                    if self.dna.get(self.unit_id, {}).get("QUARANTINE"):
+                        self.logger.info(f" >> [QUARANTINE_STAY] {self.unit_id} Unit in Re-R&D mode. Skipping active scanning.")
+                        pytime.sleep(30)
+                        break
+
                     # --- DEMO BLACKLIST: skip trading restricted tickers on demo accounts ---
                     if symbol.upper() in [s.upper() for s in blacklist]:
                         self.logger.info(f" >> [BLACKLIST] Skipping restricted ticker: {symbol}")

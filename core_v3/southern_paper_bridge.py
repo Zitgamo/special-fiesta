@@ -28,7 +28,7 @@ logging.basicConfig(
         logging.StreamHandler()
     ]
 )
-logger = logging.getLogger("SOUTHERN_BRIDGE")
+logger = logging.getLogger("DRAGON_BRIDGE")
 
 # --- DATA FETCH (STEALTH VCI) ---
 def fetch_vn30_lightning():
@@ -79,7 +79,7 @@ def prepare_index_df(df):
 class SouthernPaperBridge:
     def __init__(self):
         self.logger = logger
-        self.logger.info("Southern Front Bridge Initializing...")
+        self.logger.info("Vietnam Dragon Front Bridge Initializing...")
         
         # Unit Configurations (Mapped to Sovereign DNA)
         self.units = {

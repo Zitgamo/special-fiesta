@@ -23,7 +23,7 @@ class FleetReporter:
             "ALPHA": "engine.py alpha",
             "OMEGA": "engine.py omega",
             "GAMMA": "engine.py gamma",
-            "SOUTHERN": "southern_paper_bridge.py"
+            "DRAGON": "southern_paper_bridge.py"
         }
         try:
             self.comm = GhostComm()
@@ -38,9 +38,25 @@ class FleetReporter:
                 procs.append(cmd)
             except: continue
 
+        # Load DNA for quarantine checks
+        dna = {}
+        try:
+            with open("core_v3/dna.json", "r") as f:
+                dna = json.load(f)
+        except: pass
+
         status_lines = []
         online_count = 0
+        active_fleet_count = 0
+        quarantine_count = 0
+
         for name, identifier in self.fleet.items():
+            # Check for Quarantine status
+            if dna.get(name, {}).get("QUARANTINE"):
+                quarantine_count += 1
+                continue
+            
+            active_fleet_count += 1
             is_online = any(identifier in cmd for cmd in procs)
             status_icon = "🟢" if is_online else "🔴"
             if is_online: online_count += 1
@@ -54,8 +70,13 @@ class FleetReporter:
                 line += " | " + status_lines[i+1]
             grid += line + "\n"
 
-        report = f"📊 **FLEET READINESS**: {online_count}/{len(self.fleet)}\n"
-        report += f"<code>{grid}</code>"
+        report = f"📊 **FLEET READINESS**: {online_count}/{active_fleet_count}\n"
+        if grid:
+            report += f"<code>{grid}</code>"
+        
+        if quarantine_count > 0:
+            report += f"\n<i>⚠️ {quarantine_count} units currently in Quarantine (Re-R&D)</i>"
+        
         return report
 
     def send_report(self):
