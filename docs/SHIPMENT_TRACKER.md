@@ -1,7 +1,11 @@
 # 🛰️ SOVEREIGN SHIPMENT TRACKER: v9.0 (STABILITY)
 
-**CURRENT STATUS:** `[ PHASE 3: TACTICAL BETA ]`
-**READINESS SCORE:** `[ 95 / 100 ]` 🟢 (v9.5 LIVE BRIDGE ACTIVE)
+### CURRENT SHIPMENT STATUS: [ PHASE 3: TACTICAL BETA - HARDENED ]
+- **Tactical Readiness**: 98/100 (v10.5)
+- **Viewport Lock**: 100% Active (100vh Enforced // Zero Overflow)
+- **Sentinel Relay**: 100% Vocal (Telegram Resurrections + Error Feed)
+- **Optimizer Regime**: Active (Trend vs. Range Awareness)
+- **Remote Control**: Active (/close_all, /scale, /rescan)
 
 ---
 

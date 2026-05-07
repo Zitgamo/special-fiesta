@@ -25,6 +25,15 @@
             scrollbar-color: var(--neon-blue) transparent;
         }
 
+        /* --- STEALTH SCROLLBARS --- */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { 
+            background: var(--neon-blue); 
+            border-radius: 10px;
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
         @keyframes pulse-bg {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -244,7 +253,7 @@
             border-left: 5px solid var(--unit-color);
             padding: 20px;
             border-radius: 4px;
-            margin-bottom: 20px;
+            margin-bottom: 12px; /* Reduced to fit viewport */
             position: relative;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -777,7 +786,7 @@
                         </div>
                         <div style="margin-top: 20px; padding: 15px; background: rgba(0, 242, 255, 0.03); border: 1px dashed var(--neon-blue); border-radius: 4px;">
                             <label style="font-size: 9px; opacity: 0.6; display: block; margin-bottom: 10px; text-align: center;">STRATEGIC ACTION</label>
-                            <a href="/report" target="_blank" style="display:block; text-align:center; padding:12px; background:var(--neon-blue); color:#000; text-decoration:none; font-family:Orbitron; font-size:11px; font-weight:900; letter-spacing:2px; border-radius:2px;">VIEW BATTLE RECAP ></a>
+                            <a href="/report" target="_blank" style="display:block; text-align:center; padding:12px; background:rgba(0, 242, 255, 0.1); color:var(--neon-blue); border:1px solid var(--neon-blue); text-decoration:none; font-family:Orbitron; font-size:11px; font-weight:900; letter-spacing:2px; border-radius:2px; transition:all 0.3s;" onmouseover="this.style.background='var(--neon-blue)'; this.style.color='#000'" onmouseout="this.style.background='rgba(0, 242, 255, 0.1)'; this.style.color='var(--neon-blue)'">VIEW BATTLE RECAP ></a>
                         </div>
                     </div>
                 </div>
@@ -1169,9 +1178,7 @@
                     const elEquityBnc = document.getElementById('equity-bnc');
                     const elEquitySouth = document.getElementById('equity-south');
                     if (elEquityMt5) elEquityMt5.innerText = `$${(data.health_mt5?.equity || 0).toFixed(2)}`;
-                    if (elEquityBnc) elEquityBnc.innerText = `$${(data.health_bnc?.equity || 0).toFixed(2)}`;
-                    if (elEquitySouth) elEquitySouth.innerText = formatVND(data.health_south?.equity_vnd || 0);
-                    const squadDiv = document.getElementById('squadron-list');
+                    if (elEquityBnc) elEquityBnc.innerText = `$${(data.health_bnc?.equity || 0).toFixed(                    const squadDiv = document.getElementById('squadron-list');
                     if (squadDiv && data.squadron) {
                         squadDiv.innerHTML = '';
                         for (const [unit, symbols] of Object.entries(data.squadron)) {
@@ -1184,28 +1191,35 @@
                             const escColor = isEscalated ? 'var(--neon-gold)' : 'rgba(255,255,255,0.05)';
                             const escPulse = isEscalated ? 'animation: pulse-gold 1.5s infinite;' : '';
                             const escBorder = isEscalated ? 'border: 2px solid #fff;' : 'border: 1px solid rgba(255,255,255,0.1);';
+                            
+                            const pnlSign = unitPnL >= 0 ? "+" : "";
+                            const pnlClass = unitPnL >= 0 ? "pnl-pos" : "pnl-neg";
 
                             squadDiv.innerHTML += `
                                 <div class="unit-card" style="--unit-color: ${meta.color}">
-                                    <div class="unit-name">
-                                        ${meta.icon} ${unit} 
-                                        <span style="font-size:10px; opacity:0.4; letter-spacing:2px; margin-left:auto;">${meta.name}</span>
-                                        <div title="Autonomous Escalation Active" style="width:20px; height:20px; border-radius:50%; background:${escColor}; margin-left:15px; ${escBorder} ${escPulse} display:flex; justify-content:center; align-items:center;">
+                                    <div class="unit-name" style="display:flex; align-items:center; width:100%;">
+                                        ${meta.icon} <span style="color:${meta.color}; font-weight:900; margin-left:10px;">${unit}</span>
+                                        <div title="Autonomous Escalation Active" style="width:16px; height:16px; border-radius:50%; background:${escColor}; margin-left:15px; ${escBorder} ${escPulse} display:flex; justify-content:center; align-items:center;">
                                             ${isEscalated ? '<span style="font-size:8px; color:#000; font-weight:900;">⚡</span>' : ''}
                                         </div>
+                                        <span class="${pnlClass}" style="font-size:14px; font-family:Orbitron; margin-left:auto;">${pnlSign}${unitPnL.toFixed(2)}</span>
                                     </div>
-                                    <div class="metric-grid">
+                                    <div class="metric-grid" style="margin-top:15px;">
                                         <div class="metric-item"><label>ER</label><value>${(stats.context?.er || 0).toFixed(2)}</value></div>
                                         <div class="metric-item"><label>WIN%</label><value style="color:var(--neon-green)">${stats.win_rate}</value></div>
                                         <div class="metric-item"><label>CONF</label><value>${stats.context?.confidence || 0}%</value></div>
                                     </div>
-                                    <div style="margin-top:15px; display:flex; flex-wrap:wrap; gap:5px;">
-                                        ${symbols.map(s => `<span style="font-size:10px; padding:2px 6px; background:rgba(255,255,255,0.05); border-radius:2px;">${s}</span>`).join('')}
+                                    <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:5px;">
+                                        ${symbols.map(s => `<span style="font-size:9px; padding:2px 6px; background:rgba(0, 242, 255, 0.05); color:var(--neon-blue); border-radius:2px;">${s}</span>`).join('')}
                                     </div>
-                                    <div style="margin-top:15px; border-top:1px solid rgba(255,255,255,0.05); padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
-                                        <span style="font-size:11px; color:${isEscalated ? 'var(--neon-gold)' : 'rgba(255,255,255,0.5)'}; font-weight:700;">LOT: ${data.dna?.[unit]?.LOT_SIZE || 'AUTO'} ${isEscalated ? '(SCALED UP)' : ''}</span>
-                                        <span style="font-size:10px; color:${meta.color}; cursor:pointer; font-weight:700;" onclick="toggleLogic('${unit}')">STRATEGY ></span>
+                                    <div style="margin-top:12px; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px; display:flex; justify-content:space-between; align-items:center;">
+                                        <span style="font-size:10px; color:${isEscalated ? 'var(--neon-gold)' : 'rgba(255,255,255,0.5)'}; font-weight:700; letter-spacing:1px;">LOT: ${data.dna?.[unit]?.LOT_SIZE || 'AUTO'}</span>
+                                        <span style="font-size:10px; color:${meta.color}; cursor:pointer; font-weight:700; letter-spacing:1px;" onclick="toggleLogic('${unit}')">STRATEGY ></span>
                                     </div>
+                                </div>
+                            `;
+                        }
+                    } </div>
                                 </div>
                             `;
                         }
