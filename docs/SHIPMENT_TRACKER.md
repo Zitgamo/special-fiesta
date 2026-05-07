@@ -16,8 +16,8 @@
 | :--- | :--- | :--- |
 | **P1: DEVELOPMENT** | `[x]` COMPLETED | Hoàn thành các Task logic và UI cơ bản. |
 | **P2: ALPHA** | `[x]` COMPLETED | Tích hợp thành công Single Switch & Git UI. |
-| **P3: BETA** | `[x]` COMPLETED | Chạy Live Overwatch / Phase 3 Bridge. |
-| **P4: SHIP** | `[/]` PENDING | Thư ký Audit & Commander phê duyệt cuối cùng. |
+| **P3: BETA** | `[/]` ACTIVE | Chạy Live Overwatch / Phase 3 Bridge. |
+| **P4: SHIP** | `[ ]` LOCKED | Thư ký Audit & Commander phê duyệt cuối cùng. |
 
 ---
 
@@ -29,7 +29,7 @@
 - [x] **Single Switch**: Cơ chế gạt nút Demo/Real. (10 pts)
 - [x] **Zero-Constant Risk**: Dynamic Kelly & Math-Floor implemented. (10 pts)
 
-### 🟢 FRONTEND (VỎ) - [40/40 pts]
+### 🟢 FRONTEND (VỎ) - [25/40 pts]
 - [x] **Premium UI**: Giao diện HUD hardened v8.5. (15 pts)
 - [x] **Git Status UI**: Hiển thị commit/dirty trên Dashboard. (10 pts)
 - [x] **Tactical Control Bar**: Nút Master Arm & Emergency Stop. (5 pts)
@@ -48,7 +48,7 @@
 3. **Forensic Audit**: Weekly review of empirical learning snapshots.
 
 ---
-**Last Update:** 2026-05-07 21:22 ICT [v4.2 SHIPMENT READY]
+**Last Update:** 2026-05-07 11:32 ICT [PHASE 3 INITIALIZED]
 **Author:** Sovereign Docs Agent (Secretary)
 
 ---
