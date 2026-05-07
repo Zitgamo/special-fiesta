@@ -100,7 +100,9 @@ class FleetReporter:
         base_dir = os.path.dirname(os.path.abspath(__file__))
         state_path = os.path.join(base_dir, "report_state.json")
         with open(state_path, "w") as f:
-            json.dump(state, f    def send_report(self, forced=False, is_breach=False):
+            json.dump(state, f, indent=4)
+
+    def send_report(self, forced=False, is_breach=False):
         state = self.load_state()
         current_time = time.time()
         base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -123,34 +125,40 @@ class FleetReporter:
         # 3. CALCULATE STREAK & PROFIT
         uptime_str = bridge_meta.get("uptime", "0:00:00")
         
-        # Equity Calc
-        try:
-            import sqlite3
-            db_path = os.path.join(base_dir, "iron_core.db")
-            conn = sqlite3.connect(db_path)
-            cursor = conn.cursor()
-            cursor.execute("SELECT equity FROM equity_history ORDER BY id DESC LIMIT 1")
-            res = cursor.fetchone()
-            current_equity = res[0] if res else 0
-            conn.close()
-        except: current_equity = 0
+        # Equity Calc (Unified to use Bridge Meta for consistency in PTS)
+        VND_PER_PT = 100000
+        current_equity_pts = bridge_meta.get("peak_equity", 0) / VND_PER_PT # default to peak if current not found
+        # Actually bridge meta doesn't have current_equity, but we can calculate from peak - curr_dd
+        peak_pts = bridge_meta.get("peak_equity", 0) / VND_PER_PT
+        curr_dd_pts = bridge_meta.get("current_dd_vnd", 0) / VND_PER_PT
+        max_dd_pts = bridge_meta.get("max_dd_vnd", 0) / VND_PER_PT
+        
+        current_equity_pts = peak_pts - curr_dd_pts
         
         if state['streak_start_equity'] == 0:
-            state['streak_start_equity'] = current_equity
+            state['streak_start_equity'] = current_equity_pts
             self.save_state(state)
             
-        profit = current_equity - state['streak_start_equity']
+        profit = current_equity_pts - state['streak_start_equity']
         
-        # Drawdown Stats
-        peak = bridge_meta.get("peak_equity", current_equity)
-        curr_dd = bridge_meta.get("current_dd_vnd", 0) / 100000 # Convert to pts
-        max_dd = bridge_meta.get("max_dd_vnd", 0) / 100000 # Convert to pts
-        dd_pct = (curr_dd / (peak/100000)) * 100 if peak > 0 else 0
+        dd_pct = (curr_dd_pts / peak_pts) * 100 if peak_pts > 0 else 0
+        max_dd_pct = (max_dd_pts / peak_pts) * 100 if peak_pts > 0 else 0
         
         # Trade Stats
         ts = bridge_meta.get("trade_stats", {"total": 0, "wins": 0, "losses": 0, "last_t": "Never"})
-        win_rate = (ts['wins'] / ts['total'] * 100) if ts['total'] > 0 else 0
-        
+        last_t = ts.get("last_t", "Never")
+        if last_t != "Never" and last_t:
+            try:
+                lt_dt = datetime.strptime(last_t, '%Y-%m-%d %H:%M:%S')
+                mins_ago = int((datetime.now() - lt_dt).total_seconds() / 60)
+                last_t_str = f"{mins_ago} mins ago"
+            except: last_t_str = "Unknown"
+        else:
+            last_t_str = "Never"
+            
+        # Estimation of decision cycles (Assuming 30s loop)
+        cycles = int((current_time - state['streak_start_time']) / 30)
+
         # 4. FETCH COUNCIL PROPHECY
         council_info = "NEUTRAL"
         min_b, max_b = 0, 0
@@ -162,35 +170,34 @@ class FleetReporter:
                 max_b = v.get('max_boundary', 0)
         except: pass
 
-        # 5. CONSTRUCT RECOMMENDED FORMAT (v11.0)
+        # 5. CONSTRUCT RECOMMENDED FORMAT (v11.1)
         status_report = self.get_status()
         
-        header = "🛡️ **SOVEREIGN HEARTBEAT**"
+        header = f"🛡️ SOVEREIGN HEARTBEAT — T+{uptime_str}"
         if is_breach:
-            header = "🚨 **PROPHECY BREACH DETECTED**"
-        
-        # Boundary Visual
-        live_p = 0
-        try: # Fetch current price from active pos (approx)
-            with open(os.path.join(data_dir, "vn30_active_pos.json"), "r") as f:
-                d = json.load(f)
-                # If we had a live price field it would be better
-        except: pass
+            header = "🚨 PROPHECY BREACH — IMMEDIATE ACTION REQUIRED"
         
         breach_status = bridge_meta.get("breach_status", "SAFE ✅")
+        live_price_str = "LIVE" # Could be enhanced to show actual price if passed
+        if "⚠️ BREACH" in breach_status:
+            try:
+                live_price_str = breach_status.split(" ")[2] # Extract price from string
+            except: pass
+        
+        interval_hours = state['interval_seconds']/3600
         
         final_report = (
-            f"{header} — T+{uptime_str}\n"
-            f"━━━━━━━━━━━━━━━━━━━━━\n"
-            f"🏆 **STABILITY**  : `{uptime_str} continuous`\n"
-            f"💰 **EQUITY**     : `${current_equity:,.2f}` | Peak: `${peak/100000:,.2f}`\n"
-            f"📉 **DRAWDOWN**   : `${curr_dd:,.2f}` (`{dd_pct:.1f}%`) | Max: `${max_dd:,.2f}`\n"
-            f"⚔️ **TRADES**     : `{ts['total']} total` | W/L: `{ts['wins']}/{ts['losses']}` | WR: `{win_rate:.1f}%` \n"
-            f"━━━━━━━━━━━━━━━━━━━━━\n"
-            f"🔮 **COUNCIL**    : BIAS `{council_info}`\n"
-            f"🚧 **BOUNDARY**   : `[{min_b}]` ←── `{breach_status}` ──→ `[{max_b}]` \n"
-            f"⏳ **NEXT PULSE** : `x2 Interval` ({state['interval_seconds']/3600:.1f}H cap)\n"
-            f"━━━━━━━━━━━━━━━━━━━━━\n"
+            f"{header}\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"STABILITY  : {uptime_str} continuous | {cycles} GREEN cycles\n"
+            f"EQUITY     : ${current_equity_pts:,.2f} | Peak: ${peak_pts:,.2f}\n"
+            f"DRAWDOWN   : Current -${curr_dd_pts:,.2f} (-{dd_pct:.1f}%) | Max -${max_dd_pts:,.2f} (-{max_dd_pct:.1f}%)\n"
+            f"TRADES     : {ts['total']} total | W/L ratio: {ts['wins']}/{ts['losses']} | Last: {last_t_str}\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"COUNCIL    : BIAS [{council_info}]\n"
+            f"BOUNDARY   : [{min_b}] ←——— {breach_status} ———→ [{max_b}]\n"
+            f"NEXT REPORT: T+{interval_hours:.1f}h (interval x2 if stable)\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
             f"{status_report}"
         )
 
