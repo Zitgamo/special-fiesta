@@ -123,8 +123,24 @@ class SouthernPaperBridge:
         except:
             self.dna = {}
 
+        # --- HIGH COUNCIL HANDSHAKE (v9.0) ---
+        self.verdict_file = os.path.join(DATA_DIR, "council_verdict.json")
+        self.council_overrides = {}
+        self.load_council_advice()
+
         if not os.path.exists(TRADES_CSV):
             pd.DataFrame(columns=['unit_id', 'entry_t', 'exit_t', 'side', 'entry_p', 'exit_p', 'pnl_pts', 'reason']).to_csv(TRADES_CSV, index=False)
+
+    def load_council_advice(self):
+        """Loads the tactical overrides from the High Council LLM."""
+        if os.path.exists(self.verdict_file):
+            try:
+                with open(self.verdict_file, "r") as f:
+                    verdict = json.load(f)
+                    self.council_overrides = verdict.get("overrides", {})
+                    self.logger.info(f" >> [COUNCIL] Applied Tactical Advice: {verdict.get('council_advice')}")
+            except Exception as e:
+                self.logger.error(f" !! [COUNCIL_ERR] Failed to load verdict: {e}")
 
     def log_trade(self, unit_id, trade):
         # 1. Log to CSV (Local Backup)
@@ -222,7 +238,33 @@ class SouthernPaperBridge:
             conn.close()
         except: pass
 
+    def __init__(self):
+        # ... (Existing init)
+        self.daily_pnl = 0
+        self.last_pnl_reset = datetime.now().date()
+        self.is_dormant = False
+
+    def check_circuit_breaker(self):
+        """Ensures the bot stays silent if the daily loss limit is hit."""
+        today = datetime.now().date()
+        if today > self.last_pnl_reset:
+            self.daily_pnl = 0
+            self.last_pnl_reset = today
+            self.is_dormant = False
+            self.logger.info(" >> [RESET] New Day. Circuit Breaker Reset.")
+
+        if self.daily_pnl <= -15.0:
+            if not self.is_dormant:
+                self.logger.error(" !! [CIRCUIT_BREAKER] Daily Loss Limit Reached (-15.0 pts). Entering Dormancy.")
+                self.is_dormant = True
+                # Flatten all units
+                for uid, u in self.units.items():
+                    if u['pos'] != 0: u['pos'] = 0 # Emergency Flat
+            return True
+        return False
+
     def run_cycle(self):
+        if self.check_circuit_breaker(): return
         df_raw = fetch_vn30_lightning()
         if df_raw is None or len(df_raw) < 60: return
         
@@ -230,12 +272,34 @@ class SouthernPaperBridge:
         if df_raw is None or df_raw.empty: return
         
         price = df_raw['c'].iloc[-1]
+        
+        # --- PROPHETIC WATCHDOG (v9.1) ---
+        min_b = self.council_overrides.get("min_boundary", 0)
+        max_b = self.council_overrides.get("max_boundary", 99999)
+        
+        if price < min_b or price > max_b:
+            self.logger.warning(f" !! [BREAKOUT] Price {price} breached prophecy [{min_b}, {max_b}]. Consulting Council...")
+            # Event-Driven Trigger: Run the Auditor/Counselor
+            os.system("python core_v3/high_council.py")
+            self.load_council_advice()
+            # Update boundaries immediately to prevent infinite loop
+            min_b = self.council_overrides.get("min_boundary", 0)
+            max_b = self.council_overrides.get("max_boundary", 99999)
+
         now_t = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Council Sensitivity Overrides
+        gov_sens = self.council_overrides.get("governor_sensitivity", 1.0)
         
         for uid, u in self.units.items():
             df = df_raw.copy()
             # --- ORACLE BRAIN SCAN (SI v5.0) ---
             bias, er, vel = IronAnalytics.get_bias(df)
+            
+            # Apply Governor Sensitivity (Veto Logic)
+            if gov_sens > 1.0 and er < (0.15 * gov_sens):
+                bias = "NEUTRAL" # Council Veto due to low efficiency
+            
             atr = talib.ATR(df['h'].values, df['l'].values, df['c'].values, 14).iloc[-1]
             
             # --- MONITOR ---
