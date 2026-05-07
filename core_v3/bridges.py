@@ -276,3 +276,28 @@ class IronBridges:
                 print(error_msg)
                 self.logger.error(error_msg)
             return None
+
+    def log_shadow_strike(self, symbol, side, volume, sl, tp, er, unit_id):
+        """
+        Records a virtual trade for Purgatory units.
+        Ensures the unit is still harvesting data while in quarantine.
+        """
+        try:
+            import sqlite3
+            db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "iron_core.db")
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO trades (unit_id, symbol, side, volume, price, sl, tp, er_at_entry, type, pnl, timestamp)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now', '+7 hours'))
+            """, (
+                unit_id, symbol, side, volume, 
+                self.get_price(symbol), sl, tp, er,
+                "SHADOW_PURGATORY", 0.0 # Virtual trades start with 0 PnL
+            ))
+            conn.commit()
+            conn.close()
+            return True
+        except Exception as e:
+            self.logger.error(f" !! [SHADOW_ERR] Failed to log shadow strike: {e}")
+            return False

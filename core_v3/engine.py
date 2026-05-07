@@ -136,11 +136,13 @@ class IronEngine:
                     blacklist = []
                     
                 for symbol in symbols:
-                    # 0. QUARANTINE PROTOCOL (SI v3.7)
-                    if self.dna.get(self.unit_id, {}).get("QUARANTINE"):
-                        self.logger.info(f" >> [QUARANTINE_STAY] {self.unit_id} Unit in Re-R&D mode. Skipping active scanning.")
-                        pytime.sleep(30)
-                        break
+                    # --- 0. QUARANTINE PROTOCOL: SHADOW PURGATORY (SI v4.2) ---
+                    # Quarantined units continue to scan but trade only in Shadow Mode.
+                    is_quarantined = self.dna.get(self.unit_id, {}).get("QUARANTINE", False)
+                    shadow_mode = is_quarantined
+                    
+                    if is_quarantined:
+                        self.logger.info(f" >> [SHADOW_PURGATORY] {self.unit_id} Unit scanning for redemption...")
 
                     # --- DEMO BLACKLIST: skip trading restricted tickers on demo accounts ---
                     if symbol.upper() in [s.upper() for s in blacklist]:
@@ -222,8 +224,14 @@ class IronEngine:
                                     scale_ratio = 0.2 if expectancy > 0.5 else 0.1
                                     scale_lot = round((base_lot * scale_ratio) / v_step) * v_step
                                     scale_lot = max(scale_lot, min_lot)
+                                    # --- 7. EXECUTION STRIKE (Live vs Shadow) ---
+                                    if not shadow_mode:
+                                        res = self.bridges.execute_order(current_symbol, target_pos['side'], scale_lot, unit_id=self.unit_id)
+                                    else:
+                                        # Record Shadow Strike for Purgatory Audit
+                                        res = self.bridges.log_shadow_strike(current_symbol, target_pos['side'], scale_lot, 0, 0, 0, self.unit_id)
+                                        self.logger.info(f" >> [SHADOW_STRIKE] {self.unit_id} recorded virtual strike on {current_symbol} @ {price}")
                                     
-                                    res = self.bridges.execute_order(current_symbol, target_pos['side'], scale_lot, unit_id=self.unit_id)
                                     if res:
                                         # Track Delta (Expectancy Improvement)
                                         self.forensics.log_event(self.unit_id, "REINFORCEMENT", f"{current_symbol} Layer {len(active_symbol_pos)+1} | Lot: {scale_lot}")
