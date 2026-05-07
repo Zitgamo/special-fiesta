@@ -21,10 +21,40 @@
         header {
             border-bottom: 2px solid var(--neon-purple);
             padding-bottom: 15px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 30px;
+            background: rgba(188, 19, 254, 0.05);
+            padding: 10px 20px;
+            border: 1px solid rgba(188, 19, 254, 0.2);
+            border-radius: 6px;
+        }
+
+        .header-stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header-stat-label {
+            font-size: 9px;
+            opacity: 0.5;
+            letter-spacing: 2px;
+            margin-bottom: 2px;
+        }
+
+        .header-stat-val {
+            font-family: 'Orbitron';
+            font-size: 16px;
+            font-weight: 700;
         }
 
         .title {
@@ -66,8 +96,11 @@
 
         #fleet-list {
             flex-grow: 1;
-            overflow-y: auto;
             padding-right: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+            gap: 15px;
         }
 
         /* Custom Scrollbar */
@@ -78,27 +111,22 @@
         .unit-card {
             background: rgba(188, 19, 254, 0.03);
             border: 1px solid rgba(255,255,255,0.05);
-            padding: 25px;
+            padding: 35px 25px; /* Increased vertical padding */
             border-radius: 10px;
-            margin-bottom: 20px;
+            border-left: 4px solid transparent; /* Hardcoded in JS */
             display: grid;
             grid-template-columns: 1fr 1.5fr 1fr 1.2fr;
             align-items: center;
             transition: all 0.3s ease;
         }
 
-        .unit-name { font-family: 'Orbitron'; color: var(--neon-purple); font-size: 22px; }
+        .unit-name { font-family: 'Orbitron'; color: var(--neon-purple); font-size: 26px; font-weight: 700; }
         .unit-stat { text-align: center; }
-        .unit-label { font-size: 12px; opacity: 0.5; margin-bottom: 5px; text-transform: uppercase; }
-        .unit-val { font-family: 'Orbitron'; font-size: 18px; }
+        .unit-label { font-size: 14px; opacity: 0.5; margin-bottom: 8px; text-transform: uppercase; }
+        .unit-val { font-family: 'Orbitron'; font-size: 22px; font-weight: 700; }
 
         .stat-box {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            display: none; /* Moved to header */
         }
 
         .mini-card {
@@ -125,9 +153,10 @@
         .trade-row {
             display: grid;
             grid-template-columns: 0.8fr 0.8fr 1.2fr 1.2fr;
-            padding: 15px;
+            padding: 22px 15px; /* Increased vertical padding */
             border-bottom: 1px solid rgba(255,255,255,0.05);
-            font-size: 16px;
+            font-size: 18px; /* Larger font */
+            align-items: center;
         }
 
         .pnl-pos { color: var(--neon-green); text-shadow: 0 0 10px var(--neon-green); }
@@ -166,6 +195,18 @@
 <body>
     <header>
         <div class="title">AO LÀNG COMMAND <span class="status-tag">ICT TIME SYNCED</span></div>
+        
+        <div class="header-stats">
+            <div class="header-stat-item">
+                <span class="header-stat-label">TOTAL EQUITY (VND)</span>
+                <span id="total-equity" class="header-stat-val" style="color:var(--neon-blue)">--</span>
+            </div>
+            <div class="header-stat-item">
+                <span class="header-stat-label">SESSION PnL (VND)</span>
+                <span id="total-pnl" class="header-stat-val">--</span>
+            </div>
+        </div>
+
         <div style="display: flex; gap: 20px; align-items: center;">
             <div id="last-update" style="font-family: 'Orbitron'; color: var(--neon-blue); font-size: 14px;">--:--:--</div>
             <a href="http://127.0.0.1:5050/" class="back-btn">< NEXUS</a>
@@ -182,15 +223,8 @@
                 <!-- Populated by JS -->
             </div>
 
-            <div class="stat-box">
-                <div class="mini-card">
-                    <div class="unit-label">TOTAL EQUITY (VND)</div>
-                    <div id="total-equity" class="big-val" style="color:var(--neon-blue)">--</div>
-                </div>
-                <div class="mini-card">
-                    <div class="unit-label">SESSION PnL (VND)</div>
-                    <div id="total-pnl" class="big-val">--</div>
-                </div>
+            <div class="stat-box" style="display: none;">
+                <!-- Moved to Header -->
             </div>
         </div>
 
@@ -211,13 +245,22 @@
 
     <script>
         function formatVND(num) {
-            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num).replace('₫', 'đ');
+            if (num === undefined || num === null) return "0 Đ";
+            return new Intl.NumberFormat('vi-VN').format(num) + ' Đ';
         }
+
+        const unitStyles = {
+            "ALPHA": { icon: "🛡️", color: "var(--neon-blue)" },
+            "OMEGA": { icon: "⚔️", color: "var(--neon-gold)" },
+            "GAMMA": { icon: "⚡", color: "var(--neon-purple)" }
+        };
 
         async function updateCommand() {
             try {
+                console.log("Fetching telemetry...");
                 const response = await fetch('http://127.0.0.1:5050/api/telemetry');
                 const data = await response.json();
+                console.log("Data received:", data);
                 
                 document.getElementById('last-update').innerText = data.current_time_utc + " ICT";
 
@@ -227,29 +270,43 @@
                     const fleetDiv = document.getElementById('fleet-list');
                     fleetDiv.innerHTML = '';
                     
-                    let totalEquityVnd = south.equity_vnd || 100000000;
+                    document.getElementById('total-equity').innerText = formatVND(south.equity_vnd || 0);
+                    const sessionPnl = data.stats_day?.vnd || 0;
+                    const pnlEl = document.getElementById('total-pnl');
+                    pnlEl.innerText = (sessionPnl >= 0 ? '+' : '') + formatVND(sessionPnl);
+                    pnlEl.style.color = sessionPnl >= 0 ? 'var(--neon-green)' : 'var(--neon-red)';
 
                     for (const [uid, u] of Object.entries(fleet)) {
+                        const botName = uid.replace('SOUTH_', '');
+                        const style = unitStyles[botName] || { icon: "🛰️", color: "var(--neon-blue)" };
                         const unitPnlVnd = (u.pnl_vnd || 0);
                         const side = u.pos === 1 ? 'LONG' : u.pos === -1 ? 'SHORT' : 'STANDBY';
-                        const color = u.pos === 1 ? 'var(--neon-green)' : u.pos === -1 ? 'var(--neon-red)' : 'rgba(255,255,255,0.2)';
+                        const sideColor = u.pos === 1 ? 'var(--neon-green)' : u.pos === -1 ? 'var(--neon-red)' : 'rgba(255,255,255,0.2)';
                         
-                        fleetDiv.innerHTML += `
-                        <div class="unit-card">
-                            <div class="unit-name">${uid}</div>
+                        let rr = "0.0";
+                        if (u.pos !== 0) {
+                            const risk = Math.abs(u.entry - u.sl);
+                            const reward = Math.abs(u.tp - u.entry);
+                            rr = (reward / risk).toFixed(1);
+                        }
+
+                        const card = `
+                        <div class="unit-card" style="border-left-color: ${style.color}">
+                            <div class="unit-name" style="color: ${style.color}">${style.icon} ${botName}</div>
                             <div class="unit-stat">
                                 <div class="unit-label">POSITION</div>
-                                <div class="unit-val" style="color:${color}">${side} @ ${(u.entry || 0).toFixed(1)}</div>
+                                <div class="unit-val" style="color:${sideColor}">${side} @ ${(u.entry || 0).toFixed(1)}</div>
                             </div>
                             <div class="unit-stat">
-                                <div class="unit-label">TARGETS</div>
+                                <div class="unit-label">TARGETS // R:R ${rr}</div>
                                 <div class="unit-val" style="font-size:14px; opacity:0.7">S:${(u.sl || 0).toFixed(1)} / T:${(u.tp || 0).toFixed(1)}</div>
                             </div>
                             <div class="unit-stat">
                                 <div class="unit-label">FLOATING</div>
-                                <div class="unit-val" style="font-size:24px; color:${unitPnlVnd >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'}">${formatVND(unitPnlVnd)}</div>
+                                <div class="unit-val" style="font-size:28px; color:${unitPnlVnd >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'}">${formatVND(unitPnlVnd)}</div>
                             </div>
                         </div>`;
+                        fleetDiv.insertAdjacentHTML('beforeend', card);
                     }
 
                     // --- AO LÀNG INTELLIGENCE ---
@@ -274,30 +331,27 @@
                         </div>
                     `;
 
-                    document.getElementById('total-equity').innerText = formatVND(totalEquityVnd);
-                    const sessionPnl = data.session_pnl_vnd || 0;
-                    document.getElementById('total-pnl').innerText = formatVND(sessionPnl);
-                    document.getElementById('total-pnl').style.color = sessionPnl >= 0 ? 'var(--neon-green)' : 'var(--neon-red)';
+                    // Redundant updates removed to prevent ReferenceError and SyntaxError.
 
                     // Trades (DIRECT DB TIME)
-                    const tradeDiv = document.getElementById('ao-lang-trades');
-                    const sTrades = data.trades.filter(t => (t.unit && t.unit.includes('SOUTH')) || t.symbol === 'VN30F1M');
-                    tradeDiv.innerHTML = sTrades.map(t => {
-                        const pnlVnd = (t.symbol === 'VN30F1M') ? t.pnl * 100000 : t.pnl;
-                        // Extract only Time if the date is today, otherwise show full
-                        const timeStr = t.time.includes(' ') ? t.time.split(' ')[1] : t.time;
-                        
-                        return `
+                    const tradeLog = document.getElementById('ao-lang-trades');
+                    tradeLog.innerHTML = '';
+                    (data.trades || []).filter(t => t.symbol === 'VN30F1M').slice(0, 20).forEach(t => {
+                        const botName = t.unit.replace('SOUTH_', '');
+                        const style = unitStyles[botName] || { color: "var(--neon-blue)" };
+                        const sideColor = t.side.includes('LONG') || t.side.includes('BUY') ? 'var(--neon-green)' : 'var(--neon-red)';
+                        const tTime = t.time || "";
+                        const timeStr = tTime.includes(' ') ? tTime.split(' ')[1] : tTime;
+
+                        tradeLog.innerHTML += `
                         <div class="trade-row">
-                            <div style="color:var(--neon-purple); font-weight:700">${t.unit}</div>
-                            <div style="text-align:center; color:${t.side==='BUY'?'var(--neon-green)':'var(--neon-red)'}">${t.side}</div>
-                            <div style="text-align:center">
-                                <div class="${pnlVnd >= 0 ? 'pnl-pos' : 'pnl-neg'}" style="font-size:18px; font-weight:700">${formatVND(pnlVnd)}</div>
-                                <div style="font-size:10px; opacity:0.4">@ ${t.price.toFixed(1)}</div>
-                            </div>
-                            <div style="text-align:right; color:var(--neon-blue); font-family:Orbitron; font-size:13px">${timeStr}</div>
+                            <div style="color: ${style.color}; font-family: 'Orbitron'; font-weight: 700;">${botName}</div>
+                            <div style="text-align:center; color: ${sideColor}; font-weight: 700;">${t.side}</div>
+                            <div style="text-align:center" class="${t.pnl >= 0 ? 'pnl-pos' : 'pnl-neg'}">${formatVND((t.pnl || 0) * 100000)}</div>
+                            <div style="text-align:right; opacity:0.5">${timeStr}</div>
                         </div>
-                    `;}).join('');
+                        `;
+                    });
                 }
             } catch (e) {}
         }
