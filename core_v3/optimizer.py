@@ -40,13 +40,19 @@ class SovereignOptimizer:
             
         df = pd.DataFrame(rates)
         
-        # 2. Define Parameter Grid
-        sl_options = [1.0, 1.5, 2.0, 2.5]
-        tp_options = [2.0, 3.0, 4.0, 5.0, 6.0]
-        
+        # 2. Define Parameter Grid (Adaptive based on Regime)
+        if er < 0.3: # RANGING/CHOP
+            sl_options = [0.8, 1.0, 1.2, 1.5]
+            tp_options = [1.5, 2.0, 2.5]
+            regime = "RANGE"
+        else: # TRENDING
+            sl_options = [1.5, 2.0, 2.5]
+            tp_options = [3.0, 4.0, 5.0, 6.0]
+            regime = "TREND"
+            
         best_expectancy = -999
-        best_sl = 1.5
-        best_tp = 3.0
+        best_sl = 1.2 if regime == "RANGE" else 1.5
+        best_tp = 2.0 if regime == "RANGE" else 3.5
         
         # 3. Simulation Loop
         for sl_mult in sl_options:
@@ -57,7 +63,35 @@ class SovereignOptimizer:
                     best_sl = sl_mult
                     best_tp = tp_mult
                     
+        print(f" >> [OPTIMIZER] Regime: {regime} | Best Match: {best_sl}x / {best_tp}x (Exp: {best_expectancy:.4f})")
         return best_sl, best_tp
+
+    def suggest_global_shift(self):
+        """
+        Analyzes the last 100 trades to see if the Global DNA multipliers 
+        need a 'System-Wide' shift.
+        """
+        try:
+            import sqlite3
+            db_path = os.path.join(os.getcwd(), "core_v3", "iron_core.db")
+            conn = sqlite3.connect(db_path)
+            # Find the most successful SL/TP combinations in the current regime
+            query = '''
+                SELECT sl_mult, tp_mult, AVG(outcome_pnl) as expectancy
+                FROM empirical_learning
+                GROUP BY sl_mult, tp_mult
+                HAVING COUNT(*) > 5
+                ORDER BY expectancy DESC
+                LIMIT 1
+            '''
+            df_perf = pd.read_sql_query(query, conn)
+            conn.close()
+            
+            if not df_perf.empty:
+                best = df_perf.iloc[0]
+                return best['sl_mult'], best['tp_mult'], best['expectancy']
+        except: pass
+        return None
 
     def _simulate(self, df, sl_dist, tp_dist, side):
         """

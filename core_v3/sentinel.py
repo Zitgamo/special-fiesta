@@ -2,6 +2,7 @@ import psutil
 import subprocess
 import time
 import os
+from ghost_comm import GhostComm
 
 class IronSentinel:
     """
@@ -20,6 +21,11 @@ class IronSentinel:
         }
         self.is_running = True
         self.last_scribe = 0
+        try:
+            self.comm = GhostComm()
+        except:
+            self.comm = None
+            print(" !! [SENTINEL] GHOST_COMM initialization failed. Alerts will be local only.")
 
     def is_alive(self, name):
         """Checks if a process is alive by its command line arguments."""
@@ -61,6 +67,9 @@ class IronSentinel:
         else:
             cmd = ["python", os.path.join(base, path_data)]
             subprocess.Popen(cmd)
+            
+        if self.comm:
+            self.comm.notify(f"🛠️ [RESURRECTED] {name} has been restored to service.")
             
         print(f" >> [SUCCESS] {name} is back online.")
 
@@ -130,11 +139,17 @@ class IronSentinel:
                     for line in content:
                         if "FATAL" in line or "Order failed" in line:
                             print(f" !! [SENTINEL] Alert detected in {log_file}: {line}")
+                            if self.comm:
+                                self.comm.notify(f"⚠️ [FRACTURE] {unit} UNIT: {line}")
                             self.report_to_war_room(unit, line)
                         if "Invalid volume (Code: 10014)" in line:
-                            print(f" !! [CRITICAL] {unit} UNIT hitting VOLUME ERRORS. System requires optimization.")
+                            msg = f"❌ [CRITICAL] {unit} UNIT: VOLUME ERRORS. System requires optimization."
+                            print(f" !! {msg}")
+                            if self.comm: self.comm.notify(msg)
                         if "Invalid stops (Code: 10016)" in line:
-                            print(f" !! [CRITICAL] {unit} UNIT hitting STOP ERRORS. ATR/SL logic may be too tight.")
+                            msg = f"❌ [CRITICAL] {unit} UNIT: STOP ERRORS. ATR/SL logic may be too tight."
+                            print(f" !! {msg}")
+                            if self.comm: self.comm.notify(msg)
             except: pass
 
     def report_to_war_room(self, component, error):
@@ -210,6 +225,9 @@ class IronSentinel:
             # Push (non-blocking to prevent sentinel hang)
             print(" >> [SENTINEL] Auto-Scribe: Pushing to Sovereign Cloud (GitHub)...")
             subprocess.Popen(["git", "push", "origin", "main"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            
+            if self.comm:
+                self.comm.notify("📜 [AUTO-SCRIBE] System Evolution Recorded. State pushed to GitHub.")
             
         except Exception as e:
             print(f" !! [SENTINEL_ERR] Auto-Scribe failed: {e}")
