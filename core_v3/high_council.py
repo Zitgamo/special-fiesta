@@ -11,22 +11,27 @@ class HighCouncil:
         
     def generate_tactical_briefing(self):
         """Generates the Markdown report that the LLM will read."""
+        uptime = "UNKNOWN"
+        try:
+            with open("03_DATA/vn30_active_pos.json", "r") as f:
+                state = json.load(f)
+                uptime = state.get("meta", {}).get("uptime", "UNKNOWN")
+        except: pass
+
         if not os.path.exists(self.trades_path):
-            return " !! [ERROR] No trade data found."
+            return f" !! [ERROR] No trade data found. [UPTIME: {uptime}]"
             
         try:
-            # Hardened loading for messy CSV
             df = pd.read_csv(self.trades_path, on_bad_lines='skip')
             
-            # Calculate daily stats (columns: time, close, pnl, etc.)
-            # Assuming standard structure from previous checkpoints
             pnl_col = df.columns[6]
             total_pnl = df[pnl_col].astype(float).sum()
             wr = (df[pnl_col].astype(float) > 0).mean() * 100
             
             briefing = f"""
 # SOVEREIGN TACTICAL BRIEFING: {datetime.now().strftime('%Y-%m-%d')}
-## Operational Overview
+## System Vitals
+- **Uptime**: {uptime}
 - **Total Points Captured**: {total_pnl:+.1f}
 - **Win Rate**: {wr:.1f}%
 - **Engine**: Deep Sovereign v9.1 (Prophetic Architecture)
@@ -109,8 +114,16 @@ Return ONLY a JSON object with this structure:
             with open("03_DATA/council_verdict.json", "w") as f:
                 json.dump(verdict, f, indent=2)
                 
+            # Uptime for Telegram
+            uptime = "UNKNOWN"
+            try:
+                with open("03_DATA/vn30_active_pos.json", "r") as f:
+                    state = json.load(f)
+                    uptime = state.get("meta", {}).get("uptime", "UNKNOWN")
+            except: pass
+
             print(" >> [SUCCESS] High Council Verdict Saved.")
-            self.send_telegram_alert(f"Morning Prophecy Received:\nBias: {verdict.get('bias')}\nRange: [{verdict.get('min_boundary')} - {verdict.get('max_boundary')}]")
+            self.send_telegram_alert(f"Morning Prophecy Received:\nUptime: {uptime}\nBias: {verdict.get('bias')}\nRange: [{verdict.get('min_boundary')} - {verdict.get('max_boundary')}]")
             
         except Exception as e:
             print(f" !! [ERROR] Council consultation failed: {str(e)}")

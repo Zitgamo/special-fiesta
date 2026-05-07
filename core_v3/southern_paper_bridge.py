@@ -128,8 +128,16 @@ class SouthernPaperBridge:
         self.council_overrides = {}
         self.load_council_advice()
 
+        # --- UPTIME SENTINEL (v10.1) ---
+        self.start_time = datetime.now()
+        
         if not os.path.exists(TRADES_CSV):
             pd.DataFrame(columns=['unit_id', 'entry_t', 'exit_t', 'side', 'entry_p', 'exit_p', 'pnl_pts', 'reason']).to_csv(TRADES_CSV, index=False)
+
+        # --- CIRCUIT BREAKER STATE (v9.6) ---
+        self.daily_pnl = 0
+        self.last_pnl_reset = datetime.now().date()
+        self.is_dormant = False
 
     def load_council_advice(self):
         """Loads the tactical overrides from the High Council LLM."""
@@ -190,7 +198,13 @@ class SouthernPaperBridge:
 
     def export_state(self, price):
         VND_PER_PT = 100000
-        state = {}
+        now_t = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Uptime Calculation
+        uptime = datetime.now() - self.start_time
+        uptime_str = str(uptime).split('.')[0] # HH:MM:SS
+        
+        state = {"meta": {"uptime": uptime_str, "last_update": now_t}}
         for uid, u in self.units.items():
             pnl_pts = round((price - u['entry']) * u['pos'], 2) if u['pos'] != 0 else 0
             state[uid] = {
@@ -237,12 +251,6 @@ class SouthernPaperBridge:
             conn.commit()
             conn.close()
         except: pass
-
-    def __init__(self):
-        # ... (Existing init)
-        self.daily_pnl = 0
-        self.last_pnl_reset = datetime.now().date()
-        self.is_dormant = False
 
     def check_circuit_breaker(self):
         """Ensures the bot stays silent if the daily loss limit is hit."""

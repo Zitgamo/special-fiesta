@@ -18,7 +18,15 @@ if "!cur_time!"==" 8:35" (
     timeout /t 65
 )
 
-:: 3. Run the Bridge (Ensure Persistence)
+:: 3. Check Midnight Backup (00:00 - Golden Backup)
+if "!cur_time!"=="00:00" (
+    echo [!date! !time!] Performing Golden Backup...
+    if not exist 03_DATA\backups mkdir 03_DATA\backups
+    copy core_v3\iron_core.db 03_DATA\backups\iron_core_BACKUP.db /Y
+    timeout /t 65
+)
+
+:: 4. Run the Bridge (Ensure Persistence)
 echo [!date! !time!] Sovereign Bridge Heartbeat...
 python core_v3/southern_paper_bridge.py
 
