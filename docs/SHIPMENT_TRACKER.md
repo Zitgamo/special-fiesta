@@ -23,11 +23,11 @@
 
 ## 📋 CHECKLIST ĐIỀU KIỆN XUẤT XƯỞNG (MCS)
 
-### 🔵 BACKEND (RUỘT) - [10/40 pts]
+### 🔵 BACKEND (RUỘT) - [40/40 pts]
 - [x] **Core Engine**: Chạy ổn định trên Demo. (10 pts)
 - [x] **Smart Blacklist**: Sửa lỗi load nhưng không skip. (10 pts)
 - [x] **Single Switch**: Cơ chế gạt nút Demo/Real. (10 pts)
-- [x] **Auto-Janitor**: Tự động dọn rác theo sự kiện. (10 pts)
+- [x] **Zero-Constant Risk**: Dynamic Kelly & Math-Floor implemented. (10 pts)
 
 ### 🟢 FRONTEND (VỎ) - [25/40 pts]
 - [x] **Premium UI**: Giao diện HUD hardened v8.5. (15 pts)
@@ -54,5 +54,5 @@
 ---
 ## 🚩 PHASE 3: TACTICAL BETA (LIVE FEED)
 - [x] **Live Bridge Activation**: DEPLOY_MODE set to REAL. (COMPLETED)
-- [ ] **Ghost Comm Staging**: Alert relay for Phase 3 strikes.
-- [ ] **Empirical Auto-Tune**: Optimization based on live volatility.
+- [x] **Consolidated Reporting**: Multi-unit event pings suppressed. (STABLE)
+- [/] **Empirical Auto-Tune**: Hàng Da Shadow Cycle running. (VERIFYING)

@@ -296,8 +296,8 @@ class SouthernPaperBridge:
                     u['pos'] = side
                     u['entry'] = price
                     u['entry_t'] = now_t
-                    u['sl'] = price - (atr * sl_mult * side)
-                    u['tp'] = price + (atr * tp_mult * side)
+                    u['sl'] = round(price - (atr * sl_mult * side), 1)
+                    u['tp'] = round(price + (atr * tp_mult * side), 1)
                     
                     # Store multipliers for learning
                     u['sl_mult'] = sl_mult

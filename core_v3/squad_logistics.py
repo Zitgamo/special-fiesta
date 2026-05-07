@@ -84,18 +84,28 @@ class SquadLogistics:
         except: pass
 
     def allocate_capital(self, regime):
-        """Redistributes lot sizes based on market regime."""
-        print(f" >> [MASTER] Re-Allocating Capital for {regime} Regime...")
+        """
+        Sovereign Capital Allocation (SI v4.0).
+        Redistributes risk-weighting based on market regime and asset efficiency.
+        """
+        print(f" >> [LOGISTICS] Re-Allocating Risk for {regime} Regime...")
         try:
             with open(self.dna_path, 'r') as f:
                 dna = json.load(f)
             
+            # Instead of static lot sizes, we mutate the "VOL_SCALING" or similar in DNA
+            # For now, we adjust the base LOT_SIZE multiplier in DNA relative to regime
             if regime == "TRENDING":
-                dna["ALPHA"]["LOT_SIZE"], dna["OMEGA"]["LOT_SIZE"] = 0.03, 0.005
+                # Trending favors ALPHA (momentum) over OMEGA (scalping)
+                dna["ALPHA"]["RISK_WEIGHT"] = 1.2
+                dna["OMEGA"]["RISK_WEIGHT"] = 0.8
             else:
-                dna["ALPHA"]["LOT_SIZE"], dna["OMEGA"]["LOT_SIZE"] = 0.01, 0.02
+                # Ranging favors OMEGA (mean reversion)
+                dna["ALPHA"]["RISK_WEIGHT"] = 0.7
+                dna["OMEGA"]["RISK_WEIGHT"] = 1.3
 
             with open(self.dna_path, 'w') as f:
                 json.dump(dna, f, indent=4)
+            print(f" >> [SUCCESS] Risk Weights adjusted for {regime} dominance.")
         except Exception as e:
             self.logger.error(f" >> [ALLOC_ERR] Allocation failed: {e}")

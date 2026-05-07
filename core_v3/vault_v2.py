@@ -136,8 +136,9 @@ class IronVault:
                 veterancy_mult = 1.5 # Reward consistency
                 self.logger.info(f" >> [VETERANCY] {unit_id} Rank {rank_data['rank']} detected. Scaling risk.")
 
-        # Final Risk = Base (Dynamic) * Kelly (Math) * Rank (Performance) * Portfolio (Equity)
-        risk_pct = base_risk * kelly_adj * veterancy_mult * grad_risk
+        # Final Risk = Base (Dynamic) * Kelly (Math) * Rank (Performance) * Portfolio (Equity) * Regime Weight
+        regime_weight = self.dna.get(unit_id, {}).get("RISK_WEIGHT", 1.0)
+        risk_pct = base_risk * kelly_adj * veterancy_mult * grad_risk * regime_weight
         
         # 6. Lot Size Calculation (Law of No Magic Numbers)
         MAX_LOT = 0.05 # SOVEREIGN SAFETY CAP (Intended for Forex/Gold)
@@ -173,11 +174,12 @@ class IronVault:
         else:
             raw_lot = min_lot
 
-        # Rounding according to Broker Step
-        # Use decimal-like rounding to avoid floating point artifacts
-        lot = round(raw_lot / volume_step) * volume_step
+        # 6. Safety Rounding Protocol (SI v4.1)
+        # We enforce MATH.FLOOR to ensure we NEVER exceed the calculated risk.
+        import math
+        lot = math.floor((raw_lot / volume_step) + 1e-9) * volume_step
         
-        # Determine precision from volume_step
+        # Determine precision from volume_step for formatting
         precision = 0
         vs_str = str(float(volume_step)).rstrip('0')
         if '.' in vs_str:
@@ -257,7 +259,14 @@ class IronVault:
                 sl = price * 1.01
                 self.logger.warning(f" !! [SAFETY_FLOOR] SL clamped to {sl} (was too high)")
             
-        return round(sl, 5), round(tp, 5)
+        digits = 5
+        if not "USDT" in symbol:
+            info = mt5.symbol_info(symbol)
+            if info: digits = info.digits
+        else:
+            digits = 4 # Binance standard
+            
+        return round(sl, digits), round(tp, digits)
 
     def active_risk_governor(self, bridges, engine=None):
         positions = bridges.get_active_positions()
