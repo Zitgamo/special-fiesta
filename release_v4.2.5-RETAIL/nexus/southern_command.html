@@ -1,0 +1,363 @@
+    <style>
+        :root {
+            --neon-purple: #bc13fe;
+            --neon-blue: #00f2ff;
+            --neon-green: #00ff88;
+            --neon-red: #ff004c;
+            --bg: #020408;
+            --glass: rgba(18, 10, 30, 0.95);
+        }
+
+        body {
+            background: var(--bg);
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            margin: 0;
+            padding: 30px;
+            overflow-x: hidden;
+            font-size: 18px; /* Increased base font */
+        }
+
+        header {
+            border-bottom: 2px solid var(--neon-purple);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 30px;
+            background: rgba(188, 19, 254, 0.05);
+            padding: 10px 20px;
+            border: 1px solid rgba(188, 19, 254, 0.2);
+            border-radius: 6px;
+        }
+
+        .header-stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header-stat-label {
+            font-size: 9px;
+            opacity: 0.5;
+            letter-spacing: 2px;
+            margin-bottom: 2px;
+        }
+
+        .header-stat-val {
+            font-family: 'Orbitron';
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px; /* Larger title */
+            letter-spacing: 5px;
+            color: var(--neon-purple);
+            text-shadow: 0 0 20px rgba(188, 19, 254, 0.8);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 25px;
+            height: calc(100vh - 150px);
+        }
+
+        .panel {
+            background: var(--glass);
+            border: 1px solid rgba(188, 19, 254, 0.3);
+            border-radius: 12px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            overflow: hidden;
+        }
+
+        .panel-title {
+            font-family: 'Orbitron';
+            font-size: 14px;
+            color: var(--neon-blue);
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            border-left: 4px solid var(--neon-purple);
+            padding-left: 15px;
+        }
+
+        #fleet-list {
+            flex-grow: 1;
+            padding-right: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+            gap: 15px;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+        ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 10px; }
+
+        .unit-card {
+            background: rgba(188, 19, 254, 0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 35px 25px; /* Increased vertical padding */
+            border-radius: 10px;
+            border-left: 4px solid transparent; /* Hardcoded in JS */
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1fr 1.2fr;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .unit-name { font-family: 'Orbitron'; color: var(--neon-purple); font-size: 26px; font-weight: 700; }
+        .unit-stat { text-align: center; }
+        .unit-label { font-size: 14px; opacity: 0.5; margin-bottom: 8px; text-transform: uppercase; }
+        .unit-val { font-family: 'Orbitron'; font-size: 22px; font-weight: 700; }
+
+        .stat-box {
+            display: none; /* Moved to header */
+        }
+
+        .mini-card {
+            background: rgba(0, 242, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(0, 242, 255, 0.1);
+        }
+
+        .big-val {
+            font-family: 'Orbitron';
+            font-size: 32px; /* Large readable numbers */
+            text-shadow: 0 0 15px currentColor;
+            margin-top: 5px;
+        }
+
+        .trade-log-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        .trade-row {
+            display: grid;
+            grid-template-columns: 0.8fr 0.8fr 1.2fr 1.2fr;
+            padding: 22px 15px; /* Increased vertical padding */
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 18px; /* Larger font */
+            align-items: center;
+        }
+
+        .pnl-pos { color: var(--neon-green); text-shadow: 0 0 10px var(--neon-green); }
+        .pnl-neg { color: var(--neon-red); text-shadow: 0 0 10px var(--neon-red); }
+
+        .back-btn {
+            background: rgba(188, 19, 254, 0.1);
+            border: 1px solid var(--neon-purple);
+            color: var(--neon-purple);
+            padding: 12px 25px;
+            font-family: 'Orbitron';
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+        .back-btn:hover {
+            background: var(--neon-purple);
+            color: #fff;
+            box-shadow: 0 0 30px var(--neon-purple);
+        }
+        
+        .status-tag {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: var(--neon-green);
+            color: #000;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="title">HÀNG DA COMMAND <span class="status-tag">ICT TIME SYNCED</span></div>
+        
+        <div class="header-stats">
+            <div class="header-stat-item">
+                <span class="header-stat-label">TOTAL EQUITY (VND)</span>
+                <span id="total-equity" class="header-stat-val" style="color:var(--neon-blue)">--</span>
+            </div>
+            <div class="header-stat-item">
+                <span class="header-stat-label">SESSION PnL (VND)</span>
+                <span id="total-pnl" class="header-stat-val">--</span>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <div id="last-update" style="font-family: 'Orbitron'; color: var(--neon-blue); font-size: 14px;">--:--:--</div>
+            <a href="http://127.0.0.1:5050/" class="back-btn">< NEXUS</a>
+        </div>
+    </header>
+
+    <div class="grid">
+        <!-- FLEET STATUS -->
+        <div class="panel">
+            <div class="panel-title">ACTIVE HÀNG DA FLEET OPERATIONS</div>
+            <div id="south-intelligence" style="margin-bottom: 25px;"></div>
+            
+            <div id="fleet-list">
+                <!-- Populated by JS -->
+            </div>
+
+            <div class="stat-box" style="display: none;">
+                <!-- Moved to Header -->
+            </div>
+        </div>
+
+        <!-- STRIKE LOG -->
+        <div class="panel">
+            <div class="panel-title">LIVE STRIKE TELEMETRY</div>
+            <div class="trade-row" style="font-weight:700; font-size:11px; opacity:0.4; letter-spacing:2px; border-bottom: 2px solid rgba(255,255,255,0.1)">
+                <div>UNIT</div>
+                <div style="text-align:center">SIDE</div>
+                <div style="text-align:center">PNL</div>
+                <div style="text-align:right">TIME (ICT)</div>
+            </div>
+            <div class="trade-log-container" id="ao-lang-trades">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatVND(num) {
+            if (num === undefined || num === null) return "0 Đ";
+            return new Intl.NumberFormat('vi-VN').format(num) + ' Đ';
+        }
+
+        const unitStyles = {
+            "ALPHA": { icon: "🛡️", color: "var(--neon-blue)" },
+            "OMEGA": { icon: "⚔️", color: "var(--neon-gold)" },
+            "GAMMA": { icon: "⚡", color: "var(--neon-purple)" }
+        };
+
+        async function updateCommand() {
+            try {
+                console.log("Fetching telemetry...");
+                const response = await fetch('http://127.0.0.1:5050/api/telemetry');
+                const data = await response.json();
+                console.log("Data received:", data);
+                
+                document.getElementById('last-update').innerText = data.current_time_utc + " ICT";
+
+                if (data.status === "ONLINE") {
+                    const south = data.health_south || {};
+                    const fleet = south.fleet || {};
+                    const fleetDiv = document.getElementById('fleet-list');
+                    fleetDiv.innerHTML = '';
+                    
+                    document.getElementById('total-equity').innerText = formatVND(south.equity_vnd || 0);
+                    const sessionPnl = data.stats_day?.vnd || 0;
+                    const pnlEl = document.getElementById('total-pnl');
+                    pnlEl.innerText = (sessionPnl >= 0 ? '+' : '') + formatVND(sessionPnl);
+                    pnlEl.style.color = sessionPnl >= 0 ? 'var(--neon-green)' : 'var(--neon-red)';
+
+                    for (const [uid, u] of Object.entries(fleet)) {
+                        const botName = uid.replace('SOUTH_', '');
+                        const style = unitStyles[botName] || { icon: "🛰️", color: "var(--neon-blue)" };
+                        const unitPnlVnd = (u.pnl_vnd || 0);
+                        const side = u.pos === 1 ? 'LONG' : u.pos === -1 ? 'SHORT' : 'STANDBY';
+                        const sideColor = u.pos === 1 ? 'var(--neon-green)' : u.pos === -1 ? 'var(--neon-red)' : 'rgba(255,255,255,0.2)';
+                        
+                        let rr = "0.0";
+                        if (u.pos !== 0) {
+                            const risk = Math.abs(u.entry - u.sl);
+                            const reward = Math.abs(u.tp - u.entry);
+                            rr = (reward / risk).toFixed(1);
+                        }
+
+                        const card = `
+                        <div class="unit-card" style="border-left-color: ${style.color}">
+                            <div class="unit-name" style="color: ${style.color}">${style.icon} ${botName}</div>
+                            <div class="unit-stat">
+                                <div class="unit-label">POSITION</div>
+                                <div class="unit-val" style="color:${sideColor}">${side} @ ${(u.entry || 0).toFixed(1)}</div>
+                            </div>
+                            <div class="unit-stat">
+                                <div class="unit-label">TARGETS // R:R ${rr}</div>
+                                <div class="unit-val" style="font-size:14px; opacity:0.7">S:${(u.sl || 0).toFixed(1)} / T:${(u.tp || 0).toFixed(1)}</div>
+                            </div>
+                            <div class="unit-stat">
+                                <div class="unit-label">FLOATING</div>
+                                <div class="unit-val" style="font-size:28px; color:${unitPnlVnd >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'}">${formatVND(unitPnlVnd)}</div>
+                            </div>
+                        </div>`;
+                        fleetDiv.insertAdjacentHTML('beforeend', card);
+                    }
+
+                    // --- AO LÀNG INTELLIGENCE ---
+                    const intelDiv = document.getElementById('south-intelligence');
+                    const ctx = south.context || {er: 0.5, atr: 0, confidence: 50};
+                    const erColor = ctx.er > 0.6 ? 'var(--neon-green)' : ctx.er < 0.3 ? 'var(--neon-red)' : '#ffcc00';
+                    
+                    intelDiv.innerHTML = `
+                        <div class="intel-card" style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:20px; background:rgba(255,255,255,0.02); padding:15px; border-radius:10px; border:1px solid rgba(188,19,254,0.2)">
+                            <div>
+                                <div class="unit-label">TREND EFFICIENCY</div>
+                                <div style="font-family:Orbitron; color:${erColor}">${(ctx.er*100).toFixed(0)}%</div>
+                            </div>
+                            <div>
+                                <div class="unit-label">NEURAL CONFIDENCE</div>
+                                <div style="font-family:Orbitron; color:var(--neon-blue)">${ctx.confidence}%</div>
+                            </div>
+                            <div>
+                                <div class="unit-label">VOLATILITY</div>
+                                <div style="font-family:Orbitron; color:var(--neon-purple)">${(ctx.atr || 0).toFixed(2)} pts</div>
+                            </div>
+                        </div>
+                    `;
+
+                    // Redundant updates removed to prevent ReferenceError and SyntaxError.
+
+                    // Trades (DIRECT DB TIME)
+                    const tradeLog = document.getElementById('ao-lang-trades');
+                    tradeLog.innerHTML = '';
+                    (data.trades || []).filter(t => t.symbol === 'VN30F1M').slice(0, 20).forEach(t => {
+                        const botName = t.unit.replace('SOUTH_', '');
+                        const style = unitStyles[botName] || { color: "var(--neon-blue)" };
+                        const sideColor = t.side.includes('LONG') || t.side.includes('BUY') ? 'var(--neon-green)' : 'var(--neon-red)';
+                        const tTime = t.time || "";
+                        const timeStr = tTime.includes(' ') ? tTime.split(' ')[1] : tTime;
+
+                        tradeLog.innerHTML += `
+                        <div class="trade-row">
+                            <div style="color: ${style.color}; font-family: 'Orbitron'; font-weight: 700;">${botName}</div>
+                            <div style="text-align:center; color: ${sideColor}; font-weight: 700;">${t.side}</div>
+                            <div style="text-align:center" class="${t.pnl >= 0 ? 'pnl-pos' : 'pnl-neg'}">${formatVND((t.pnl || 0) * 100000)}</div>
+                            <div style="text-align:right; opacity:0.5">${timeStr}</div>
+                        </div>
+                        `;
+                    });
+                }
+            } catch (e) {}
+        }
+
+        setInterval(updateCommand, 3000);
+        updateCommand();
+    </script>
+</body>
+</html>

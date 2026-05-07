@@ -119,6 +119,50 @@ Last updated: {timestamp}
                     return "LOCKED"
         return "FREE"
 
+    def prepare_release(self):
+        """Prepares a clean release bundle for customers."""
+        version = "v4.2.5-RETAIL"
+        dist_dir = f"release_{version}"
+        if not os.path.exists(dist_dir):
+            os.makedirs(dist_dir)
+        
+        # Define what to keep
+        keep_list = [
+            "core_v3", 
+            "nexus", 
+            "janitor.py",
+            "README.md",
+            "KILL_SWITCH.bat"
+        ]
+        
+        print(f" >> [LIBRARIAN] Initiating Commercial Release: {version}")
+        import shutil
+        for item in keep_list:
+            if os.path.exists(item):
+                dest = os.path.join(dist_dir, item)
+                if os.path.isdir(item):
+                    if os.path.exists(dest): shutil.rmtree(dest)
+                    shutil.copytree(item, dest, ignore=shutil.ignore_patterns('*.log', '*.db', 'secrets_real.json'))
+                    print(f"  [+] Bundled Directory: {item}")
+                else:
+                    shutil.copy2(item, dest)
+                    print(f"  [+] Bundled File: {item}")
+
+        # Create a clean secrets template
+        secrets_template = {
+            "telegram_token": "YOUR_TOKEN_HERE",
+            "telegram_chat_id": "YOUR_CHAT_ID_HERE",
+            "binance_api_key": "",
+            "binance_api_secret": "",
+            "mt5_login": 0,
+            "mt5_password": "",
+            "mt5_server": ""
+        }
+        with open(os.path.join(dist_dir, "core_v3", "secrets.json"), "w") as f:
+            json.dump(secrets_template, f, indent=4)
+        
+        print(f" >> [LIBRARIAN] Release {version} is ready in ./{dist_dir}")
+
 if __name__ == "__main__":
     import argparse
     import sys
@@ -129,6 +173,7 @@ if __name__ == "__main__":
     parser.add_argument("--update", action="store_true", help="Update the index")
     parser.add_argument("--query", type=str, help="Query the docs")
     parser.add_argument("--log", nargs=3, metavar=('MSG', 'FIX', 'FILE'), help="Log an error")
+    parser.add_argument("--release", action="store_true", help="Prepare a customer-ready release")
     args = parser.parse_args()
 
     lib = Librarian()
@@ -138,5 +183,7 @@ if __name__ == "__main__":
         print(lib.query(args.query))
     elif args.log:
         lib.log_error(args.log[0], args.log[1], args.log[2])
+    elif args.release:
+        lib.prepare_release()
     else:
         lib.update_index()

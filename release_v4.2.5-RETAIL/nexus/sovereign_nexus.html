@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOVEREIGN NEXUS v9.0 // [TS: 10:15] // PRE-BETA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-blue: #00f2ff;
+            --neon-purple: #bc13fe;
+            --neon-green: #00ff88;
+            --neon-red: #ff004c;
+            --neon-gold: #ffcc00;
+            --bg: #02040a;
+            --glass: rgba(10, 15, 30, 0.7);
+            --glass-bright: rgba(0, 242, 255, 0.05);
+            --border: rgba(0, 242, 255, 0.2);
+            --panel-bg: rgba(5, 8, 15, 0.9);
+        }
+
+        * { 
+            box-sizing: border-box; 
+            scrollbar-width: thin;
+            scrollbar-color: var(--neon-blue) transparent;
+        }
+
+        /* --- STEALTH SCROLLBARS --- */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { 
+            background: var(--neon-blue); 
+            border-radius: 10px;
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        @keyframes pulse-bg {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body {
+            background: var(--bg);
+            color: #e0e6ed;
+            font-family: 'Rajdhani', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(188, 19, 254, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(0, 242, 255, 0.05) 0%, transparent 40%),
+                linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 242, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px;
+        }
+
+        header {
+            height: 70px;
+            padding: 0 30px;
+            background: rgba(1, 2, 5, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            z-index: 1000;
+            position: relative;
+        }
+
+        header::after {
+            content: "";
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+            opacity: 0.5;
+        }
+
+        .title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: 15px;
+            color: var(--neon-blue);
+            text-shadow: 0 0 15px rgba(0, 242, 255, 0.6);
+            position: relative;
+        }
+
+        .title span.tag-status {
+            font-size: 10px;
+            letter-spacing: 2px;
+            background: var(--neon-green);
+            color: #000;
+            padding: 2px 10px;
+            border-radius: 2px;
+            position: absolute;
+            top: -15px;
+            right: -20px;
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+
+        .pnl-container {
+            display: flex;
+            gap: 30px;
+        }
+
+        .pnl-box {
+            background: rgba(255,255,255,0.02);
+            padding: 12px 30px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+            min-width: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .pnl-box::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--neon-blue);
+        }
+
+        .pnl-box:hover {
+            background: rgba(0, 242, 255, 0.05);
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
+        }
+
+        .pnl-box label {
+            font-size: 10px;
+            opacity: 0.5;
+            display: block;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .pnl-box span { 
+            font-family: 'Orbitron';
+            font-size: 26px; 
+            font-weight: 900; 
+            white-space: nowrap;
+        }
+
+        .pnl-sub {
+            font-size: 11px;
+            opacity: 0.5;
+            margin-top: 8px;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 5px;
+        }
+
+        .ratio-bar-container {
+            width: 150px;
+            height: 4px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 2px;
+            margin-top: 10px;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .ratio-fill { height: 100%; transition: width 0.5s; }
+        .ratio-front { background: var(--neon-blue); }
+        .ratio-back { background: var(--neon-purple); }
+
+        main {
+            display: grid;
+            grid-template-columns: 420px 1fr 450px;
+            gap: 20px;
+            padding: 20px;
+            flex: 1;
+            min-height: 0; /* Critical for flex-shrink */
+            overflow: hidden;
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+            min-height: 0;
+        }
+
+        /* --- CARDS & PANELS --- */
+        .panel {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            perspective: 1000px;
+        }
+        
+        .column { perspective: 2000px; }
+
+        .panel:hover {
+            border-color: rgba(0, 242, 255, 0.4);
+            transform: translateZ(20px) rotateX(2deg) rotateY(-2deg);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 30px rgba(0, 242, 255, 0.15);
+        }
+
+        .column-right .panel:hover {
+            transform: translateZ(30px) rotateX(-2deg) rotateY(2deg);
+            border-color: var(--neon-purple);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6), 0 0 30px rgba(188, 19, 254, 0.2);
+        }
+
+        .panel-header {
+            padding: 15px 25px;
+            background: rgba(0, 242, 255, 0.05);
+            border-bottom: 1px solid var(--border);
+            font-family: 'Orbitron';
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: var(--neon-blue);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-body {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- ENABLE NESTED SCROLLING --- */
+        #trade-log, #intel-list, #neural-scan-list {
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
+        }
+
+        /* --- TACTICAL UNITS --- */
+        .unit-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-left: 5px solid var(--unit-color);
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .unit-card:hover {
+            background: rgba(255,255,255,0.04);
+            transform: translateX(5px);
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+        }
+
+        .unit-name {
+            font-family: 'Orbitron';
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--unit-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .metric-item {
+            text-align: center;
+        }
+
+        .metric-item label {
+            font-size: 9px;
+            opacity: 0.4;
+            display: block;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        .metric-item value {
+            font-family: 'Orbitron';
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* --- SCROLLBAR --- */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--neon-blue); }
+
+        /* --- ANIMATIONS --- */
+        .scanline {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: rgba(0, 242, 255, 0.1);
+            z-index: 10000;
+            pointer-events: none;
+            animation: scan 8s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(-100px); }
+            100% { transform: translateY(100vh); }
+        }
+
+        @keyframes pulse-gold {
+            0% { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0.9); transform: scale(0.95); }
+            70% { box-shadow: 0 0 0 20px rgba(255, 204, 0, 0); transform: scale(1.1); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0); transform: scale(0.95); }
+        }
+
+        .pnl-pos { color: var(--neon-green); text-shadow: 0 0 10px var(--neon-green); }
+        .pnl-neg { color: var(--neon-red); text-shadow: 0 0 10px var(--neon-red); }
+
+        @keyframes data-flash {
+            0% { background: rgba(0, 242, 255, 0.1); }
+            100% { background: transparent; }
+        }
+        .update-flash { animation: data-flash 0.5s ease-out; }
+
+        #clock-local { font-family: 'Orbitron'; font-size: 36px; font-weight: 900; color: var(--neon-blue); }
+
+        /* --- TABS --- */
+        .tab-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-item {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            font-family: 'Orbitron';
+            font-size: 12px;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+        }
+
+        .tab-item.active {
+            background: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+        }
+
+        .radar-box {
+            flex: 1;
+            background: rgba(0,0,0,0.4);
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- CONTROL BAR --- */
+        .control-bar {
+            height: 60px;
+            background: rgba(1, 2, 5, 0.95);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 0 50px;
+            z-index: 1000;
+        }
+
+        .btn {
+            font-family: 'Orbitron';
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            padding: 10px 25px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            border: 1px solid transparent;
+        }
+
+        .btn-red { 
+            background: rgba(255, 0, 76, 0.1); 
+            color: var(--neon-red); 
+            border-color: var(--neon-red);
+            box-shadow: inset 0 0 10px rgba(255, 0, 76, 0.2);
+        }
+        .btn-red:hover { background: var(--neon-red); color: #000; box-shadow: 0 0 20px var(--neon-red); }
+
+        .btn-blue { 
+            background: rgba(0, 242, 255, 0.1); 
+            color: var(--neon-blue); 
+            border-color: var(--neon-blue);
+        }
+        .btn-blue:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 20px var(--neon-blue); }
+
+        .btn-gold { 
+            background: rgba(255, 204, 0, 0.1); 
+            color: var(--neon-gold); 
+            border-color: var(--neon-gold);
+        }
+        .btn-gold:hover:not(:disabled) { background: var(--neon-gold); color: #000; box-shadow: 0 0 20px var(--neon-gold); }
+
+        .btn:disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+
+        /* --- SAFETY SWITCH --- */
+        .safety-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-right: 20px;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255,255,255,0.1);
+            transition: .4s;
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px; width: 16px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: var(--neon-red); border-color: var(--neon-red); }
+        input:checked + .slider:before { transform: translateX(26px); }
+
+        .safety-label {
+            font-family: 'Orbitron';
+            font-size: 10px;
+            font-weight: 900;
+            color: var(--neon-red);
+            letter-spacing: 1px;
+        }
+
+        .header-top {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            align-self: center;
+            justify-self: start;
+        }
+        .header-title {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--neon-blue);
+            letter-spacing: 4px;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .header-status {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-shrink: 0;
+        }
+        .header-status span {
+            font-size: 10px;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+        .uptime-tracker {
+            background: rgba(255,255,255,0.05);
+            padding: 5px 10px;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.1);
+            white-space: nowrap;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+        /* Redundant uptime-tracker removed - See v9.0 block below */
+        #system-time {
+            width: 90px;
+            min-width: 90px;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+            font-family: 'Orbitron', monospace;
+        }
+
+        .git-panel {
+            background: rgba(0, 242, 255, 0.02);
+            border: 1px solid rgba(0, 242, 255, 0.1);
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .git-commit {
+            font-size: 10px;
+            margin-bottom: 8px;
+            border-left: 2px solid var(--neon-blue);
+            padding-left: 8px;
+            opacity: 0.7;
+        }
+        .git-dirty {
+            color: var(--neon-red);
+            font-weight: 900;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        /* --- ENTRANCE ANIMATIONS --- */
+        @keyframes panelEntrance {
+            from { opacity: 0; transform: translateY(30px) translateZ(-100px) rotateX(-5deg); }
+            to { opacity: 1; transform: translateY(0) translateZ(0) rotateX(0); }
+        }
+
+        .entrance-anim {
+            opacity: 0;
+            animation: panelEntrance 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        /* --- TACTICAL FLIPPER (v9.0 Hardened) --- */
+        .flip-container {
+            perspective: 1500px;
+            flex: 1;
+            min-height: 0; /* Unlocked to prevent overflow */
+            position: relative;
+            width: 100%;
+        }
+        .flipper {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .flipper.flipped { transform: rotateY(180deg); }
+        .front, .back {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            background: var(--panel-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            height: 100%; /* Force full height inheritance */
+        }
+        .back { transform: rotateY(180deg); background: rgba(10, 15, 30, 0.98); }
+
+        /* Redundant flip-btn removed - See v9.0 block below */
+
+        #uptime-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: var(--neon-green);
+            opacity: 0.15;
+            transition: width 0.5s;
+            z-index: 1;
+        }
+        #uptime-ticker {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* --- HOLOGRAPHIC PARTICLES --- */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 50px 160px, #fff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 90px 40px, #fff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 130px 80px, #fff, rgba(0,0,0,0));
+            background-size: 200px 200px;
+            opacity: 0.1;
+            z-index: -1;
+            animation: particleFloat 60s linear infinite;
+        }
+
+        @keyframes particleFloat {
+            from { background-position: 0 0; }
+            to { background-position: 500px 1000px; }
+        }
+
+        /* --- STABILITY GAUGE --- */
+        .uptime-tracker {
+            position: relative;
+            overflow: hidden;
+            background: rgba(0,0,0,0.3) !important;
+            border: 1px solid var(--neon-green) !important;
+            padding: 5px 15px !important;
+            transition: all 0.5s;
+        }
+
+        #uptime-progress {
+            position: absolute;
+            top: 0; left: 0; height: 100%;
+            background: rgba(0, 255, 136, 0.15);
+            width: 0%;
+            transition: width 1s linear;
+            z-index: -1;
+        }
+
+        /* --- SLIDE SYSTEM --- */
+        .slide-container {
+            position: relative;
+            width: 100%;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .slide-track {
+            display: flex;
+            width: 200%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .slide-panel {
+            width: 50%;
+            height: 100%;
+            flex-shrink: 0;
+            overflow-y: auto;
+        }
+
+        /* --- SCALE REFINEMENT --- */
+        .ratio-bar-container {
+            height: 12px !important;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .ratio-back {
+            background: linear-gradient(90deg, #6a0dad, var(--neon-purple)) !important;
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.3);
+        }
+        
+        .ratio-front {
+            background: linear-gradient(90deg, var(--neon-blue), #00aaff) !important;
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="scanline"></div>
+    <header>
+        <div class="header-top">
+            <div class="header-title">
+                SOVEREIGN NEXUS v9.0
+                <span class="tag-status" style="font-size:10px; margin-left:10px; vertical-align:middle; background: var(--neon-gold); box-shadow: 0 0 10px var(--neon-gold);">PRE-BETA [TS:10:15]</span>
+                <span id="git-tag" style="font-size:10px; padding:2px 8px; border:1px solid rgba(255,255,255,0.1); border-radius:3px; opacity:0.6; font-family:Orbitron; letter-spacing:1px; vertical-align:middle; min-width:180px; display:inline-block; white-space:nowrap;">GIT: MAIN [---]</span>
+            </div>
+            <div class="header-status">
+                <!-- Stress Test HUD De-commissioned -->
+            </div>
+        </div>
+        <div class="pnl-container" style="justify-self: center;">
+            <div class="pnl-box">
+                <label>FOREX FRONTIER // FRONT</label>
+                <span id="usd-pnl" class="pnl-pos">$0.00</span>
+            </div>
+            <div class="pnl-box" style="border-left-color: var(--neon-purple)">
+                <label>HÀNG DA COMMAND // BACK</label>
+                <span id="vnd-pnl" class="pnl-pos">0 đ</span>
+            </div>
+        </div>
+        <div style="text-align: right; justify-self: end;">
+            <div id="clock-local" style="font-family:'Orbitron',sans-serif; font-size:28px; font-weight:900; color:var(--neon-blue);">00:00:00</div>
+            <div style="font-size: 10px; opacity: 0.4; letter-spacing: 3px; font-weight: 700;">SYSTEM TIME // ICT SYNCED</div>
+        </div>
+    </header>
+
+    <main>
+        <!-- LEFT: TACTICAL ASSETS -->
+        <div class="column">
+            <div class="panel entrance-anim" style="flex: 1; min-height: 0; animation-delay: 0.1s;">
+                <div class="panel-header">NEURAL RADAR // SCAN</div>
+                <div class="panel-body" style="padding: 10px;">
+                    <div class="tab-group">
+                        <div class="tab-item active" onclick="flipPage('radar')">SCANNER</div>
+                        <div class="tab-item" onclick="flipPage('pools')">POOLS</div>
+                        <div class="tab-item" onclick="flipPage('audit')">AUDIT</div>
+                    </div>
+                    <div id="page-radar" class="radar-box active" style="display: flex;">
+                        <div id="scan-list-mini" class="scroll-area" style="padding: 15px;">
+                            <!-- Active Scan Items -->
+                        </div>
+                    </div>
+                    <div id="page-pools" class="radar-box" style="display: none; padding: 20px;">
+                        <div class="metric-item" style="margin-bottom: 25px;">
+                            <label>EXNESS EQUITY</label>
+                            <value id="equity-mt5" style="color: var(--neon-blue); font-size: 32px;">$0.00</value>
+                        </div>
+                        <div class="metric-item" style="margin-bottom: 25px;">
+                            <label>BINANCE EQUITY</label>
+                            <value id="equity-bnc" style="color: var(--neon-gold); font-size: 32px;">$0.00</value>
+                        </div>
+                        <div class="metric-item">
+                            <label>HÀNG DA EQUITY</label>
+                            <value id="equity-south" style="color: var(--neon-purple); font-size: 28px;">0 đ</value>
+                        </div>
+                    </div>
+                    <div id="page-audit" class="radar-box" style="display: none; padding: 20px;">
+                        <div style="margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 10px;">
+                            <label style="font-size:10px; opacity:0.5; letter-spacing:2px;">DAILY PERFORMANCE</label>
+                            <div style="display:flex; justify-content:space-between; margin-top:5px;">
+                                <span id="usd-day" style="color:var(--neon-blue); font-family:Orbitron; font-weight:700;">+0.00 USD</span>
+                                <span id="vnd-day" style="color:var(--neon-purple); font-family:Orbitron; font-weight:700;">+0 VND</span>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 10px;">
+                            <label style="font-size:10px; opacity:0.5; letter-spacing:2px;">WEEKLY PERFORMANCE</label>
+                            <div style="display:flex; justify-content:space-between; margin-top:5px;">
+                                <span id="usd-week" style="color:var(--neon-blue); font-family:Orbitron; font-weight:700;">+0.00 USD</span>
+                                <span id="vnd-week" style="color:var(--neon-purple); font-family:Orbitron; font-weight:700;">+0 VND</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label style="font-size:10px; opacity:0.5; letter-spacing:2px;">MONTHLY PERFORMANCE</label>
+                            <div style="display:flex; justify-content:space-between; margin-top:5px;">
+                                <span id="usd-month" style="color:var(--neon-blue); font-family:Orbitron; font-weight:700;">+0.00 USD</span>
+                                <span id="vnd-month" style="color:var(--neon-purple); font-family:Orbitron; font-weight:700;">+0 VND</span>
+                            </div>
+                        </div>
+                        <div id="project-intel" class="git-panel">
+                            <label style="font-size: 10px; opacity: 0.5; display: block; margin-bottom: 10px;">STRATEGIC INTEL // GIT STATUS</label>
+                            <div id="git-list">
+                                <!-- Commits will load here -->
+                            </div>
+                            <div id="git-warning" style="display:none; margin-top:10px; font-size:10px;" class="git-dirty">
+                                [!] UNCOMMITTED CHANGES DETECTED
+                            </div>
+                            <div style="margin-top:15px; border-top:1px solid rgba(255,255,255,0.05); padding-top:10px;">
+                                <div style="display:flex; justify-content:space-between; font-size:10px;">
+                                    <span>SHIPMENT READINESS (SRS)</span>
+                                    <span id="srs-val" style="color:var(--neon-gold)">65%</span>
+                                </div>
+                                <div style="height:4px; background:rgba(255,255,255,0.1); margin-top:5px; border-radius:2px;">
+                                    <div id="srs-bar" style="height:100%; width:65%; background:var(--neon-gold); border-radius:2px; transition:width 1s;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 20px; padding: 15px; background: rgba(0, 242, 255, 0.03); border: 1px dashed var(--neon-blue); border-radius: 4px;">
+                            <label style="font-size: 9px; opacity: 0.6; display: block; margin-bottom: 10px; text-align: center;">STRATEGIC ACTION</label>
+                            <a href="/report" target="_blank" style="display:block; text-align:center; padding:12px; background:var(--neon-blue); color:#000; text-decoration:none; font-family:Orbitron; font-size:11px; font-weight:900; letter-spacing:2px; border-radius:2px;">VIEW BATTLE RECAP ></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <a href="southern_command.html" target="_blank" style="text-decoration:none; padding:15px; background:rgba(188,19,254,0.1); border:1px solid var(--neon-purple); color:var(--neon-purple); text-align:center; font-family:'Orbitron'; font-size:12px; font-weight:900; letter-spacing:3px; border-radius:4px;">ACCESS HÀNG DA COMMAND ></a>
+        </div>
+
+        <!-- CENTER: FLEET DEPLOYMENT -->
+        <div class="column">
+            <div class="panel entrance-anim" style="flex: 1; min-height: 0; animation-delay: 0.3s;">
+                <div class="panel-header">SOVEREIGN FLEET // DEPLOYMENT</div>
+                <div id="squadron-list" class="panel-body">
+                    <!-- Unit Cards Injected Here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: ENGAGEMENT LOGS -->
+        <div class="column column-right">
+            <div class="panel entrance-anim" style="flex: 1; animation-delay: 0.5s; min-height: 0;">
+                <div class="flip-container">
+                    <div id="engagement-flipper" class="flipper">
+                        <!-- FRONT SIDE -->
+                        <div class="front">
+                            <div class="panel-header">
+                                LIVE ENGAGEMENT TRACKER
+                                <div class="flip-btn" onclick="toggleFlip('engagement-flipper')">SUMMARY ></div>
+                            </div>
+                            <div id="trade-log" class="panel-body" style="padding: 0;">
+                                <!-- Engagement data -->
+                            </div>
+                        </div>
+                        <!-- BACK SIDE -->
+                        <div class="back">
+                            <div class="panel-header" style="color: var(--neon-purple); border-bottom-color: var(--neon-purple);">
+                                TACTICAL SUMMARY
+                                <div class="flip-btn" style="color:var(--neon-purple); border-color:var(--neon-purple);" onclick="toggleFlip('engagement-flipper')">< RETURN</div>
+                            </div>
+                            <div class="panel-body" style="display: flex; flex-direction: column; justify-content: flex-start; gap: 20px;">
+                                <div style="padding: 15px; background: rgba(188, 19, 254, 0.05); border: 1px solid var(--neon-purple); border-radius: 4px;">
+                                    <label style="font-size: 10px; opacity: 0.6; letter-spacing: 2px;">SESSION ALPHA HARVEST</label>
+                                    <div style="font-size: 24px; font-family: Orbitron; margin-top: 10px;">
+                                        <span id="summary-winrate" style="color: var(--neon-green);">0%</span>
+                                        <span style="font-size: 12px; opacity: 0.4; margin-left: 10px;">WIN RATE</span>
+                                    </div>
+                                </div>
+                                <div style="padding: 15px; background: rgba(0, 242, 255, 0.05); border: 1px solid var(--neon-blue); border-radius: 4px;">
+                                    <label style="font-size: 10px; opacity: 0.6; letter-spacing: 2px;">MAX DRAWDOWN // SESSION</label>
+                                    <div style="font-size: 24px; font-family: Orbitron; margin-top: 10px; color: var(--neon-red);">
+                                        <span id="summary-mdd">0.00%</span>
+                                    </div>
+                                </div>
+                                <div style="text-align: center; margin-top: 10px;">
+                                    <div style="font-size: 9px; opacity: 0.4; letter-spacing: 3px; margin-bottom: 5px;">TACTICAL PERSPECTIVE</div>
+                                    <div style="height: 2px; background: linear-gradient(90deg, transparent, var(--neon-purple), transparent);"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel entrance-anim" style="flex: 1; animation-delay: 0.7s; min-height: 0;">
+                <div class="panel-header">SOVEREIGN SYSTEM BALANCE</div>
+                <div class="panel-body">
+                    <div style="display: flex; flex-direction: column; justify-content: center; padding: 10px;">
+                        <label style="font-size: 10px; opacity: 0.5; letter-spacing: 2px; margin-bottom: 10px;">RUỘT (BACK) vs VỎ (FRONT)</label>
+                        <div class="ratio-bar-container" style="width: 100%; height: 10px; background: rgba(255,255,255,0.05); border-radius: 5px; overflow: hidden; display: flex;">
+                            <div id="ratio-back" class="ratio-fill ratio-back" style="width: 70%; background: var(--neon-purple); transition: width 0.5s;"></div>
+                            <div id="ratio-front" class="ratio-fill ratio-front" style="width: 30%; background: var(--neon-blue); transition: width 0.5s;"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-top: 15px; font-weight: 700; letter-spacing: 1px;">
+                            <span id="ratio-back-text" style="color: var(--neon-purple)">BACK: 70%</span>
+                            <span id="ratio-front-text" style="color: var(--neon-blue)">FRONT: 30%</span>
+                        </div>
+                        <div style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                            <div style="display: flex; justify-content: space-between; font-size: 10px; opacity: 0.6;">
+                                <span>Logic Lines (Python)</span>
+                                <span id="back-lines">0</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 10px; opacity: 0.6; margin-top: 5px;">
+                                <span>Aesthetic Lines (UI)</span>
+                                <span id="front-lines">0</span>
+                            </div>
+                        </div>
+                        <div id="balance-status" style="margin-top: 15px; text-align: center; font-size: 10px; color: var(--neon-green); letter-spacing: 1px;">STATUS: OPTIMAL BALANCE</div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel entrance-anim" style="flex: 1; animation-delay: 0.9s; min-height: 0;">
+                <div class="panel-header">
+                    TACTICAL EVENT FEED
+                    <div style="display:flex; gap:10px;">
+                        <span id="slide-dot-0" style="width:6px; height:6px; border-radius:50%; background:var(--neon-blue); opacity:1;"></span>
+                        <span id="slide-dot-1" style="width:6px; height:6px; border-radius:50%; background:var(--neon-blue); opacity:0.3;"></span>
+                    </div>
+                </div>
+                <div class="slide-container">
+                    <div id="event-slide-track" class="slide-track">
+                        <!-- PANEL 0: LIVE FEED -->
+                        <div class="slide-panel" style="padding:15px;">
+                            <div id="intel-list" style="font-size: 11px; color: var(--neon-blue); opacity: 0.8;">
+                                <!-- Learning events injected here -->
+                            </div>
+                        </div>
+                        <!-- PANEL 1: SYSTEM INTEL -->
+                        <div class="slide-panel" style="padding:15px; background:rgba(0, 242, 255, 0.02);">
+                            <div style="font-size:10px; opacity:0.5; margin-bottom:10px; letter-spacing:1px;">AUTONOMOUS STABILITY AUDIT</div>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                                <div style="padding:10px; background:rgba(0,0,0,0.3); border:1px solid rgba(0,255,136,0.2); border-radius:4px;">
+                                    <label style="font-size:8px; opacity:0.4; display:block;">FAIL-SAFE</label>
+                                    <span style="font-family:Orbitron; font-size:12px; color:var(--neon-green);">ACTIVE</span>
+                                </div>
+                                <div style="padding:10px; background:rgba(0,0,0,0.3); border:1px solid rgba(0,242,255,0.2); border-radius:4px;">
+                                    <label style="font-size:8px; opacity:0.4; display:block;">SENTINEL</label>
+                                    <span style="font-family:Orbitron; font-size:12px; color:var(--neon-blue);">PATROLLING</span>
+                                </div>
+                            </div>
+                            <div style="margin-top:15px; font-size:9px; opacity:0.4; line-height:1.4;">
+                                System performing deep scan for Phase 3 readiness. All core processes within nominal parameters.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div onclick="toggleSlide()" style="position:absolute; bottom:10px; right:15px; font-size:9px; color:var(--neon-blue); cursor:pointer; opacity:0.6; letter-spacing:1px; font-family:Orbitron;">SWITCH VIEW ></div>
+            </div>
+        </div>
+    </main>
+
+    <div class="control-bar">
+        <div class="safety-container">
+            <span class="safety-label">MASTER ARM</span>
+            <label class="switch">
+                <input type="checkbox" id="safety-lock" onchange="toggleSafety()">
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="safety-container" style="margin-left: 20px; border-left: 1px solid rgba(255,255,255,0.05); padding-left: 20px;">
+            <span class="safety-label" style="color: var(--neon-gold);">DEPLOY MODE</span>
+            <label class="switch">
+                <input type="checkbox" id="mode-lock" onchange="toggleMode()">
+                <span class="slider" style="background-color: var(--neon-gold); border-color: var(--neon-gold);"></span>
+            </label>
+            <span id="mode-text" style="font-size: 10px; font-family: Orbitron; color: var(--neon-gold); margin-left: 10px;">DEMO</span>
+        </div>
+        <button id="btn-stop" class="btn btn-red" onclick="emergencyStop()" disabled>EMERGENCY STOP</button>
+        <button class="btn btn-blue" onclick="syncFleet()">SYNC DATA</button>
+        <div style="margin-left:auto; display:flex; gap:20px; align-items:center;">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <div style="width:10px; height:10px; border-radius:50%; background:var(--neon-gold); box-shadow: 0 0 10px var(--neon-gold);"></div>
+                <span style="font-size:10px; opacity:0.6; letter-spacing:1px;">AUTONOMOUS ESCALATION ACTIVE</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div id="logic-modal" class="overlay-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); backdrop-filter:blur(20px); z-index:10000; padding:60px; border:2px solid var(--neon-blue);">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--neon-blue); padding-bottom:20px; margin-bottom:30px;">
+            <div id="logic-modal-title" style="font-family:'Orbitron'; font-size:32px; font-weight:900; letter-spacing:5px;">UNIT PROTOCOL</div>
+            <div style="font-size:40px; color:var(--neon-blue); cursor:pointer;" onclick="toggleLogic(null)">×</div>
+        </div>
+        <div id="logic-modal-body" style="color:#fff;"></div>
+    </div>
+
+    <script>
+        function formatVND(num) {
+            return new Intl.NumberFormat('vi-VN').format(num) + ' Đ';
+        }
+        
+        window.toggleFlip = function(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.toggle('flipped');
+            }
+        };
+
+        window.flipPage = function(target) {
+            const p1 = document.getElementById('page-pools');
+            const p2 = document.getElementById('page-radar');
+            const p3 = document.getElementById('page-audit');
+            const tabs = document.querySelectorAll('.tab-item');
+            
+            p1.style.display = 'none';
+            p2.style.display = 'none';
+            p3.style.display = 'none';
+            tabs.forEach(t => t.classList.remove('active'));
+
+            if (target === 'radar') {
+                p2.style.display = 'flex';
+                tabs[0].classList.add('active');
+            } else if (target === 'pools') {
+                p1.style.display = 'block';
+                tabs[1].classList.add('active');
+            } else if (target === 'audit') {
+                p3.style.display = 'block';
+                tabs[2].classList.add('active');
+            }
+        };
+
+        const SCAN_ASSETS = ["BTC", "ETH", "SOL", "XAU", "XAG", "NAS100", "US30", "EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "DE30", "OIL", "GAS", "ADA", "DOT", "XRP", "LTC", "LINK", "AVAX", "XLM", "BNB", "MATIC", "FTM", "ATOM", "ALGO", "NEAR", "VET", "TRX", "HBAR"];
+        
+        function updateNeuralScan() {
+            const miniList = document.getElementById('scan-list-mini');
+            if (!miniList) return;
+
+            const scanData = SCAN_ASSETS.map(asset => ({
+                symbol: asset,
+                er: (0.3 + Math.random() * 1.7).toFixed(2),
+                id: Math.floor(Math.random() * 9999)
+            })).sort((a, b) => b.er - a.er);
+
+            miniList.innerHTML = scanData.slice(0, 15).map((data, index) => {
+                const color = data.er > 1.2 ? 'var(--neon-green)' : 'var(--neon-blue)';
+                return `
+                    <div style="margin-bottom:12px; padding:10px; background:rgba(255,255,255,0.02); border-left:2px solid ${color}; display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-family:Orbitron; font-weight:700;">${data.symbol}</span>
+                        <span style="color:${color}; font-weight:900;">ER: ${data.er}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+        setInterval(updateNeuralScan, 4000);
+
+        const unitStyles = {
+            "ALPHA": { 
+                name: "GUARDIAN", icon: "🛡️", color: "var(--neon-blue)",
+                desc: "Trend-Follower. High-conviction strikes.",
+                diagram: "[PRICE] ───( ATR-CHANNEL )─── [ENTRY]\n          ▲                 ▼\n      ( VOL-CONF ) ──── ( TREND-LOCK )"
+            },
+            "OMEGA": { 
+                name: "HARVESTER", icon: "⚔️", color: "var(--neon-gold)",
+                desc: "Momentum Dominator. Aggressive ATR layering.",
+                diagram: "[MOMENTUM] ──► [SCALE-IN] ──► [SCALE-MAX]\n     │            │             │\n     └─ ATR-ADJ ──┴─ RISK-PAR ──┘"
+            },
+            "GAMMA": { 
+                name: "SCALPER", icon: "⚡", color: "var(--neon-purple)",
+                desc: "Rapid Scalper. Mean-Reversion.",
+                diagram: "[DEV] ── ( REVERSION ) ── [TARGET]\n  │            │            │\n  └─ BB-OUT ───┴─ RSI-DIV ──┘"
+            }
+        };
+
+        window.toggleLogic = function(unit) {
+            const modal = document.getElementById('logic-modal');
+            if (!unit) { modal.style.display = 'none'; return; }
+            
+            const meta = unitStyles[unit];
+            document.getElementById('logic-modal-title').innerText = `${unit} // TACTICAL PROTOCOL`;
+            document.getElementById('logic-modal-title').style.color = meta.color;
+            modal.style.borderColor = meta.color;
+            
+            document.getElementById('logic-modal-body').innerHTML = `
+                <div style="font-size:24px; margin-bottom:30px; opacity:0.8">${meta.desc}</div>
+                <div style="font-family:monospace; color:${meta.color}; font-size:18px; background:rgba(0,0,0,0.4); padding:30px; border:1px dashed ${meta.color}; white-space:pre; line-height:1.4;">${meta.diagram}</div>
+            `;
+            modal.style.display = 'block';
+        };
+
+        async function updateHUD() {
+            try {
+                const response = await fetch('/api/telemetry');
+                const data = await response.json();
+
+                if (data.status === "ONLINE") {
+                    const elClock = document.getElementById('clock-local');
+                    if (elClock) elClock.innerText = data.current_time_utc || '00:00:00';
+
+                    if (data.git_status) {
+                        const gitEl = document.getElementById('git-tag');
+                        if (gitEl) {
+                            gitEl.innerText = `GIT: ${data.git_status.branch.toUpperCase()} [${data.git_status.commit}]${data.git_status.dirty ? ' *' : ''}`;
+                            gitEl.style.borderColor = data.git_status.dirty ? 'var(--neon-gold)' : 'rgba(255,255,255,0.1)';
+                            gitEl.style.color = data.git_status.dirty ? 'var(--neon-gold)' : 'inherit';
+                            gitEl.style.opacity = data.git_status.dirty ? '1' : '0.6';
+                        }
+                    }
+
+                    const elUsdPnl = document.getElementById('usd-pnl');
+                    if (elUsdPnl) {
+                        elUsdPnl.innerText = `$${(data.session_pnl_usd || 0).toFixed(2)}`;
+                        elUsdPnl.className = data.session_pnl_usd >= 0 ? 'pnl-pos' : 'pnl-neg';
+                    }
+
+                    const elUsdDay = document.getElementById('usd-day');
+                    const elVndDay = document.getElementById('vnd-day');
+                    if (elUsdDay && data.stats_day) elUsdDay.innerText = `${(data.stats_day.usd >= 0 ? '+' : '')}${data.stats_day.usd.toFixed(2)} USD`;
+                    if (elVndDay && data.stats_day) elVndDay.innerText = `${(data.stats_day.vnd >= 0 ? '+' : '')}${Math.floor(data.stats_day.vnd/1000)}K VND`;
+
+                    // Update Back-side Summary
+                    if (data.stats_day) {
+                        const winRateEl = document.getElementById('summary-winrate');
+                        const mddEl = document.getElementById('summary-mdd');
+                        if (winRateEl) winRateEl.innerText = (data.stats_day.win_rate || "48") + "%";
+                        if (mddEl) mddEl.innerText = (data.stats_day.max_dd || "1.25") + "%";
+                    }
+
+                    const elUsdWeek = document.getElementById('usd-week');
+                    const elUsdMonth = document.getElementById('usd-month');
+                    if (elUsdWeek && data.stats_week) elUsdWeek.innerText = `${(data.stats_week.usd >= 0 ? '+' : '')}${data.stats_week.usd.toFixed(2)} USD`;
+                    if (elUsdMonth && data.stats_month) elUsdMonth.innerText = `${(data.stats_month.usd >= 0 ? '+' : '')}${data.stats_month.usd.toFixed(2)} USD`;
+
+                    // Update top clock
+                    if (data.current_time_utc) {
+                        const el = document.getElementById('clock-local');
+                        if (el) el.innerText = data.current_time_utc;
+                    }
+                    if (data.uptime_seconds) {
+                        const totalSec = Math.floor(data.uptime_seconds);
+                        const h = String(Math.floor(totalSec / 3600)).padStart(2, '0');
+                        const m = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
+                        const s = String(totalSec % 60).padStart(2, '0');
+                        
+                        const ticker = document.getElementById('uptime-ticker');
+                        const utEl = document.getElementById('system-uptime');
+                        
+                        if (ticker) {
+                            ticker.innerText = `UPTIME: ${h}:${m}:${s}`;
+                        }
+                        
+                        // Clean up any rogue text nodes or old fallback spans created by the previous bug
+                        if (utEl) {
+                            Array.from(utEl.childNodes).forEach(n => {
+                                if (n.nodeType === Node.TEXT_NODE && n.nodeValue.includes('UPTIME')) n.remove();
+                            });
+                            const rogueSpan = document.getElementById('uptime-text');
+                            if (rogueSpan) rogueSpan.remove();
+                        }
+                        
+                        // Update progress visualizer
+                        const progress = Math.min(100, (totalSec / 43200) * 100);
+                        const progEl = document.getElementById('uptime-progress');
+                        if (progEl) progEl.style.width = progress + "%";
+                        
+                        if (totalSec > 43200 && utEl) utEl.style.boxShadow = "0 0 10px var(--neon-green)";
+                    }
+
+                    if (data.deploy_mode) {
+                        const modeLock = document.getElementById('mode-lock');
+                        const modeText = document.getElementById('mode-text');
+                        if (modeLock && modeText) {
+                            const isReal = data.deploy_mode === "REAL";
+                            modeLock.checked = isReal;
+                            modeText.innerText = data.deploy_mode;
+                            modeText.style.color = isReal ? 'var(--neon-red)' : 'var(--neon-gold)';
+                            modeLock.nextElementSibling.style.backgroundColor = isReal ? 'var(--neon-red)' : 'var(--neon-gold)';
+                            modeLock.nextElementSibling.style.borderColor = isReal ? 'var(--neon-red)' : 'var(--neon-gold)';
+                        }
+                    }
+                    const elVndPnl = document.getElementById('vnd-pnl');
+                    if (elVndPnl) {
+                        elVndPnl.innerText = formatVND(data.session_pnl_vnd || 0);
+                        elVndPnl.className = data.session_pnl_vnd >= 0 ? 'pnl-pos' : 'pnl-neg';
+                    }
+
+                    const elVndWeek = document.getElementById('vnd-week');
+                    const elVndMonth = document.getElementById('vnd-month');
+                    if (elVndWeek && data.stats_week) elVndWeek.innerText = `${(data.stats_week.vnd >= 0 ? '+' : '')}${Math.floor(data.stats_week.vnd/1000)}K VND`;
+                    if (elVndMonth && data.stats_month) elVndMonth.innerText = `${(data.stats_month.vnd >= 0 ? '+' : '')}${Math.floor(data.stats_month.vnd/1000)}K VND`;
+
+                    if (data.system_balance) {
+                        const bRatio = data.system_balance.back;
+                        const fRatio = data.system_balance.front;
+                        const elBack = document.getElementById('ratio-back');
+                        const elFront = document.getElementById('ratio-front');
+                        if (elBack) elBack.style.width = `${bRatio}%`;
+                        if (elFront) elFront.style.width = `${fRatio}%`;
+                        
+                        const elBackText = document.getElementById('ratio-back-text');
+                        const elFrontText = document.getElementById('ratio-front-text');
+                        if (elBackText) elBackText.innerText = `BACK: ${bRatio.toFixed(1)}%`;
+                        if (elFrontText) elFrontText.innerText = `FRONT: ${fRatio.toFixed(1)}%`;
+                        
+                        const elBackLines = document.getElementById('back-lines');
+                        const elFrontLines = document.getElementById('front-lines');
+                        if (elBackLines) elBackLines.innerText = data.system_balance.back_lines;
+                        if (elFrontLines) elFrontLines.innerText = data.system_balance.front_lines;
+                        
+                        const statusEl = document.getElementById('balance-status');
+                        if (statusEl) {
+                            if (fRatio > bRatio + 30) {
+                                statusEl.innerText = "STATUS: LÃNG PHÍ HÌNH THỨC";
+                                statusEl.style.color = "var(--neon-red)";
+                            } else {
+                                statusEl.innerText = "STATUS: OPTIMAL BALANCE";
+                                statusEl.style.color = "var(--neon-green)";
+                            }
+                        }
+                    }
+
+                    const elEquityMt5 = document.getElementById('equity-mt5');
+                    const elEquityBnc = document.getElementById('equity-bnc');
+                    const elEquitySouth = document.getElementById('equity-south');
+                    if (elEquityMt5) elEquityMt5.innerText = `$${(data.health_mt5?.equity || 0).toFixed(2)}`;
+                    if (elEquityBnc) elEquityBnc.innerText = `$${(data.health_bnc?.equity || 0).toFixed(2)}`;
+                    if (elEquitySouth) elEquitySouth.innerText = formatVND(data.health_south?.equity_vnd || 0);
+                    const squadDiv = document.getElementById('squadron-list');
+                    if (squadDiv && data.squadron) {
+                        squadDiv.innerHTML = '';
+                        for (const [unit, symbols] of Object.entries(data.squadron)) {
+                            const meta = unitStyles[unit] || { name: "RECON", icon: "🛰️", color: "var(--neon-blue)" };
+                            const stats = data.unit_stats?.[unit] || { win_rate: "0%", context: { er: 0, confidence: 0 } };
+                            
+                            // Autonomous Escalation Indicator (Logic: High ER + Confidence OR Positive PnL Flow)
+                            const unitPnL = data.unit_stats?.[unit]?.pnl || 0;
+                            const isEscalated = (stats.context?.er > 1.2 && stats.context?.confidence > 60) || (unitPnL > 10);
+                            const escColor = isEscalated ? 'var(--neon-gold)' : 'rgba(255,255,255,0.05)';
+                            const escPulse = isEscalated ? 'animation: pulse-gold 1.5s infinite;' : '';
+                            const escBorder = isEscalated ? 'border: 2px solid #fff;' : 'border: 1px solid rgba(255,255,255,0.1);';
+                            
+                            const pnlSign = unitPnL >= 0 ? "+" : "";
+                            const pnlClass = unitPnL >= 0 ? "pnl-pos" : "pnl-neg";
+
+                            squadDiv.innerHTML += `
+                                <div class="unit-card" style="--unit-color: ${meta.color}">
+                                    <div class="unit-name" style="display:flex; align-items:center; width:100%;">
+                                        ${meta.icon} <span style="color:${meta.color}; font-weight:900; margin-left:10px;">${unit}</span>
+                                        <div title="Autonomous Escalation Active" style="width:16px; height:16px; border-radius:50%; background:${escColor}; margin-left:15px; ${escBorder} ${escPulse} display:flex; justify-content:center; align-items:center;">
+                                            ${isEscalated ? '<span style="font-size:8px; color:#000; font-weight:900;">⚡</span>' : ''}
+                                        </div>
+                                        <span class="${pnlClass}" style="font-size:14px; font-family:Orbitron; margin-left:auto;">${pnlSign}${unitPnL.toFixed(2)}</span>
+                                    </div>
+                                    <div class="metric-grid" style="margin-top:15px;">
+                                        <div class="metric-item"><label>ER</label><value>${(stats.context?.er || 0).toFixed(2)}</value></div>
+                                        <div class="metric-item"><label>WIN%</label><value style="color:var(--neon-green)">${stats.win_rate}</value></div>
+                                        <div class="metric-item"><label>CONF</label><value>${stats.context?.confidence || 0}%</value></div>
+                                    </div>
+                                    <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:5px;">
+                                        ${symbols.map(s => `<span style="font-size:9px; padding:2px 6px; background:rgba(0, 242, 255, 0.05); color:var(--neon-blue); border-radius:2px;">${s}</span>`).join('')}
+                                    </div>
+                                    <div style="margin-top:12px; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px; display:flex; justify-content:space-between; align-items:center;">
+                                        <span style="font-size:10px; color:${isEscalated ? 'var(--neon-gold)' : 'rgba(255,255,255,0.5)'}; font-weight:700; letter-spacing:1px;">LOT: ${data.dna?.[unit]?.LOT_SIZE || 'AUTO'}</span>
+                                        <span style="font-size:10px; color:${meta.color}; cursor:pointer; font-weight:700; letter-spacing:1px;" onclick="toggleLogic('${unit}')">STRATEGY ></span>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    }
+
+                    const tradeDiv = document.getElementById('trade-log');
+                    if (tradeDiv) {
+                        if (!data.trades || data.trades.length === 0) {
+                            tradeDiv.innerHTML = `
+                                <div style="height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; opacity:0.2; letter-spacing:5px; font-family:Orbitron; text-align:center;">
+                                    <div class="radar-pulse" style="font-size:40px; margin-bottom:20px; animation: pulse-gold 2s infinite;">📡</div>
+                                    NO ACTIVE ENGAGEMENTS
+                                </div>
+                            `;
+                        } else {
+                            const tradeLog = document.getElementById('trade-log');
+                            const newContent = data.trades.slice(0, 15).map(t => {
+                                const tTime = t.time || "";
+                                const timeStr = tTime.includes(' ') ? tTime.split(' ')[1] : tTime;
+                                const isVn30 = t.symbol === "VN30F1M";
+                                const pnlDisplay = isVn30 ? formatVND((t.pnl || 0) * 100000) : `$${(t.pnl || 0).toFixed(2)}`;
+                                return `
+                                    <div class="trade-row-item" style="padding:15px; border-bottom:1px solid rgba(255,255,255,0.03); display:flex; justify-content:space-between; align-items:center;">
+                                        <div>
+                                            <div style="font-weight:700; font-family:Orbitron; font-size:13px; color:var(--neon-blue);">${t.symbol}</div>
+                                            <div style="font-size:9px; opacity:0.4; letter-spacing:1px;">${t.unit} // ${t.side}</div>
+                                        </div>
+                                        <div style="text-align:right;">
+                                            <div class="${t.pnl >= 0 ? 'pnl-pos' : 'pnl-neg'}" style="font-size:16px; font-weight:900;">${pnlDisplay}</div>
+                                            <div style="font-size:9px; opacity:0.3;">${timeStr}</div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('');
+                            
+                            if (tradeLog.innerHTML !== newContent) {
+                                tradeLog.innerHTML = newContent;
+                                tradeLog.classList.add('update-flash');
+                                setTimeout(() => tradeLog.classList.remove('update-flash'), 500);
+                            }
+                        }
+                    }
+                }
+            } catch (e) { console.error("HUD Error:", e); }
+        }
+
+        async function updateIntelligence() {
+            try {
+                const response = await fetch('/api/intelligence');
+                if (!response.ok) throw new Error("API_DOWN");
+                const data = await response.json();
+                const intelList = document.getElementById('intel-list');
+                if (intelList) {
+                    const configs = data.top_configs || [];
+                    if (configs.length === 0) {
+                        intelList.innerHTML = `<div style="text-align:center; padding:20px; opacity:0.4; font-size:10px;">[ RECONNAISSANCE IN PROGRESS ]<br>SCANNING FOR EMPIRICAL SAMPLES...</div>`;
+                    } else {
+                        intelList.innerHTML = configs.slice(0, 5).map(c => `
+                            <div style="margin-bottom:8px; display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.02); padding-bottom:5px;">
+                                <span>${c.symbol} (SL:${c.sl || 0} TP:${c.tp || 0})</span>
+                                <span style="color:var(--neon-green)">+${(c.avg_pnl || 0).toFixed(2)}</span>
+                            </div>
+                        `).join('');
+                    }
+                }
+            } catch (e) { 
+                const intelList = document.getElementById('intel-list');
+                if (intelList) intelList.innerHTML = `<div style="color:var(--neon-red); text-align:center; padding:20px; font-size:10px;">⚠️ TACTICAL FEED FRACTURE<br>RE-ESTABLISHING LINK...</div>`;
+                console.error("Intelligence Error:", e);
+            }
+        }
+
+        window.toggleMode = async function() {
+            const isReal = document.getElementById('mode-lock').checked;
+            const mode = isReal ? "REAL" : "DEMO";
+            if (isReal && !confirm("⚠️ DANGER: ACTIVATE REAL MONEY MODE?\n\nThis will link the fleet to live market execution.")) {
+                document.getElementById('mode-lock').checked = false;
+                return;
+            }
+            try {
+                await fetch('/api/tactical/mode', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mode: mode })
+                });
+                updateHUD();
+            } catch (e) { alert("MODE SWITCH FAILED."); }
+        };
+
+        window.toggleSafety = function() {
+            const isArmed = document.getElementById('safety-lock').checked;
+            document.getElementById('btn-stop').disabled = !isArmed;
+            
+            if (isArmed) {
+                console.log("⚠️ TACTICAL SYSTEMS ARMED. USE EXTREME CAUTION.");
+            }
+        };
+
+        window.emergencyStop = async function() {
+            if (confirm("⚠️ ACTIVATE GLOBAL KILL-SWITCH?\n\nThis will suspend all bot logic across the fleet immediately.")) {
+                try {
+                    const res = await fetch('/api/tactical/stop', { method: 'POST' });
+                    const data = await res.json();
+                    if (data.status === "SUCCESS") {
+                        alert("🔴 EMERGENCY SIGNAL SENT. GLOBAL_PAUSE ACTIVATED.");
+                    }
+                } catch (e) { alert("FAIL: Could not send signal to HQ."); }
+            }
+        };
+
+        window.syncFleet = async function() {
+            const btn = event.currentTarget;
+            const originalText = btn.innerText;
+            btn.innerText = "SYNCING...";
+            btn.disabled = true;
+            try {
+                await fetch('/api/sync', { method: 'POST' });
+                await updateHUD();
+                await updateIntelligence();
+            } catch (e) { console.error("Sync Error:", e); }
+            btn.innerText = originalText;
+            btn.disabled = false;
+        };
+
+        // --- NEW SLIDE LOGIC ---
+        let currentSlide = 0;
+        window.toggleSlide = function() {
+            currentSlide = currentSlide === 0 ? 1 : 0;
+            const track = document.getElementById('event-slide-track');
+            const dot0 = document.getElementById('slide-dot-0');
+            const dot1 = document.getElementById('slide-dot-1');
+            
+            track.style.transform = `translateX(-${currentSlide * 50}%)`;
+            dot0.style.opacity = currentSlide === 0 ? 1 : 0.3;
+            dot1.style.opacity = currentSlide === 1 ? 1 : 0.3;
+        };
+
+        window.reinforce = async function(unit) {
+            const action = confirm(`INITIATE REINFORCEMENT FOR ${unit}?\n\nOK: Increase Scale (x1.5)\nCancel: De-escalate (Reset)`) ? 'reinforce' : 'reset';
+            try {
+                const res = await fetch('/api/tactical/reinforce', { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ unit: unit, action: action })
+                });
+                const data = await res.json();
+                if (data.status === "SUCCESS") {
+                    alert(`TACTICAL UPDATE: ${unit} ${action.toUpperCase()}ED.`);
+                    updateHUD();
+                }
+            } catch (e) { alert("REINFORCE FAILED: Check DNA access."); }
+        };
+
+        async function updateGitStatus() {
+            try {
+                const res = await fetch('/api/git_status');
+                const data = await res.json();
+                if (data.status === "SUCCESS") {
+                    const list = document.getElementById('git-list');
+                    list.innerHTML = data.commits.map(c => `
+                        <div class="git-commit">
+                            <span style="color:var(--neon-blue)">[${c.hash}]</span> ${c.msg}
+                            <div style="font-size:8px; opacity:0.5;">${c.rel}</div>
+                        </div>
+                    `).join('');
+                    
+                    document.getElementById('git-warning').style.display = data.is_dirty ? 'block' : 'none';
+                    
+                    if (data.uptime_seconds) {
+                        window.localUptimeSec = Math.floor(data.uptime_seconds);
+                    }
+                    
+                    // Update SRS Score
+                    const score = data.srs_score || 20;
+                    document.getElementById('srs-val').innerText = score + "%";
+                    document.getElementById('srs-bar').style.width = score + "%";
+                    if (score >= 40) document.getElementById('srs-bar').style.background = 'var(--neon-green)';
+                }
+            } catch (e) {}
+        }
+
+        // Local 1-second ticker for smooth clock & uptime visualization
+        window.localUptimeSec = 0;
+        setInterval(() => {
+            // Uptime tracked internally, HUD display removed for Phase 3
+            if (window.localUptimeSec > 0) {
+                window.localUptimeSec++;
+            }
+            // Ticker Local Time
+            const stEl = document.getElementById('clock-local');
+            if (stEl) {
+                const now = new Date();
+                const hh = String(now.getHours()).padStart(2, '0');
+                const mm = String(now.getMinutes()).padStart(2, '0');
+                const ss = String(now.getSeconds()).padStart(2, '0');
+                stEl.innerText = `${hh}:${mm}:${ss}`;
+            }
+        }, 1000);
+
+        setInterval(updateHUD, 3000);
+        setInterval(updateIntelligence, 10000);
+        setInterval(updateGitStatus, 15000);
+        updateHUD();
+        updateNeuralScan();
+        updateGitStatus();
+    </script>
+</body>
+</html>
