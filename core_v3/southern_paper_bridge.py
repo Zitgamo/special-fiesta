@@ -134,8 +134,13 @@ class SouthernPaperBridge:
         if not os.path.exists(TRADES_CSV):
             pd.DataFrame(columns=['unit_id', 'entry_t', 'exit_t', 'side', 'entry_p', 'exit_p', 'pnl_pts', 'reason']).to_csv(TRADES_CSV, index=False)
         
-        # --- INITIAL PULSE (v10.4) ---
-        # Export state immediately so report data is available
+        # --- SOVEREIGN VICTORY METRICS (v11.0) ---
+        self.peak_equity = self.current_balance_vnd
+        self.max_drawdown_vnd = 0
+        self.trade_stats = {"total": 0, "wins": 0, "losses": 0, "last_t": None}
+        self.prophecy_breach_active = False
+        
+        # --- INITIAL PULSE ---
         self.export_state(0)
 
         # --- CIRCUIT BREAKER STATE (v9.6) ---
@@ -208,7 +213,49 @@ class SouthernPaperBridge:
         uptime = datetime.now() - self.start_time
         uptime_str = str(uptime).split('.')[0] # HH:MM:SS
         
-        state = {"meta": {"uptime": uptime_str, "last_update": now_t}}
+        # --- VICTORY METRICS CALCULATION (v11.0) ---
+        total_pnl_pts = 0
+        for uid, u in self.units.items():
+            if u['pos'] != 0:
+                total_pnl_pts += (price - u['entry']) * u['pos']
+        
+        current_equity_vnd = self.current_balance_vnd + (total_pnl_pts * VND_PER_PT)
+        
+        # Track Peak & DD
+        if current_equity_vnd > self.peak_equity:
+            self.peak_equity = current_equity_vnd
+        
+        drawdown_vnd = self.peak_equity - current_equity_vnd
+        if drawdown_vnd > self.max_drawdown_vnd:
+            self.max_drawdown_vnd = drawdown_vnd
+            
+        # Check Prophecy Breach
+        breach_msg = "SAFE ✅"
+        try:
+            with open(os.path.join(DATA_DIR, "council_verdict.json"), "r") as f:
+                v = json.load(f)
+                min_b = v.get('min_boundary', 0)
+                max_b = v.get('max_boundary', 0)
+                if min_b > 0 and (price < min_b or price > max_b) and price > 0:
+                    breach_msg = f"⚠️ BREACH: {price:.1f} is outside [{min_b}-{max_b}]"
+                    if not self.prophecy_breach_active:
+                        self.prophecy_breach_active = True
+                        self.trigger_immediate_breach_alert(price, min_b, max_b)
+                elif min_b > 0 and price >= min_b and price <= max_b:
+                    self.prophecy_breach_active = False
+        except: pass
+
+        state = {
+            "meta": {
+                "uptime": uptime_str, 
+                "last_update": now_t,
+                "peak_equity": self.peak_equity,
+                "max_dd_vnd": self.max_drawdown_vnd,
+                "current_dd_vnd": drawdown_vnd,
+                "trade_stats": self.trade_stats,
+                "breach_status": breach_msg
+            }
+        }
         for uid, u in self.units.items():
             pnl_pts = round((price - u['entry']) * u['pos'], 2) if u['pos'] != 0 else 0
             state[uid] = {
