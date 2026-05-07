@@ -195,6 +195,12 @@ class SouthernPaperBridge:
             
             self.logger.info(f" [SQL_SYNC] {unit_id} Strike recorded to iron_core.db")
             
+            # --- VICTORY TRADE STATS (v11.0) ---
+            self.trade_stats['total'] += 1
+            if trade['pnl_pts'] > 0: self.trade_stats['wins'] += 1
+            else: self.trade_stats['losses'] += 1
+            self.trade_stats['last_t'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
             # --- COMPOUND EQUITY ---
             VND_PER_PT = 100000
             self.current_balance_vnd += (trade['pnl_pts'] * VND_PER_PT)
@@ -204,6 +210,17 @@ class SouthernPaperBridge:
             self.logger.error(f" !! [SQL_ERR] Could not sync paper trade: {e}")
 
         self.logger.info(f" [PAPER_STRIKE] {unit_id} {trade['side']} PnL: {trade['pnl_pts']:.2f} pts")
+
+    def trigger_immediate_breach_alert(self, price, min_b, max_b):
+        """Immediately bypasses the 'x2' interval to alert the Commander of a Prophecy Breach."""
+        self.logger.warning(f" !! [PROPHECY_BREACH] Price {price} broke boundaries [{min_b}-{max_b}]!")
+        try:
+            from fleet_report import FleetReporter
+            reporter = FleetReporter()
+            # Send the special Breach Card (v11.0 Recommended Format)
+            reporter.send_report(forced=True, is_breach=True)
+        except Exception as e:
+            self.logger.error(f" !! [ALERT_FAIL] Could not send breach alert: {e}")
 
     def export_state(self, price):
         VND_PER_PT = 100000

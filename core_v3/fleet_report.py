@@ -100,9 +100,7 @@ class FleetReporter:
         base_dir = os.path.dirname(os.path.abspath(__file__))
         state_path = os.path.join(base_dir, "report_state.json")
         with open(state_path, "w") as f:
-            json.dump(state, f, indent=4)
-
-    def send_report(self, forced=False):
+            json.dump(state, f    def send_report(self, forced=False, is_breach=False):
         state = self.load_state()
         current_time = time.time()
         base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -112,13 +110,20 @@ class FleetReporter:
         if not forced and (current_time - state['last_report_time']) < state['interval_seconds']:
             return False
 
-        # 2. GENERATE REPORT
-        status_report = self.get_status()
+        # 2. FETCH BRIDGE METRICS (Deterministic Retry)
+        bridge_meta = {}
+        for _ in range(5): # Retry loop instead of sleep
+            try:
+                with open(os.path.join(data_dir, "vn30_active_pos.json"), "r") as f:
+                    bridge_data = json.load(f)
+                    bridge_meta = bridge_data.get("meta", {})
+                    break
+            except: time.sleep(0.1)
+
+        # 3. CALCULATE STREAK & PROFIT
+        uptime_str = bridge_meta.get("uptime", "0:00:00")
         
-        # 3. CALCULATE STREAK METRICS
-        uptime_hours = (current_time - state['streak_start_time']) / 3600
-        
-        # Get Current Equity for Profit calculation
+        # Equity Calc
         try:
             import sqlite3
             db_path = os.path.join(base_dir, "iron_core.db")
@@ -132,57 +137,75 @@ class FleetReporter:
         
         if state['streak_start_equity'] == 0:
             state['streak_start_equity'] = current_equity
-            self.save_state(state) # Save immediately to lock in the start point
+            self.save_state(state)
             
         profit = current_equity - state['streak_start_equity']
         
-        # Estimation of decision cycles (Assuming 30s loop)
-        cycles = int((current_time - state['streak_start_time']) / 30)
-
+        # Drawdown Stats
+        peak = bridge_meta.get("peak_equity", current_equity)
+        curr_dd = bridge_meta.get("current_dd_vnd", 0) / 100000 # Convert to pts
+        max_dd = bridge_meta.get("max_dd_vnd", 0) / 100000 # Convert to pts
+        dd_pct = (curr_dd / (peak/100000)) * 100 if peak > 0 else 0
+        
+        # Trade Stats
+        ts = bridge_meta.get("trade_stats", {"total": 0, "wins": 0, "losses": 0, "last_t": "Never"})
+        win_rate = (ts['wins'] / ts['total'] * 100) if ts['total'] > 0 else 0
+        
         # 4. FETCH COUNCIL PROPHECY
-        council_info = "<i>Prophecy Loading...</i>"
+        council_info = "NEUTRAL"
+        min_b, max_b = 0, 0
         try:
-            v_path = os.path.join(data_dir, "council_verdict.json")
-            if os.path.exists(v_path):
-                # Persistence Guard: Small wait for disk sync
-                time.sleep(0.5) 
-                with open(v_path, "r") as f:
-                    v = json.load(f)
-                    # Use .get with robust defaults
-                    bias = v.get('bias') or v.get('bias_verdict', 'NEUTRAL')
-                    min_b = v.get('min_boundary', 0)
-                    max_b = v.get('max_boundary', 0)
-                    council_info = f"<b>BIAS</b>: {bias} | <b>RANGE</b>: [{min_b} - {max_b}]"
-        except Exception as e:
-            council_info = f"<i>Council Syncing... ({str(e)})</i>"
+            with open(os.path.join(data_dir, "council_verdict.json"), "r") as f:
+                v = json.load(f)
+                council_info = v.get('bias') or v.get('bias_verdict', 'NEUTRAL')
+                min_b = v.get('min_boundary', 0)
+                max_b = v.get('max_boundary', 0)
+        except: pass
 
-        # 5. CONSTRUCT TACTICAL CARD
-        title = "🛡️ **SOVEREIGN STABILITY STREAK** 🛡️"
-        if state.get("reset_occurred"):
-            title = "⚠️ **STREAK RESET: INCIDENT DETECTED** ⚠️"
-            state['reset_occurred'] = False
-            
+        # 5. CONSTRUCT RECOMMENDED FORMAT (v11.0)
+        status_report = self.get_status()
+        
+        header = "🛡️ **SOVEREIGN HEARTBEAT**"
+        if is_breach:
+            header = "🚨 **PROPHECY BREACH DETECTED**"
+        
+        # Boundary Visual
+        live_p = 0
+        try: # Fetch current price from active pos (approx)
+            with open(os.path.join(data_dir, "vn30_active_pos.json"), "r") as f:
+                d = json.load(f)
+                # If we had a live price field it would be better
+        except: pass
+        
+        breach_status = bridge_meta.get("breach_status", "SAFE ✅")
+        
         final_report = (
-            f"{title}\n"
-            f"━━━━━━━━━━━━━━━━━━\n"
-            f"🏆 **STABILITY**: `{uptime_hours:.1f} HOURS`\n"
-            f"🔄 **CYCLES**: `{cycles:,} GREEN`\n"
-            f"💰 **PROFIT**: `${profit:+.2f}`\n\n"
-            f"🔮 **COUNCIL**: {council_info}\n"
-            f"💎 **STATUS**: `INTERVAL x2 ({state['interval_seconds']/3600:.0f}H)`\n"
-            f"━━━━━━━━━━━━━━━━━━\n"
+            f"{header} — T+{uptime_str}\n"
+            f"━━━━━━━━━━━━━━━━━━━━━\n"
+            f"🏆 **STABILITY**  : `{uptime_str} continuous`\n"
+            f"💰 **EQUITY**     : `${current_equity:,.2f}` | Peak: `${peak/100000:,.2f}`\n"
+            f"📉 **DRAWDOWN**   : `${curr_dd:,.2f}` (`{dd_pct:.1f}%`) | Max: `${max_dd:,.2f}`\n"
+            f"⚔️ **TRADES**     : `{ts['total']} total` | W/L: `{ts['wins']}/{ts['losses']}` | WR: `{win_rate:.1f}%` \n"
+            f"━━━━━━━━━━━━━━━━━━━━━\n"
+            f"🔮 **COUNCIL**    : BIAS `{council_info}`\n"
+            f"🚧 **BOUNDARY**   : `[{min_b}]` ←── `{breach_status}` ──→ `[{max_b}]` \n"
+            f"⏳ **NEXT PULSE** : `x2 Interval` ({state['interval_seconds']/3600:.1f}H cap)\n"
+            f"━━━━━━━━━━━━━━━━━━━━━\n"
             f"{status_report}"
         )
 
-        # 5. EXECUTE BROADCAST
+        # 6. EXECUTE BROADCAST
         if self.comm:
             self.comm.notify(final_report)
             
-        # 6. UPDATE STATE (Exponential Silence)
+        # 7. UPDATE STATE (Exponential Silence - CAP AT 8H)
         state['last_report_time'] = current_time
-        state['interval_seconds'] *= 2 # Double the silence
-        self.save_state(state)
+        if not is_breach: # Only double if it was a normal report
+            state['interval_seconds'] = min(state['interval_seconds'] * 2, 8 * 3600)
         
+        self.save_state(state)
+        return True
+    
         print(f" >> [SSS] Report sent. Next in {state['interval_seconds']/3600:.0f} hours.")
         return True
 
