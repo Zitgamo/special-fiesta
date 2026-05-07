@@ -33,7 +33,7 @@ def run_audit():
     if os.path.exists(master_path):
         with open(master_path, 'r') as f:
             content = f.read()
-            if "self.perform_market_scan()" in content:
+            if "self.logistics.perform_market_scan()" in content:
                 results["DISCOVERY (Scanner)"] = "PASS"
             else:
                 results["DISCOVERY (Scanner)"] = "FAIL"

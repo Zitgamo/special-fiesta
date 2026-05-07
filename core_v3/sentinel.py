@@ -2,6 +2,8 @@ import psutil
 import subprocess
 import time
 import os
+import datetime
+import json
 from ghost_comm import GhostComm
 
 class IronSentinel:
@@ -48,7 +50,6 @@ class IronSentinel:
         return False
 
     def resurrect(self, name):
-        import datetime
         crash_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         msg = f" !! [SENTINEL] {name} has fallen! Initiating Emergency Resurrection at {crash_time}..."
         print(msg)
@@ -125,7 +126,33 @@ class IronSentinel:
                 self.auto_scribe()
                 self.last_scribe = time.time()
             
+            # 6. AUTONOMOUS CLEANUP (The Janitor Handshake)
+            self.autonomous_cleanup()
+            
             time.sleep(5)
+
+    def autonomous_cleanup(self):
+        """
+        SMA v1.0 Rule 5: Orchestrated Cleanup.
+        Triggers janitor.py if more than 24h passed since last report.
+        """
+        report_path = "logs/janitor_report.json"
+        try:
+            should_run = False
+            if not os.path.exists(report_path):
+                should_run = True
+            else:
+                with open(report_path, 'r') as f:
+                    report = json.load(f)
+                last_ts = datetime.datetime.fromisoformat(report.get("timestamp", "2000-01-01"))
+                if (datetime.datetime.now() - last_ts).total_seconds() > 86400: # 24 Hours
+                    should_run = True
+            
+            if should_run:
+                print(" >> [SENTINEL] Cleanup Overdue. Summoning the Janitor...")
+                subprocess.Popen(["python", "janitor.py", "--run"])
+        except Exception as e:
+            print(f" !! [JANITOR_TRIGGER_ERR] {e}")
 
     def monitor_engine_logs(self):
         """Detects patterns like 'Invalid volume' and alerts the user."""
